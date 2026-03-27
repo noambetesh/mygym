@@ -1,14 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createRoot } from "react-dom/client";
 import { motion, AnimatePresence } from "framer-motion";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Switch } from "@/components/ui/switch";
-import { Slider } from "@/components/ui/slider";
-import { Input } from "@/components/ui/input";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Play, Pause, RotateCcw, SkipForward, SkipBack, Dumbbell, Flame, Clock3,
   CheckCircle2, Youtube, TimerReset, Volume2, VolumeX, Home, ListChecks,
@@ -16,7 +8,78 @@ import {
   Bot, Sparkles, X, Send, MessageCircle, ExternalLink, TrendingUp, RefreshCcw, Bell, AlertTriangle, FlameKindle, Plus
 } from "lucide-react";
 
-// --- Types ---
+// ==========================================
+// 1. INLINE UI COMPONENTS (Zero External Dependencies)
+// ==========================================
+const Card = ({ className, children }: any) => <div className={`bg-zinc-900 border border-zinc-800 rounded-3xl overflow-hidden ${className || ''}`}>{children}</div>;
+const CardHeader = ({ className, children }: any) => <div className={className?.includes('p-') ? className : `p-6 pb-2 ${className || ''}`}>{children}</div>;
+const CardTitle = ({ className, children }: any) => <h3 className={`text-xl font-bold ${className || ''}`}>{children}</h3>;
+const CardDescription = ({ className, children }: any) => <p className={`text-sm text-zinc-400 ${className || ''}`}>{children}</p>;
+const CardContent = ({ className, children }: any) => <div className={className?.includes('p-') ? className : `p-6 ${className || ''}`}>{children}</div>;
+
+const Button = React.forwardRef(({ className, variant = 'default', size = 'default', asChild, ...props }: any, ref: any) => {
+  const base = "inline-flex items-center justify-center font-bold transition-all focus:outline-none disabled:opacity-50 disabled:pointer-events-none cursor-pointer";
+  const variants: any = {
+    default: "bg-zinc-100 text-zinc-950 hover:bg-white",
+    outline: "border border-zinc-700 bg-transparent hover:bg-zinc-800 text-zinc-100",
+    ghost: "bg-transparent hover:bg-zinc-800 text-zinc-100",
+    destructive: "bg-red-900/40 text-red-400 hover:bg-red-900/60 border border-red-900/50",
+    secondary: "bg-zinc-800 text-zinc-100 hover:bg-zinc-700",
+    link: "text-indigo-400 hover:underline bg-transparent"
+  };
+  const sizes: any = {
+    default: "h-10 px-4 py-2 rounded-xl",
+    sm: "h-9 px-3 rounded-lg text-sm",
+    lg: "h-14 px-8 rounded-2xl text-lg",
+    icon: "h-10 w-10 rounded-full flex items-center justify-center shrink-0"
+  };
+  if (asChild) {
+    const child = React.Children.only(props.children);
+    return React.cloneElement(child, {
+      ref,
+      ...props,
+      className: `${base} ${variants[variant] || variants.default} ${sizes[size] || sizes.default} ${className || ''} ${child.props.className || ''}`,
+    });
+  }
+  return <button ref={ref} className={`${base} ${variants[variant] || variants.default} ${sizes[size] || sizes.default} ${className || ''}`} {...props} />;
+});
+
+const Badge = ({ className, variant = 'default', children }: any) => {
+  const base = "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-bold transition-colors";
+  const variants: any = {
+    default: "bg-zinc-100 text-zinc-950",
+    secondary: "bg-zinc-800 text-zinc-200",
+    outline: "border border-zinc-700 text-zinc-300"
+  };
+  return <div className={`${base} ${variants[variant] || variants.default} ${className || ''}`}>{children}</div>;
+};
+
+const Input = React.forwardRef(({ className, ...props }: any, ref: any) => (
+  <input ref={ref} className={`flex h-10 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2 text-sm text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-indigo-500 disabled:opacity-50 ${className || ''}`} {...props} />
+));
+
+const Switch = ({ checked, onCheckedChange }: any) => (
+  <button type="button" role="switch" aria-checked={checked} onClick={() => onCheckedChange(!checked)} className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full border-2 border-transparent transition-colors focus:outline-none ${checked ? 'bg-indigo-600' : 'bg-zinc-700'}`}>
+    <span className={`pointer-events-none block h-5 w-5 rounded-full bg-white shadow-lg transition-transform ${checked ? 'translate-x-5' : 'translate-x-0'}`} />
+  </button>
+);
+
+const Progress = ({ value, className }: any) => (
+  <div className={`relative h-2 w-full overflow-hidden rounded-full bg-zinc-800 ${className || ''}`}>
+    <div className="h-full bg-emerald-500 transition-all duration-500" style={{ width: `${Math.max(0, Math.min(100, value || 0))}%` }} />
+  </div>
+);
+
+const Slider = ({ value, min, max, step, onValueChange, className }: any) => (
+  <input type="range" min={min} max={max} step={step} value={value[0]} onChange={(e) => onValueChange([parseFloat(e.target.value)])} className={`w-full accent-indigo-500 ${className || ''}`} />
+);
+
+const ScrollArea = ({ className, children }: any) => <div className={`overflow-y-auto overflow-x-hidden ${className || ''}`}>{children}</div>;
+
+
+// ==========================================
+// 2. CORE TYPES & DATA
+// ==========================================
 type MuscleGroup = "Back" | "Chest" | "Legs" | "Shoulders" | "Arms" | "Core" | "FullBody";
 
 type Exercise = {
@@ -50,7 +113,6 @@ type SetRecord = {
   date: number; // timestamp
 };
 
-// --- Images Mapping ---
 const imageByMuscle: Record<MuscleGroup, string> = {
   Back: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop",
   Chest: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800&auto=format&fit=crop",
@@ -61,7 +123,6 @@ const imageByMuscle: Record<MuscleGroup, string> = {
   FullBody: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800&auto=format&fit=crop",
 };
 
-// --- Data ---
 const initialDays: DayPlan[] =[
   {
     key: "day1",
@@ -165,15 +226,14 @@ const initialDays: DayPlan[] =[
   },
 ];
 
-// Flat list of all main exercises to serve as swap options
 const allExercisesPool = initialDays.flatMap(d => d.exercises);
-
 const iconByCategory = { pull: Dumbbell, push: Flame, legs: Trophy, armor: Swords, power: Activity, core: CheckCircle2, bonus: CheckCircle2 };
 
-// --- Custom Hooks ---
-
+// ==========================================
+// 3. CUSTOM HOOKS
+// ==========================================
 function useLocalStorage<T>(key: string, initialValue: T) {
-  const[storedValue, setStoredValue] = useState<T>(() => {
+  const [storedValue, setStoredValue] = useState<T>(() => {
     if (typeof window === "undefined") return initialValue;
     try {
       const item = window.localStorage.getItem(key);
@@ -240,30 +300,23 @@ function useWakeLock(active: boolean) {
 }
 
 function usePushNotifications() {
-  const[enabled, setEnabled] = useLocalStorage("reacher_notifications", false);
-
+  const [enabled, setEnabled] = useLocalStorage("reacher_notifications", false);
   const requestPermission = async () => {
     if (!("Notification" in window)) return false;
-    if (Notification.permission === "granted") {
-      setEnabled(true);
-      return true;
-    }
+    if (Notification.permission === "granted") { setEnabled(true); return true; }
     const perm = await Notification.requestPermission();
     const isGranted = perm === "granted";
     setEnabled(isGranted);
     return isGranted;
   };
-
   const notify = useCallback((title: string, body: string) => {
     if (enabled && "Notification" in window && Notification.permission === "granted") {
       new Notification(title, { body, icon: "/favicon.ico" });
     }
   }, [enabled]);
-
   return { enabled, requestPermission, notify };
 }
 
-// --- Helper Functions ---
 function formatTime(total: number) {
   const m = Math.floor(total / 60);
   const s = total % 60;
@@ -274,11 +327,13 @@ function youtubeUrl(name: string) {
   return `https://www.youtube.com/results?search_query=${encodeURIComponent(`${name} proper form workout`)}`;
 }
 
-// --- AI Chat Modal Component ---
+// ==========================================
+// 4. AI COACH COMPONENT
+// ==========================================
 function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKey: string, onClose: () => void }) {
   const [question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
-  const[chatHistory, setChatHistory] = useState<{role: 'user'|'ai', text: string}[]>([
+  const [chatHistory, setChatHistory] = useState<{role: 'user'|'ai', text: string}[]>([
     { role: 'ai', text: `מאמן ה-AI איתך! מטרה: מבנה של ריצ'ר. מה הבעיה עם ${exercise.name}?` }
   ]);
 
@@ -302,13 +357,11 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
     setLoading(true);
   
     try {
-      // ה-Prompt המקצועי שמתמקד בבנייה מקסימלית וביומכניקה
       const prompt = `You are an elite bodybuilding coach. The user wants a physique like 'Reacher' (massive, functional). Focus on: Maximum recruitment, free weights over machines, and biomechanical cues. 
       The user is asking about: ${exercise.name}. 
       Question: ${text}. 
       Answer in HEBREW, be concise (3 short sentences max), and provide one high-level 'Pro-Tip' for muscle growth. No asterisks or formatting.`;
   
-      // עודכן לגרסת 1.5-flash ליציבות ואמינות
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -329,13 +382,9 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} 
                   className="bg-zinc-900 border border-zinc-700 w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[85vh] max-h-[700px]">
-        
-        {/* Header */}
         <div className="bg-gradient-to-r from-indigo-900 to-zinc-900 p-4 border-b border-zinc-800 flex justify-between items-center">
           <div className="flex items-center gap-3">
-             <div className="bg-indigo-500/20 p-2 rounded-full border border-indigo-500/30">
-                <Bot className="h-6 w-6 text-indigo-400" />
-             </div>
+             <div className="bg-indigo-500/20 p-2 rounded-full border border-indigo-500/30"><Bot className="h-6 w-6 text-indigo-400" /></div>
              <div>
                <h3 className="font-bold text-lg text-white">Reacher AI Coach <Sparkles className="inline w-4 h-4 text-amber-400 mb-1" /></h3>
                <p className="text-xs text-indigo-200">{exercise.name}</p>
@@ -344,7 +393,6 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
           <Button variant="ghost" size="icon" onClick={onClose} className="text-zinc-400 hover:text-white"><X className="h-5 w-5"/></Button>
         </div>
 
-        {/* Body */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4" dir="rtl">
           {!apiKey ? (
             <div className="h-full flex flex-col items-center justify-center text-center space-y-6 px-4">
@@ -377,10 +425,8 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
           )}
         </div>
 
-        {/* Quick Actions & Input Area */}
         {apiKey && (
           <div className="p-4 border-t border-zinc-800 bg-zinc-950 flex flex-col gap-3" dir="rtl">
-             {/* Quick Prompts */}
              <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                {quickPrompts.map((qp, idx) => {
                  const Icon = qp.icon;
@@ -391,7 +437,6 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
                  );
                })}
              </div>
-             
              <div className="flex gap-2">
                 <Button onClick={() => askGemini(question)} disabled={loading || !question.trim()} className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-4">
                   <Send className="w-5 h-5" />
@@ -401,7 +446,7 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
                   onChange={(e) => setQuestion(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && askGemini(question)}
                   placeholder="הקלד שאלה חופשית..." 
-                  className="flex-1 bg-zinc-900 border-zinc-700 rounded-xl text-right"
+                  className="flex-1 text-right"
                 />
              </div>
           </div>
@@ -411,49 +456,44 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
   );
 }
 
-// --- Main Application ---
-export default function ReacherApp() {
-  const [screen, setScreen] = useState<"home" | "day" | "live" | "analytics" | "settings">("home");
-  const[viewMode, setViewMode] = useState<"days" | "muscles">("days");
+// ==========================================
+// 5. MAIN APP COMPONENT
+// ==========================================
+function ReacherApp() {
+  const[screen, setScreen] = useState<"home" | "day" | "live" | "analytics" | "settings">("home");
+  const [viewMode, setViewMode] = useState<"days" | "muscles">("days");
   
-  // Persisted App State
-  const[exerciseHistory, setExerciseHistory] = useLocalStorage<Record<string, SetRecord[]>>("reacher_history", {});
+  const [exerciseHistory, setExerciseHistory] = useLocalStorage<Record<string, SetRecord[]>>("reacher_history", {});
   const [swaps, setSwaps] = useLocalStorage<Record<string, string>>("reacher_swaps", {});
   const[weeklyProgress, setWeeklyProgress] = useLocalStorage<Record<string, boolean>>("reacher_weekly", {});
   const[geminiApiKey, setGeminiApiKey] = useLocalStorage<string>("reacher_gemini_api_key", "");
   
-  // Settings
   const [soundOn, setSoundOn] = useLocalStorage("reacher_sound", true);
-  const[autoAdvance, setAutoAdvance] = useLocalStorage("reacher_auto", true);
-  const[globalWorkAdjust, setGlobalWorkAdjust] = useLocalStorage("reacher_work_adj", 100);
+  const [autoAdvance, setAutoAdvance] = useLocalStorage("reacher_auto", true);
+  const [globalWorkAdjust, setGlobalWorkAdjust] = useLocalStorage("reacher_work_adj", 100);
   const [globalRestAdjust, setGlobalRestAdjust] = useLocalStorage("reacher_rest_adj", 100);
 
-  // External hooks
   const { initAudio, playBeep } = useAudioBeep();
   const { enabled: pushEnabled, requestPermission, notify } = usePushNotifications();
   
-  // Live Workout & State
-  const[selectedDayKey, setSelectedDayKey] = useState(initialDays[0].key);
+  const [selectedDayKey, setSelectedDayKey] = useState(initialDays[0].key);
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const[setIndex, setSetIndex] = useState(0);
-  const[phase, setPhase] = useState<"work" | "rest" | "done">("work");
+  const [phase, setPhase] = useState<"work" | "rest" | "done">("work");
   const [running, setRunning] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(0);
   const[targetTime, setTargetTime] = useState<number | null>(null);
   
-  // Logger State (Current Set)
   const [currentWeight, setCurrentWeight] = useState<string>("");
-  const[currentReps, setCurrentReps] = useState<string>("");
+  const [currentReps, setCurrentReps] = useState<string>("");
   const [currentRpe, setCurrentRpe] = useState<number>(8);
   const[isWarmup, setIsWarmup] = useState(false);
 
-  // Modals
   const[aiExerciseToAsk, setAiExerciseToAsk] = useState<Exercise | null>(null);
-  const[swapExerciseOrigin, setSwapExerciseOrigin] = useState<Exercise | null>(null);
+  const [swapExerciseOrigin, setSwapExerciseOrigin] = useState<Exercise | null>(null);
 
   useWakeLock(running);
 
-  // --- Derived State (Handling Swaps) ---
   const days = useMemo(() => {
     return initialDays.map(day => ({
       ...day,
@@ -461,7 +501,7 @@ export default function ReacherApp() {
         const swappedId = swaps[ex.id];
         if (swappedId) {
           const alternative = allExercisesPool.find(e => e.id === swappedId);
-          if (alternative) return { ...alternative, originalIdForSwap: ex.id }; // tracking swap
+          if (alternative) return { ...alternative, originalIdForSwap: ex.id };
         }
         return ex;
       })
@@ -471,7 +511,6 @@ export default function ReacherApp() {
   const selectedDay = useMemo(() => days.find((d) => d.key === selectedDayKey) ?? days[0],[days, selectedDayKey]);
   const liveExercise = selectedDay.exercises[exerciseIndex];
   
-  // Get last set's data for overload recommendation
   const previousSetRecord = useMemo(() => {
     if (!liveExercise) return null;
     const history = exerciseHistory[liveExercise.id] ||[];
@@ -479,7 +518,6 @@ export default function ReacherApp() {
     return workingSets.length > 0 ? workingSets[0] : null;
   }, [liveExercise, exerciseHistory]);
 
-  // Pre-fill logger when exercise changes
   useEffect(() => {
     if (previousSetRecord) {
       setCurrentWeight(previousSetRecord.weight.toString());
@@ -494,7 +532,6 @@ export default function ReacherApp() {
   function adjustedWork(ex: Exercise) { return Math.max(10, Math.round((ex.work * globalWorkAdjust) / 100)); }
   function adjustedRest(ex: Exercise) { return Math.max(10, Math.round((ex.rest * globalRestAdjust) / 100)); }
 
-  // --- Accurate Timer Logic ---
   useEffect(() => {
     if (!running || targetTime === null) return;
     const interval = setInterval(() => {
@@ -505,17 +542,8 @@ export default function ReacherApp() {
       if (remaining <= 0) {
         clearInterval(interval);
         if (soundOn) playBeep();
-        
-        // Notify if it was a rest phase
-        if (phase === "rest" && pushEnabled) {
-          notify("Time to lift!", `Rest is over. Get ready for ${liveExercise?.name}`);
-        }
-
-        if (autoAdvance) {
-          setTimeout(() => handleNextStep(), 100);
-        } else {
-          setRunning(false);
-        }
+        if (phase === "rest" && pushEnabled) notify("Time to lift!", `Rest is over. Get ready for ${liveExercise?.name}`);
+        if (autoAdvance) setTimeout(() => handleNextStep(), 100); else setRunning(false);
       }
     }, 100);
     return () => clearInterval(interval);
@@ -525,11 +553,7 @@ export default function ReacherApp() {
     const w = parseFloat(currentWeight) || 0;
     const r = parseInt(currentReps) || parseInt(liveExercise?.reps.split('-')[0]) || 0;
     const record: SetRecord = { weight: w, reps: r, rpe: currentRpe, isWarmup, date: Date.now() };
-    
-    setExerciseHistory(prev => ({
-      ...prev,
-      [exId]:[...(prev[exId] ||[]), record]
-    }));
+    setExerciseHistory(prev => ({ ...prev, [exId]:[...(prev[exId] ||[]), record] }));
   };
 
   const handleNextStep = useCallback(() => {
@@ -539,15 +563,12 @@ export default function ReacherApp() {
         if (!ex) return currSetIdx;
 
         if (phase === "work") {
-          // Log the set!
           saveCurrentSetToHistory(ex.id);
-
-          // If it was a warmup, we don't advance the working set counter!
           if (isWarmup) {
             setPhase("rest");
-            const restTime = adjustedRest(ex) * 0.7; // Shorter rest for warmups
+            const restTime = adjustedRest(ex) * 0.7;
             setSecondsLeft(restTime);
-            setIsWarmup(false); // Default back to working set
+            setIsWarmup(false);
             if (running || autoAdvance) setTargetTime(Date.now() + restTime * 1000);
             return currSetIdx; 
           }
@@ -571,7 +592,6 @@ export default function ReacherApp() {
           return currSetIdx;
         } 
         
-        // Phase is REST
         const isLastSet = currSetIdx + 1 >= ex.sets;
         if (isLastSet) {
           const nextEx = selectedDay.exercises[currExIdx + 1];
@@ -644,7 +664,7 @@ export default function ReacherApp() {
       setRunning(false);
       setTargetTime(null);
     } else {
-      if (pushEnabled) requestPermission(); // good time to ask
+      if (pushEnabled) requestPermission();
       setRunning(true);
       setTargetTime(Date.now() + secondsLeft * 1000);
     }
@@ -658,36 +678,27 @@ export default function ReacherApp() {
     return `${d.getUTCFullYear()}-W${weekNo}`;
   };
 
-  // Build Analytics Data
   const analyticsData = useMemo(() => {
-     // Get top 5 exercises user logged most
      const counts = Object.entries(exerciseHistory).map(([id, records]) => ({ id, count: records.length, maxWeight: Math.max(...records.map(r=>r.weight)) }));
      counts.sort((a,b) => b.count - a.count);
      const topIds = counts.slice(0, 5).map(c => c.id);
      
-     const topExercisesInfo = topIds.map(id => {
+     return topIds.map(id => {
        const ex = allExercisesPool.find(e => e.id === id);
        const records = exerciseHistory[id].filter(r=>!r.isWarmup).sort((a,b)=>a.date - b.date);
-       // We'll take the first logged weight vs last logged weight
        const firstW = records[0]?.weight || 0;
        const lastW = records[records.length - 1]?.weight || 0;
        const progressPercent = firstW > 0 ? ((lastW - firstW) / firstW) * 100 : 0;
        return { name: ex?.name || id, firstW, lastW, progressPercent, muscle: ex?.muscleGroup };
      });
-     return topExercisesInfo;
   }, [exerciseHistory]);
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-50 font-sans selection:bg-zinc-800 relative pb-10">
-      
-      {/* AI Modal Portal */}
       <AnimatePresence>
-        {aiExerciseToAsk && (
-          <AiCoachModal exercise={aiExerciseToAsk} apiKey={geminiApiKey} onClose={() => setAiExerciseToAsk(null)} />
-        )}
+        {aiExerciseToAsk && <AiCoachModal exercise={aiExerciseToAsk} apiKey={geminiApiKey} onClose={() => setAiExerciseToAsk(null)} />}
       </AnimatePresence>
 
-      {/* SWAP Modal Portal */}
       <AnimatePresence>
         {swapExerciseOrigin && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
@@ -697,7 +708,7 @@ export default function ReacherApp() {
                  <Button variant="ghost" size="icon" onClick={() => setSwapExerciseOrigin(null)}><X className="h-5 w-5"/></Button>
                </div>
                <p className="text-sm text-zinc-400 mb-4">Select an alternative for <strong className="text-white">{swapExerciseOrigin.name}</strong> ({swapExerciseOrigin.muscleGroup}):</p>
-               <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+               <div className="space-y-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                  {allExercisesPool.filter(e => e.muscleGroup === swapExerciseOrigin.muscleGroup && e.id !== swapExerciseOrigin.id).map(alt => (
                    <div key={alt.id} className="bg-zinc-950 border border-zinc-800 p-4 rounded-2xl flex justify-between items-center hover:border-zinc-600 transition-colors">
                       <div>
@@ -705,16 +716,13 @@ export default function ReacherApp() {
                         <div className="text-xs text-zinc-500">{alt.category.toUpperCase()}</div>
                       </div>
                       <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg" onClick={() => {
-                        // The key in swaps should be the ORIGINAL id.
                         const origId = (swapExerciseOrigin as any).originalIdForSwap || swapExerciseOrigin.id;
                         setSwaps(prev => ({ ...prev, [origId]: alt.id }));
                         setSwapExerciseOrigin(null);
-                      }}>
-                        Select
-                      </Button>
+                      }}>Select</Button>
                    </div>
                  ))}
-                 <Button variant="outline" className="w-full mt-4 border-red-900/50 text-red-400 hover:bg-red-900/20" onClick={() => {
+                 <Button variant="outline" className="w-full mt-4 text-red-400 hover:bg-red-900/20" onClick={() => {
                     const origId = (swapExerciseOrigin as any).originalIdForSwap || swapExerciseOrigin.id;
                     const newSwaps = {...swaps}; delete newSwaps[origId]; setSwaps(newSwaps);
                     setSwapExerciseOrigin(null);
@@ -726,30 +734,18 @@ export default function ReacherApp() {
       </AnimatePresence>
 
       <div className="mx-auto max-w-7xl p-4 md:p-6 lg:p-8">
-        
-        {/* Header Dashboard */}
         <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 overflow-hidden rounded-[2rem] border border-zinc-800/60 bg-zinc-900/40 p-6 md:p-8 backdrop-blur-xl shadow-2xl">
             <div>
               <div className="mb-4 flex items-center gap-2 flex-wrap">
-                <Badge variant="outline" className="border-indigo-500/30 bg-indigo-500/10 text-indigo-300 backdrop-blur-md">
-                  <Sparkles className="w-3 h-3 mr-1 inline" /> Beast Mode
-                </Badge>
-                <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300 backdrop-blur-md">
-                  <TrendingUp className="w-3 h-3 mr-1 inline" /> Overload Tracked
-                </Badge>
+                <Badge variant="outline" className="border-indigo-500/30 bg-indigo-500/10 text-indigo-300 backdrop-blur-md"><Sparkles className="w-3 h-3 mr-1 inline" /> Beast Mode</Badge>
+                <Badge variant="outline" className="border-emerald-500/30 bg-emerald-500/10 text-emerald-300 backdrop-blur-md"><TrendingUp className="w-3 h-3 mr-1 inline" /> Overload Tracked</Badge>
               </div>
               <h1 className="text-4xl md:text-6xl font-black tracking-tight bg-gradient-to-br from-white to-zinc-500 bg-clip-text text-transparent">Reacher.</h1>
-              <p dir="rtl" className="mt-3 max-w-xl text-lg text-zinc-400 font-medium">
-                תכנית היפרטרופיה מתקדמת. עוקב אחרי משקלים, RPE, מנתח התקדמות, ומאמן אותך בזמן אמת.
-              </p>
+              <p dir="rtl" className="mt-3 max-w-xl text-lg text-zinc-400 font-medium">תכנית היפרטרופיה מתקדמת. עוקב אחרי משקלים, RPE, מנתח התקדמות, ומאמן אותך בזמן אמת.</p>
             </div>
-            
             <div className="flex flex-col gap-3 min-w-[200px]">
-              <div className="flex items-center justify-between text-sm font-semibold text-zinc-400">
-                <span>Weekly Streak</span>
-                <CalendarDays className="h-4 w-4" />
-              </div>
+              <div className="flex items-center justify-between text-sm font-semibold text-zinc-400"><span>Weekly Streak</span><CalendarDays className="h-4 w-4" /></div>
               <div className="flex gap-2">
                 {initialDays.map(d => {
                   const isDone = weeklyProgress[`${getCurrentWeekKey()}-${d.key}`];
@@ -764,23 +760,33 @@ export default function ReacherApp() {
           </div>
         </motion.div>
 
-        {/* Navigation */}
-        <Tabs value={screen} onValueChange={(v) => setScreen(v as any)} className="space-y-8">
-          <TabsList className="grid h-auto w-full max-w-3xl grid-cols-5 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-1.5 backdrop-blur-xl overflow-x-auto scrollbar-hide">
-            <TabsTrigger value="home" className="rounded-xl py-3 data-[state=active]:bg-zinc-800 transition-all text-xs sm:text-sm"><Home className="sm:mr-2 h-4 w-4" /><span className="hidden sm:inline">Home</span></TabsTrigger>
-            <TabsTrigger value="day" className="rounded-xl py-3 data-[state=active]:bg-zinc-800 transition-all text-xs sm:text-sm"><ListChecks className="sm:mr-2 h-4 w-4" /><span className="hidden sm:inline">Routine</span></TabsTrigger>
-            <TabsTrigger value="live" className="rounded-xl py-3 data-[state=active]:bg-zinc-800 transition-all text-xs sm:text-sm"><Play className="sm:mr-2 h-4 w-4" /><span className="hidden sm:inline">Live</span></TabsTrigger>
-            <TabsTrigger value="analytics" className="rounded-xl py-3 data-[state=active]:bg-zinc-800 transition-all text-xs sm:text-sm"><TrendingUp className="sm:mr-2 h-4 w-4" /><span className="hidden sm:inline">Stats</span></TabsTrigger>
-            <TabsTrigger value="settings" className="rounded-xl py-3 data-[state=active]:bg-zinc-800 transition-all text-xs sm:text-sm"><Settings2 className="sm:mr-2 h-4 w-4" /><span className="hidden sm:inline">Settings</span></TabsTrigger>
-          </TabsList>
+        {/* --- CUSTOM NAVIGATION (Replaces Radix Tabs) --- */}
+        <div className="grid h-auto w-full max-w-3xl grid-cols-5 gap-1 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-1.5 backdrop-blur-xl mb-8 overflow-x-auto">
+          {[
+            { id: "home", icon: Home, label: "Home" },
+            { id: "day", icon: ListChecks, label: "Routine" },
+            { id: "live", icon: Play, label: "Live" },
+            { id: "analytics", icon: TrendingUp, label: "Stats" },
+            { id: "settings", icon: Settings2, label: "Settings" }
+          ].map(tab => {
+            const Icon = tab.icon;
+            const isActive = screen === tab.id;
+            return (
+              <button key={tab.id} onClick={() => setScreen(tab.id as any)} className={`rounded-xl py-3 flex items-center justify-center transition-all text-xs sm:text-sm font-bold min-w-[65px] ${isActive ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50'}`}>
+                <Icon className="sm:mr-2 h-4 w-4 shrink-0" />
+                <span className="hidden sm:inline">{tab.label}</span>
+              </button>
+            );
+          })}
+        </div>
 
-          {/* HOME TAB */}
-          <TabsContent value="home" className="space-y-6">
+        {/* HOME SCREEN */}
+        {screen === "home" && (
+          <div className="space-y-6">
             <div className="flex items-center justify-between bg-zinc-900/40 border border-zinc-800/60 p-2 rounded-2xl backdrop-blur-md max-w-[280px]">
               <Button variant={viewMode === 'days' ? 'default' : 'ghost'} className={`w-1/2 rounded-xl ${viewMode === 'days' ? 'bg-zinc-800 text-white' : 'text-zinc-400'}`} onClick={() => setViewMode('days')}>By Days</Button>
               <Button variant={viewMode === 'muscles' ? 'default' : 'ghost'} className={`w-1/2 rounded-xl ${viewMode === 'muscles' ? 'bg-zinc-800 text-white' : 'text-zinc-400'}`} onClick={() => setViewMode('muscles')}>By Muscle</Button>
             </div>
-
             <AnimatePresence mode="wait">
               {viewMode === "days" ? (
                 <motion.div key="days" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
@@ -796,11 +802,11 @@ export default function ReacherApp() {
                           </div>
                         </div>
                       </div>
-                      <CardContent className="p-6">
+                      <CardContent>
                         <p dir="rtl" className="text-right text-sm leading-relaxed text-zinc-400 mb-5 h-10">{day.focusHe}</p>
                         <div className="grid grid-cols-2 gap-3">
-                          <Button className="rounded-xl bg-zinc-100 text-zinc-950 hover:bg-white font-bold" onClick={() => { setSelectedDayKey(day.key); setScreen("day"); }}>View Details</Button>
-                          <Button variant="outline" className="rounded-xl border-zinc-700 bg-zinc-800/50 text-zinc-100 hover:bg-zinc-700 font-bold" onClick={() => startLive(day.key)}>Start Live</Button>
+                          <Button className="w-full text-zinc-950 font-bold" onClick={() => { setSelectedDayKey(day.key); setScreen("day"); }}>View Details</Button>
+                          <Button variant="outline" className="w-full font-bold" onClick={() => startLive(day.key)}>Start Live</Button>
                         </div>
                       </CardContent>
                     </Card>
@@ -826,35 +832,30 @@ export default function ReacherApp() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* DAY VIEW TAB */}
-          <TabsContent value="day" className="space-y-6">
+        {/* DAY / ROUTINE SCREEN */}
+        {screen === "day" && (
+          <div className="space-y-6">
             <ScrollArea className="w-full pb-4">
               <div className="flex gap-3 min-w-max">
                 {days.map((day) => (
-                  <Button key={day.key} variant={selectedDayKey === day.key ? "default" : "outline"} className={`rounded-xl px-6 ${selectedDayKey === day.key ? `bg-gradient-to-r ${day.accent} border-none` : 'border-zinc-800 bg-zinc-900/50'}`} onClick={() => setSelectedDayKey(day.key)}>
-                    {day.title}
-                  </Button>
+                  <Button key={day.key} variant={selectedDayKey === day.key ? "default" : "outline"} className={`rounded-xl px-6 ${selectedDayKey === day.key ? `bg-gradient-to-r ${day.accent} border-none` : 'border-zinc-800 bg-zinc-900/50'}`} onClick={() => setSelectedDayKey(day.key)}>{day.title}</Button>
                 ))}
               </div>
             </ScrollArea>
-
             <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="space-y-6">
                 <div className="flex items-center justify-between">
                   <h3 className="text-2xl font-bold">Main Routine</h3>
-                  <Button className="rounded-xl bg-zinc-100 text-zinc-950 hover:bg-white font-bold" onClick={() => startLive(selectedDay.key)}>
-                    <Play className="mr-2 h-4 w-4" /> Start Day
-                  </Button>
+                  <Button className="rounded-xl font-bold text-zinc-950" onClick={() => startLive(selectedDay.key)}><Play className="mr-2 h-4 w-4" /> Start Day</Button>
                 </div>
-                
                 <div className="space-y-4">
                   {selectedDay.exercises.map((ex, idx) => {
                     const Icon = iconByCategory[ex.category];
                     const hist = exerciseHistory[ex.id];
                     const maxW = hist ? Math.max(...hist.map(h => h.weight)) : 0;
-                    
                     return (
                       <Card key={ex.id} className="overflow-hidden rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-md hover:bg-zinc-900/60 transition-colors">
                         <CardContent className="p-0">
@@ -862,33 +863,23 @@ export default function ReacherApp() {
                             <div className="h-40 sm:h-full relative overflow-hidden border-r border-zinc-800/50">
                               <img src={imageByMuscle[ex.muscleGroup]} alt={ex.name} className="w-full h-full object-cover opacity-70" />
                               <div className="absolute top-3 left-3 bg-black/60 backdrop-blur-md px-2 py-1 rounded-md border border-white/10 flex items-center gap-1.5">
-                                <Icon className="h-3.5 w-3.5 text-zinc-300" />
-                                <span className="text-xs font-bold uppercase">{ex.category}</span>
+                                <Icon className="h-3.5 w-3.5 text-zinc-300" /><span className="text-xs font-bold uppercase">{ex.category}</span>
                               </div>
                             </div>
                             <div className="p-5 flex flex-col justify-between">
                                <div>
                                  <div className="flex justify-between items-start mb-1">
-                                    <h4 className="text-xl font-bold">{ex.name}</h4>
-                                    <span className="text-2xl font-black text-zinc-700">0{idx+1}</span>
+                                    <h4 className="text-xl font-bold">{ex.name}</h4><span className="text-2xl font-black text-zinc-700">0{idx+1}</span>
                                  </div>
                                  <p dir="rtl" className="text-right text-sm text-zinc-400 mb-4">{ex.he}</p>
                                </div>
-                               
                                <div className="flex flex-wrap items-center gap-3">
-                                  <Badge variant="secondary" className="bg-zinc-800 text-zinc-200">{ex.sets} Sets × {ex.reps}</Badge>
+                                  <Badge variant="secondary">{ex.sets} Sets × {ex.reps}</Badge>
                                   {maxW > 0 && <Badge className="bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"><TrendingUp className="mr-1.5 h-3 w-3" /> PR: {maxW}kg</Badge>}
-                                  
                                   <div className="flex-1" />
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-zinc-800 text-zinc-400 hover:text-white" onClick={() => setSwapExerciseOrigin(ex)}>
-                                     <RefreshCcw className="h-4 w-4" />
-                                  </Button>
-                                  <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-indigo-900/40 text-indigo-400 hover:text-white hover:bg-indigo-600 border border-indigo-500/30" onClick={() => setAiExerciseToAsk(ex)}>
-                                     <Bot className="h-4 w-4" />
-                                  </Button>
-                                  <Button variant="secondary" size="sm" className="rounded-lg font-bold bg-zinc-100 text-zinc-950 hover:bg-white" onClick={() => startLive(selectedDay.key, idx)}>
-                                    Go Live
-                                  </Button>
+                                  <Button variant="ghost" size="icon" onClick={() => setSwapExerciseOrigin(ex)}><RefreshCcw className="h-4 w-4" /></Button>
+                                  <Button variant="ghost" size="icon" className="text-indigo-400 border border-indigo-500/30" onClick={() => setAiExerciseToAsk(ex)}><Bot className="h-4 w-4" /></Button>
+                                  <Button variant="secondary" size="sm" onClick={() => startLive(selectedDay.key, idx)}>Go Live</Button>
                                </div>
                             </div>
                           </div>
@@ -898,21 +889,14 @@ export default function ReacherApp() {
                   })}
                 </div>
               </div>
-
-              {/* Bonus */}
               <div className="space-y-6">
                 <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl overflow-hidden">
                   <div className={`h-2 bg-gradient-to-r ${selectedDay.accent}`} />
-                  <CardHeader>
-                     <CardTitle>Bonus Details</CardTitle>
-                  </CardHeader>
+                  <CardHeader><CardTitle>Bonus Details</CardTitle></CardHeader>
                   <CardContent className="space-y-3">
                     {selectedDay.bonus.map((bonus) => (
-                      <div key={bonus.id} className="group relative rounded-2xl border border-zinc-800/60 bg-zinc-950/50 p-4 hover:border-zinc-700 transition-colors">
-                        <div className="flex justify-between items-start">
-                          <div className="font-bold text-lg">{bonus.name}</div>
-                          <Badge variant="outline" className="border-zinc-700 text-xs">{bonus.muscleGroup}</Badge>
-                        </div>
+                      <div key={bonus.id} className="group relative rounded-2xl border border-zinc-800/60 bg-zinc-950/50 p-4">
+                        <div className="flex justify-between items-start"><div className="font-bold text-lg">{bonus.name}</div><Badge variant="outline">{bonus.muscleGroup}</Badge></div>
                         <p dir="rtl" className="text-right text-sm text-zinc-400 mt-2">{bonus.he}</p>
                       </div>
                     ))}
@@ -920,10 +904,12 @@ export default function ReacherApp() {
                 </Card>
               </div>
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* LIVE WORKOUT TAB */}
-          <TabsContent value="live" className="space-y-6">
+        {/* LIVE WORKOUT SCREEN */}
+        {screen === "live" && (
+          <div className="space-y-6">
             <AnimatePresence mode="wait">
               {phase === "done" ? (
                 <motion.div key="done" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="flex min-h-[60vh] flex-col items-center justify-center">
@@ -933,14 +919,10 @@ export default function ReacherApp() {
                   </div>
                   <h2 className="text-6xl font-black mb-4 tracking-tight">BEAST.</h2>
                   <p dir="rtl" className="text-xl text-zinc-400 max-w-lg text-center leading-relaxed">אימון מטורף. כל הסטים הושלמו. תתאושש טוב, תאכל חלבון, ונראה אותך באימון הבא.</p>
-                  <div className="mt-10 flex gap-4">
-                    <Button size="lg" className="rounded-xl bg-zinc-100 text-zinc-950 hover:bg-white font-bold" onClick={() => setScreen("home")}>Finish Session</Button>
-                  </div>
+                  <Button size="lg" className="mt-10 font-bold text-zinc-950" onClick={() => setScreen("home")}>Finish Session</Button>
                 </motion.div>
               ) : (
                 <motion.div key="live-player" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid gap-6 lg:grid-cols-[1fr_450px]">
-                  
-                  {/* Main Player */}
                   <div className="space-y-6">
                     <Card className="overflow-hidden rounded-[2.5rem] border-zinc-800/60 bg-zinc-900/60 shadow-2xl backdrop-blur-xl relative">
                       <div className="absolute top-0 left-0 w-full h-1">
@@ -948,267 +930,83 @@ export default function ReacherApp() {
                       </div>
                       <CardContent className="p-6 md:p-12">
                         <div className="flex justify-between items-center mb-6">
-                           <Badge variant="outline" className="bg-zinc-950/50 border-zinc-700 text-zinc-300 py-1.5 px-4 rounded-full text-sm">{selectedDay.title}</Badge>
-                           <Badge className={`py-1.5 px-4 rounded-full text-sm font-bold ${phase === "work" ? "bg-red-500/20 text-red-400 border border-red-500/30" : "bg-blue-500/20 text-blue-400 border border-blue-500/30"}`}>
+                           <Badge variant="outline" className="bg-zinc-950/50 py-1.5 px-4 rounded-full">{selectedDay.title}</Badge>
+                           <Badge className={`py-1.5 px-4 rounded-full font-bold ${phase === "work" ? "bg-red-500/20 text-red-400 border border-red-500/30" : "bg-blue-500/20 text-blue-400 border border-blue-500/30"}`}>
                              {phase === "work" ? "WORK PHASE" : "REST PHASE"}
                            </Badge>
                         </div>
-                        
                         <div className="text-center mb-8 relative">
                           <div className="flex items-center justify-center gap-4 mb-4">
                              <h2 className="text-4xl md:text-5xl lg:text-6xl font-black tracking-tight leading-tight">{liveExercise?.name}</h2>
-                             <Button variant="ghost" size="icon" className="h-10 w-10 rounded-full bg-zinc-800 hover:bg-zinc-700 text-zinc-400 hover:text-white shrink-0" onClick={() => setSwapExerciseOrigin(liveExercise)}>
-                               <RefreshCcw className="h-5 w-5" />
-                             </Button>
+                             <Button variant="ghost" size="icon" className="shrink-0" onClick={() => setSwapExerciseOrigin(liveExercise)}><RefreshCcw className="h-5 w-5" /></Button>
                           </div>
                           <p dir="rtl" className="text-lg text-zinc-400 max-w-2xl mx-auto">{liveExercise?.he}</p>
-                          
-                          <div className="mt-4 flex justify-center">
-                            <Button variant="outline" size="sm" className="rounded-full bg-indigo-900/20 border-indigo-500/30 text-indigo-300 hover:bg-indigo-600 hover:text-white" onClick={() => setAiExerciseToAsk(liveExercise)}>
-                               <Sparkles className="w-4 h-4 mr-2" /> Ask Coach (Reacher Mode)
-                            </Button>
-                          </div>
+                          <Button variant="outline" size="sm" className="mt-4 rounded-full border-indigo-500/30 text-indigo-300" onClick={() => setAiExerciseToAsk(liveExercise)}>
+                             <Sparkles className="w-4 h-4 mr-2" /> Ask Coach
+                          </Button>
                         </div>
-
-                        {/* BIG TIMER */}
                         <div className="grid grid-cols-2 gap-4 md:gap-8 mb-8">
                           <div className="bg-zinc-950/50 rounded-[2rem] p-6 text-center border border-zinc-800/50 relative">
                              {isWarmup && <Badge className="absolute top-0 right-0 -mt-2 -mr-2 bg-amber-500 text-amber-950">Warmup</Badge>}
                              <div className="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-sm">Current Set</div>
                              <div className="text-5xl md:text-6xl font-black">{setIndex + 1}<span className="text-3xl text-zinc-600">/{liveExercise?.sets}</span></div>
-                             <div className="mt-3 text-sm font-medium text-zinc-400">Target: {liveExercise?.reps} Reps</div>
                           </div>
                           <div className={`rounded-[2rem] p-6 text-center border ${phase === 'work' ? 'bg-red-950/30 border-red-900/50' : 'bg-blue-950/30 border-blue-900/50'}`}>
                              <div className="text-zinc-500 font-bold mb-2 uppercase tracking-widest text-sm">Timer</div>
                              <div className={`text-5xl md:text-6xl font-black tabular-nums ${phase === 'work' ? 'text-red-400' : 'text-blue-400'}`}>{formatTime(secondsLeft)}</div>
-                             <div className="mt-3 text-sm font-medium text-zinc-400">{phase === 'work' ? 'Crush it.' : 'Breathe.'}</div>
                           </div>
                         </div>
-
-                        {/* WORKOUT LOGGER */}
                         <div className="bg-zinc-950/80 rounded-[2rem] p-6 border border-zinc-800">
                            <div className="flex justify-between items-center mb-4 text-sm">
-                              <span className="font-bold text-zinc-300 flex items-center gap-2"><FlameKindle className="w-4 h-4 text-amber-500"/> Log Your Set</span>
-                              {previousSetRecord && (
-                                <span className="text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">
-                                   Last: {previousSetRecord.weight}kg × {previousSetRecord.reps} (RPE {previousSetRecord.rpe})
-                                </span>
-                              )}
+                              <span className="font-bold text-zinc-300 flex items-center gap-2"><FlameKindle className="w-4 h-4 text-amber-500"/> Log Set</span>
+                              {previousSetRecord && <span className="text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">Last: {previousSetRecord.weight}kg × {previousSetRecord.reps}</span>}
                            </div>
-                           
                            <div className="grid grid-cols-3 gap-3 mb-6">
-                              <div>
-                                <label className="text-xs text-zinc-500 mb-1 block">Weight (kg)</label>
-                                <Input type="number" placeholder="0" className="bg-zinc-900 border-zinc-700 h-12 text-center text-lg font-bold" value={currentWeight} onChange={e=>setCurrentWeight(e.target.value)} />
-                              </div>
-                              <div>
-                                <label className="text-xs text-zinc-500 mb-1 block">Reps Done</label>
-                                <Input type="number" placeholder="0" className="bg-zinc-900 border-zinc-700 h-12 text-center text-lg font-bold" value={currentReps} onChange={e=>setCurrentReps(e.target.value)} />
-                              </div>
-                              <div>
-                                <label className="text-xs text-zinc-500 mb-1 block flex justify-between"><span>RPE</span> <span className="text-zinc-400">{currentRpe}/10</span></label>
-                                <div className="h-12 flex items-center bg-zinc-900 border border-zinc-700 rounded-md px-3">
-                                  <Slider value={[currentRpe]} min={5} max={10} step={0.5} onValueChange={(v)=>setCurrentRpe(v[0])} className="w-full" />
-                                </div>
-                              </div>
+                              <div><label className="text-xs text-zinc-500 mb-1 block">Weight</label><Input type="number" value={currentWeight} onChange={e=>setCurrentWeight(e.target.value)} className="text-center font-bold" /></div>
+                              <div><label className="text-xs text-zinc-500 mb-1 block">Reps</label><Input type="number" value={currentReps} onChange={e=>setCurrentReps(e.target.value)} className="text-center font-bold" /></div>
+                              <div><label className="text-xs text-zinc-500 mb-1 flex justify-between"><span>RPE</span><span>{currentRpe}/10</span></label><Slider value={[currentRpe]} min={5} max={10} step={0.5} onValueChange={(v)=>setCurrentRpe(v[0])} className="mt-3"/></div>
                            </div>
-
                            <div className="flex gap-3">
-                             <Button size="lg" className="flex-1 rounded-xl h-14 bg-zinc-100 text-zinc-950 hover:bg-white font-black text-lg" onClick={handleNextStep}>
-                               <CheckCircle2 className="w-5 h-5 mr-2"/> Log & Next
-                             </Button>
-                             <Button size="lg" variant="outline" className={`rounded-xl h-14 border-amber-500/50 ${isWarmup ? 'bg-amber-500/20 text-amber-400' : 'text-zinc-400 hover:text-amber-400 hover:border-amber-500'}`} onClick={() => setIsWarmup(!isWarmup)}>
-                               <Flame className="w-5 h-5 mr-2"/> Warmup
-                             </Button>
+                             <Button size="lg" className="flex-1 text-zinc-950" onClick={handleNextStep}><CheckCircle2 className="w-5 h-5 mr-2"/> Log & Next</Button>
+                             <Button size="lg" variant="outline" className={isWarmup ? 'bg-amber-500/20 text-amber-400 border-amber-500/50' : 'text-zinc-400'} onClick={() => setIsWarmup(!isWarmup)}><Flame className="w-5 h-5 mr-2"/> Warmup</Button>
                            </div>
                         </div>
-
                       </CardContent>
                     </Card>
                   </div>
-
-                  {/* Sidebar Tools */}
                   <div className="space-y-6">
-                    
-                    {/* Timer Controls */}
                     <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl">
-                      <CardHeader className="pb-4">
-                        <CardTitle className="text-lg flex items-center gap-2"><Clock3 className="h-5 w-5 text-zinc-400" /> Controls</CardTitle>
-                      </CardHeader>
+                      <CardHeader className="pb-4"><CardTitle className="text-lg flex items-center gap-2"><Clock3 className="h-5 w-5 text-zinc-400" /> Controls</CardTitle></CardHeader>
                       <CardContent className="space-y-4">
-                         <Button variant={running ? "destructive" : "default"} className="w-full rounded-xl h-12 font-bold" onClick={togglePlayPause}>
-                             {running ? <Pause className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />}
-                             {running ? "Pause Timer" : "Resume Timer"}
+                         <Button variant={running ? "destructive" : "default"} className="w-full text-zinc-950" onClick={togglePlayPause}>
+                             {running ? <Pause className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />} {running ? "Pause" : "Resume"}
                          </Button>
                          <div className="flex justify-between items-center bg-zinc-950/50 p-3 rounded-xl border border-zinc-800">
-                            <div>
-                               <div className="font-bold text-sm">Auto-Advance</div>
-                            </div>
-                            <Switch checked={autoAdvance} onCheckedChange={setAutoAdvance} />
+                            <div className="font-bold text-sm">Auto-Advance</div><Switch checked={autoAdvance} onCheckedChange={setAutoAdvance} />
                          </div>
-                         <Button variant="outline" className="w-full rounded-xl border-zinc-700 h-10" onClick={previousStep}>
-                            <SkipBack className="mr-2 h-4 w-4" /> Go Back
-                         </Button>
+                         <Button variant="outline" className="w-full" onClick={previousStep}><SkipBack className="mr-2 h-4 w-4" /> Go Back</Button>
                       </CardContent>
                     </Card>
-
-                    {/* Exercise History Preview */}
-                    <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl flex-1 max-h-[300px] overflow-hidden flex flex-col">
-                      <CardHeader className="pb-2 shrink-0">
-                         <CardTitle className="text-lg">History for {liveExercise?.name}</CardTitle>
-                      </CardHeader>
-                      <CardContent className="overflow-y-auto flex-1 pr-2 space-y-2 pb-4">
-                         {exerciseHistory[liveExercise?.id] ? (
-                           [...exerciseHistory[liveExercise.id]].reverse().map((record, i) => (
+                    <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl flex-1 max-h-[300px] flex flex-col">
+                      <CardHeader className="pb-2"><CardTitle className="text-lg">History</CardTitle></CardHeader>
+                      <CardContent className="overflow-y-auto flex-1 space-y-2 pb-4">
+                         {exerciseHistory[liveExercise?.id] ? [...exerciseHistory[liveExercise.id]].reverse().map((record, i) => (
                              <div key={i} className={`flex justify-between items-center p-3 rounded-lg border ${record.isWarmup ? 'border-amber-900/30 bg-amber-950/10' : 'border-zinc-800 bg-zinc-950/50'}`}>
-                               <div className="text-sm">
-                                  <span className="text-zinc-500 block text-xs">{new Date(record.date).toLocaleDateString()}</span>
-                                  <span className="font-bold">{record.weight}kg × {record.reps}</span>
-                               </div>
-                               <div className="text-right">
-                                  {record.isWarmup ? <Badge variant="outline" className="text-amber-500 border-amber-900">Warmup</Badge> : <Badge variant="outline" className="text-zinc-300">RPE {record.rpe}</Badge>}
-                               </div>
+                               <div className="text-sm"><span className="text-zinc-500 block text-xs">{new Date(record.date).toLocaleDateString()}</span><span className="font-bold">{record.weight}kg × {record.reps}</span></div>
+                               <div>{record.isWarmup ? <Badge variant="outline" className="text-amber-500">Warmup</Badge> : <Badge variant="outline">RPE {record.rpe}</Badge>}</div>
                              </div>
-                           ))
-                         ) : (
-                           <div className="text-zinc-500 text-sm italic text-center py-4">No logged sets yet. Crush it today!</div>
-                         )}
+                         )) : <div className="text-zinc-500 text-sm italic text-center py-4">No logged sets yet.</div>}
                       </CardContent>
                     </Card>
-
                   </div>
                 </motion.div>
               )}
             </AnimatePresence>
-          </TabsContent>
+          </div>
+        )}
 
-          {/* ANALYTICS TAB */}
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid gap-6 md:grid-cols-2">
-               <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl">
-                  <CardHeader>
-                     <CardTitle className="flex items-center gap-2"><TrendingUp className="text-emerald-400" /> Progression Overview</CardTitle>
-                     <CardDescription>Top 5 most logged exercises.</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-6">
-                     {analyticsData.length > 0 ? analyticsData.map((data, i) => (
-                       <div key={i} className="space-y-2">
-                          <div className="flex justify-between items-end">
-                            <span className="font-bold">{data.name} <span className="text-xs text-zinc-500 ml-1">({data.muscle})</span></span>
-                            <span className={data.progressPercent > 0 ? "text-emerald-400 font-bold" : "text-zinc-400"}>
-                              {data.progressPercent > 0 ? `+${data.progressPercent.toFixed(1)}%` : 'No change'}
-                            </span>
-                          </div>
-                          <div className="h-4 bg-zinc-950 rounded-full overflow-hidden border border-zinc-800 relative">
-                             {/* First weight indicator */}
-                             <div className="absolute top-0 left-0 h-full bg-zinc-700 z-10" style={{ width: '40%' }}>
-                                <span className="absolute right-2 top-0 text-[10px] leading-4 text-zinc-300">{data.firstW}kg</span>
-                             </div>
-                             {/* Growth indicator */}
-                             {data.progressPercent > 0 && (
-                               <div className="absolute top-0 left-[40%] h-full bg-emerald-500 z-0" style={{ width: `${Math.min(data.progressPercent, 60)}%` }}>
-                                  <span className="absolute right-2 top-0 text-[10px] leading-4 text-emerald-950 font-bold">{data.lastW}kg</span>
-                               </div>
-                             )}
-                          </div>
-                       </div>
-                     )) : (
-                       <div className="text-zinc-500 text-center py-10">Log some workouts to see your progress!</div>
-                     )}
-                  </CardContent>
-               </Card>
-
-               <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl">
-                 <CardHeader>
-                    <CardTitle>Volume Heatmap</CardTitle>
-                    <CardDescription>Sets completed over the last weeks</CardDescription>
-                 </CardHeader>
-                 <CardContent>
-                    {/* Simple visualization of weekly progress state */}
-                    <div className="flex flex-wrap gap-2">
-                       {Object.keys(weeklyProgress).reverse().slice(0, 14).map(key => (
-                         <div key={key} className="p-3 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold">
-                           {key.split('-W')[0]} Wk{key.split('-W')[1]}
-                         </div>
-                       ))}
-                       {Object.keys(weeklyProgress).length === 0 && <div className="text-zinc-500">No data yet.</div>}
-                    </div>
-                 </CardContent>
-               </Card>
-            </div>
-          </TabsContent>
-
-          {/* SETTINGS TAB */}
-          <TabsContent value="settings" className="max-w-3xl mx-auto space-y-6">
-             <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl border-indigo-500/30">
-                <CardHeader>
-                   <CardTitle className="text-2xl flex items-center gap-2"><Bot className="text-indigo-400 h-6 w-6"/> AI Coach Settings</CardTitle>
-                   <CardDescription dir="rtl" className="text-right">חיבור למנוע ה-AI של גוגל (Gemini) כדי לאפשר צ'אט חי בתוך האפליקציה.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6 p-6 md:p-8" dir="rtl">
-                   <div className="space-y-3">
-                      <label className="font-bold text-zinc-200">Gemini API Key</label>
-                      <Input 
-                        type="password"
-                        placeholder="הדבק כאן את מפתח ה-API שלך..."
-                        value={geminiApiKey}
-                        onChange={(e) => setGeminiApiKey(e.target.value)}
-                        className="bg-zinc-950 border-zinc-700 rounded-xl h-12"
-                      />
-                      <p className="text-sm text-zinc-400">
-                        * ניתן להוציא מפתח בחינם מ- <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-indigo-400 underline">Google AI Studio</a>. המפתח נשמר רק אצלך במכשיר.
-                      </p>
-                   </div>
-                </CardContent>
-             </Card>
-
+        {/* ANALYTICS SCREEN */}
+        {screen === "analytics" && (
+          <div className="grid gap-6 md:grid-cols-2">
              <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl">
-                <CardHeader>
-                   <CardTitle className="text-2xl">Global Settings</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-8 p-6 md:p-8">
-                   <div className="space-y-4">
-                      <div className="flex justify-between items-center text-lg font-bold">
-                         <span>Push Notifications</span>
-                         <Button variant="outline" size="sm" onClick={requestPermission} className={pushEnabled ? "text-emerald-400 border-emerald-500/50" : ""}>
-                           {pushEnabled ? "Enabled" : "Enable"} <Bell className="ml-2 h-4 w-4" />
-                         </Button>
-                      </div>
-                      <p className="text-sm text-zinc-500">Get notified when rest is over, even outside the browser.</p>
-                   </div>
-                   
-                   <div className="space-y-4">
-                      <div className="flex justify-between text-lg font-bold">
-                         <span>Work Duration Base</span>
-                         <span className="text-zinc-400">{globalWorkAdjust}%</span>
-                      </div>
-                      <Slider value={[globalWorkAdjust]} min={50} max={200} step={10} onValueChange={(v) => setGlobalWorkAdjust(v[0])} />
-                   </div>
-                   
-                   <div className="space-y-4">
-                      <div className="flex justify-between text-lg font-bold">
-                         <span>Rest Duration Base</span>
-                         <span className="text-zinc-400">{globalRestAdjust}%</span>
-                      </div>
-                      <Slider value={[globalRestAdjust]} min={50} max={200} step={10} onValueChange={(v) => setGlobalRestAdjust(v[0])} />
-                   </div>
-
-                   <div className="pt-6 border-t border-zinc-800/60 flex flex-col sm:flex-row gap-4">
-                      <Button variant="destructive" className="rounded-xl flex-1 bg-red-900/40 text-red-400 hover:bg-red-900/60 border border-red-900/50" onClick={() => {
-                        if(confirm("Are you sure you want to clear ALL history and analytics?")) {
-                           window.localStorage.clear();
-                           window.location.reload();
-                        }
-                      }}>
-                         Reset All Data
-                      </Button>
-                   </div>
-                </CardContent>
-             </Card>
-          </TabsContent>
-
-        </Tabs>
-      </div>
-    </div>
-  );
-}
+                <CardHeader><CardTitle className="flex items-center gap-2"><Trendin
