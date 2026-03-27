@@ -474,6 +474,6 @@ function BeteshBISTTrainerApp() {
 const rootElement = document.getElementById("root");
 if (rootElement && !rootElement.innerHTML) {
   const root = createRoot(rootElement);
-    root.render(<BeteshBISTTrainerApp />);
+  root.render(<BeteshBISTTrainerApp />);
 
 }
