@@ -254,7 +254,7 @@ function useLocalStorage<T>(key: string, initialValue: T) {
       console.error(error);
     }
   };
-  return [storedValue, setValue] as const;
+  return[storedValue, setValue] as const;
 }
 
 function useAudioBeep() {
@@ -443,8 +443,8 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
                 </Button>
                 <Input 
                   value={question}
-                  onChange={(e) => setQuestion(e.target.value)}
-                  onKeyDown={(e) => e.key === 'Enter' && askGemini(question)}
+                  onChange={(e: any) => setQuestion(e.target.value)}
+                  onKeyDown={(e: any) => e.key === 'Enter' && askGemini(question)}
                   placeholder="הקלד שאלה חופשית..." 
                   className="flex-1 text-right"
                 />
@@ -461,17 +461,17 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
 // ==========================================
 function ReacherApp() {
   const[screen, setScreen] = useState<"home" | "day" | "live" | "analytics" | "settings">("home");
-  const [viewMode, setViewMode] = useState<"days" | "muscles">("days");
+  const[viewMode, setViewMode] = useState<"days" | "muscles">("days");
   
-  const [exerciseHistory, setExerciseHistory] = useLocalStorage<Record<string, SetRecord[]>>("reacher_history", {});
+  const[exerciseHistory, setExerciseHistory] = useLocalStorage<Record<string, SetRecord[]>>("reacher_history", {});
   const [swaps, setSwaps] = useLocalStorage<Record<string, string>>("reacher_swaps", {});
   const[weeklyProgress, setWeeklyProgress] = useLocalStorage<Record<string, boolean>>("reacher_weekly", {});
   const[geminiApiKey, setGeminiApiKey] = useLocalStorage<string>("reacher_gemini_api_key", "");
   
-  const [soundOn, setSoundOn] = useLocalStorage("reacher_sound", true);
-  const [autoAdvance, setAutoAdvance] = useLocalStorage("reacher_auto", true);
-  const [globalWorkAdjust, setGlobalWorkAdjust] = useLocalStorage("reacher_work_adj", 100);
-  const [globalRestAdjust, setGlobalRestAdjust] = useLocalStorage("reacher_rest_adj", 100);
+  const[soundOn, setSoundOn] = useLocalStorage("reacher_sound", true);
+  const[autoAdvance, setAutoAdvance] = useLocalStorage("reacher_auto", true);
+  const[globalWorkAdjust, setGlobalWorkAdjust] = useLocalStorage("reacher_work_adj", 100);
+  const[globalRestAdjust, setGlobalRestAdjust] = useLocalStorage("reacher_rest_adj", 100);
 
   const { initAudio, playBeep } = useAudioBeep();
   const { enabled: pushEnabled, requestPermission, notify } = usePushNotifications();
@@ -486,7 +486,7 @@ function ReacherApp() {
   
   const [currentWeight, setCurrentWeight] = useState<string>("");
   const [currentReps, setCurrentReps] = useState<string>("");
-  const [currentRpe, setCurrentRpe] = useState<number>(8);
+  const[currentRpe, setCurrentRpe] = useState<number>(8);
   const[isWarmup, setIsWarmup] = useState(false);
 
   const[aiExerciseToAsk, setAiExerciseToAsk] = useState<Exercise | null>(null);
@@ -516,7 +516,7 @@ function ReacherApp() {
     const history = exerciseHistory[liveExercise.id] ||[];
     const workingSets = history.filter(h => !h.isWarmup).sort((a,b) => b.date - a.date);
     return workingSets.length > 0 ? workingSets[0] : null;
-  }, [liveExercise, exerciseHistory]);
+  },[liveExercise, exerciseHistory]);
 
   useEffect(() => {
     if (previousSetRecord) {
@@ -527,7 +527,7 @@ function ReacherApp() {
       setCurrentWeight(""); setCurrentReps(""); setCurrentRpe(8);
     }
     setIsWarmup(false);
-  }, [liveExercise?.id]);
+  },[liveExercise?.id]);
 
   function adjustedWork(ex: Exercise) { return Math.max(10, Math.round((ex.work * globalWorkAdjust) / 100)); }
   function adjustedRest(ex: Exercise) { return Math.max(10, Math.round((ex.rest * globalRestAdjust) / 100)); }
@@ -717,7 +717,7 @@ function ReacherApp() {
                       </div>
                       <Button size="sm" className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg" onClick={() => {
                         const origId = (swapExerciseOrigin as any).originalIdForSwap || swapExerciseOrigin.id;
-                        setSwaps(prev => ({ ...prev, [origId]: alt.id }));
+                        setSwaps(prev => ({ ...prev,[origId]: alt.id }));
                         setSwapExerciseOrigin(null);
                       }}>Select</Button>
                    </div>
@@ -760,7 +760,7 @@ function ReacherApp() {
           </div>
         </motion.div>
 
-        {/* --- CUSTOM NAVIGATION (Replaces Radix Tabs) --- */}
+        {/* --- CUSTOM NAVIGATION --- */}
         <div className="grid h-auto w-full max-w-3xl grid-cols-5 gap-1 rounded-2xl border border-zinc-800/60 bg-zinc-900/40 p-1.5 backdrop-blur-xl mb-8 overflow-x-auto">
           {[
             { id: "home", icon: Home, label: "Home" },
@@ -962,9 +962,9 @@ function ReacherApp() {
                               {previousSetRecord && <span className="text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-full border border-emerald-500/20">Last: {previousSetRecord.weight}kg × {previousSetRecord.reps}</span>}
                            </div>
                            <div className="grid grid-cols-3 gap-3 mb-6">
-                              <div><label className="text-xs text-zinc-500 mb-1 block">Weight</label><Input type="number" value={currentWeight} onChange={e=>setCurrentWeight(e.target.value)} className="text-center font-bold" /></div>
-                              <div><label className="text-xs text-zinc-500 mb-1 block">Reps</label><Input type="number" value={currentReps} onChange={e=>setCurrentReps(e.target.value)} className="text-center font-bold" /></div>
-                              <div><label className="text-xs text-zinc-500 mb-1 flex justify-between"><span>RPE</span><span>{currentRpe}/10</span></label><Slider value={[currentRpe]} min={5} max={10} step={0.5} onValueChange={(v)=>setCurrentRpe(v[0])} className="mt-3"/></div>
+                              <div><label className="text-xs text-zinc-500 mb-1 block">Weight</label><Input type="number" value={currentWeight} onChange={(e: any) => setCurrentWeight(e.target.value)} className="text-center font-bold" /></div>
+                              <div><label className="text-xs text-zinc-500 mb-1 block">Reps</label><Input type="number" value={currentReps} onChange={(e: any) => setCurrentReps(e.target.value)} className="text-center font-bold" /></div>
+                              <div><label className="text-xs text-zinc-500 mb-1 flex justify-between"><span>RPE</span><span>{currentRpe}/10</span></label><Slider value={[currentRpe]} min={5} max={10} step={0.5} onValueChange={(v:any)=>setCurrentRpe(v[0])} className="mt-3"/></div>
                            </div>
                            <div className="flex gap-3">
                              <Button size="lg" className="flex-1 text-zinc-950" onClick={handleNextStep}><CheckCircle2 className="w-5 h-5 mr-2"/> Log & Next</Button>
@@ -1009,4 +1009,75 @@ function ReacherApp() {
         {screen === "analytics" && (
           <div className="grid gap-6 md:grid-cols-2">
              <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl">
-                <CardHeader><CardTitle className="flex items-center gap-2"><Trendin
+                <CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="text-emerald-400" /> Progression Overview</CardTitle></CardHeader>
+                <CardContent className="space-y-6">
+                   {analyticsData.length > 0 ? analyticsData.map((data, i) => (
+                     <div key={i} className="space-y-2">
+                        <div className="flex justify-between items-end">
+                          <span className="font-bold">{data.name} <span className="text-xs text-zinc-500">({data.muscle})</span></span>
+                          <span className={data.progressPercent > 0 ? "text-emerald-400 font-bold" : "text-zinc-400"}>{data.progressPercent > 0 ? `+${data.progressPercent.toFixed(1)}%` : 'No change'}</span>
+                        </div>
+                        <div className="h-4 bg-zinc-950 rounded-full border border-zinc-800 relative">
+                           <div className="absolute top-0 left-0 h-full bg-zinc-700 z-10" style={{ width: '40%' }}><span className="absolute right-2 text-[10px] text-zinc-300">{data.firstW}kg</span></div>
+                           {data.progressPercent > 0 && <div className="absolute top-0 left-[40%] h-full bg-emerald-500 z-0" style={{ width: `${Math.min(data.progressPercent, 60)}%` }}><span className="absolute right-2 text-[10px] text-emerald-950 font-bold">{data.lastW}kg</span></div>}
+                        </div>
+                     </div>
+                   )) : <div className="text-zinc-500 text-center py-10">Log workouts to see progress!</div>}
+                </CardContent>
+             </Card>
+             <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 backdrop-blur-xl">
+               <CardHeader><CardTitle>Volume Heatmap</CardTitle></CardHeader>
+               <CardContent>
+                  <div className="flex flex-wrap gap-2">
+                     {Object.keys(weeklyProgress).reverse().slice(0, 14).map(key => (
+                       <div key={key} className="p-3 bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 rounded-xl text-xs font-bold">{key.split('-W')[0]} Wk{key.split('-W')[1]}</div>
+                     ))}
+                     {Object.keys(weeklyProgress).length === 0 && <div className="text-zinc-500">No data yet.</div>}
+                  </div>
+               </CardContent>
+             </Card>
+          </div>
+        )}
+
+        {/* SETTINGS SCREEN */}
+        {screen === "settings" && (
+          <div className="max-w-3xl mx-auto space-y-6">
+             <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40 border-indigo-500/30">
+                <CardHeader><CardTitle className="text-2xl flex items-center gap-2"><Bot className="text-indigo-400 h-6 w-6"/> AI Coach Settings</CardTitle></CardHeader>
+                <CardContent className="space-y-6" dir="rtl">
+                   <div className="space-y-3">
+                      <label className="font-bold text-zinc-200">Gemini API Key</label>
+                      <Input type="password" value={geminiApiKey} onChange={(e: any) => setGeminiApiKey(e.target.value)} />
+                      <p className="text-sm text-zinc-400">* ניתן להוציא מפתח בחינם מ- <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noreferrer" className="text-indigo-400 underline">Google AI Studio</a>. המפתח נשמר מקומית במכשיר.</p>
+                   </div>
+                </CardContent>
+             </Card>
+             <Card className="rounded-3xl border-zinc-800/60 bg-zinc-900/40">
+                <CardHeader><CardTitle className="text-2xl">Global Settings</CardTitle></CardHeader>
+                <CardContent className="space-y-8">
+                   <div className="space-y-4">
+                      <div className="flex justify-between items-center text-lg font-bold">
+                         <span>Push Notifications</span>
+                         <Button variant="outline" size="sm" onClick={requestPermission} className={pushEnabled ? "text-emerald-400" : ""}>{pushEnabled ? "Enabled" : "Enable"} <Bell className="ml-2 h-4 w-4" /></Button>
+                      </div>
+                   </div>
+                   <div className="space-y-4"><div className="flex justify-between font-bold"><span>Work Base</span><span className="text-zinc-400">{globalWorkAdjust}%</span></div><Slider value={[globalWorkAdjust]} min={50} max={200} step={10} onValueChange={(v:any) => setGlobalWorkAdjust(v[0])} /></div>
+                   <div className="space-y-4"><div className="flex justify-between font-bold"><span>Rest Base</span><span className="text-zinc-400">{globalRestAdjust}%</span></div><Slider value={[globalRestAdjust]} min={50} max={200} step={10} onValueChange={(v:any) => setGlobalRestAdjust(v[0])} /></div>
+                   <div className="pt-6 border-t border-zinc-800/60"><Button variant="destructive" className="w-full" onClick={() => { if(confirm("Clear ALL history?")) { window.localStorage.clear(); window.location.reload(); }}}>Reset All Data</Button></div>
+                </CardContent>
+             </Card>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ==========================================
+// 6. RENDER ENGINE (MUST BE AT THE BOTTOM)
+// ==========================================
+const rootElement = document.getElementById("root");
+if (rootElement && !rootElement.innerHTML) {
+  const root = createRoot(rootElement);
+  root.render(<ReacherApp />);
+}
