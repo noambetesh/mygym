@@ -459,53 +459,87 @@ export default function App() {
             <div className="grid gap-8 xl:grid-cols-[1.1fr_0.9fr]">
               <div className="space-y-6">
                 <div className="flex justify-between" dir="rtl"><h3 className="text-2xl font-bold">תוכנית האימון</h3><Button onClick={() => startLive(selectedDay.key)}><Play className="ml-2 h-4 w-4" /> התחל</Button></div>
-                {selectedDay.exercises.map((ex, idx) => {
-                  const Icon = iconByCategory[ex.category]; const maxW = Math.max(...(exerciseHistory[ex.id] ||[]).map(h => h.weight), 0);
-                  return (
-                    <Card key={ex.id}><CardContent className="p-0"><div className="grid sm:grid-cols-[180px_1fr]">
-                      <div className="h-40 sm:h-full relative border-r border-zinc-800"><img src={ex.imageUrl || imageByMuscle[ex.muscleGroup]} className="w-full h-full object-cover opacity-70" /><div className="absolute top-3 left-3 bg-black/60 px-2 py-1 rounded text-xs font-bold">{categoryHebrew[ex.category] ?? ex.category}</div></div>
-                      <div className="p-5 flex flex-col justify-between"><div><div className="flex justify-between"><h4 className="text-xl font-bold">{ex.name}</h4><span className="text-xl text-zinc-700">{idx+1}</span></div><p dir="rtl" className="text-sm text-zinc-400 mb-4">{ex.he}</p></div><div className="flex gap-3"><Badge variant="secondary">{ex.sets} × {ex.reps}</Badge>{maxW > 0 && <Badge className="text-emerald-300">שיא: {maxW}kg</Badge>}<div className="flex-1"/><Button variant="ghost" size="icon" onClick={() => setSwapExerciseOrigin(ex)}><RefreshCcw className="h-4 w-4" /></Button><Button variant="ghost" size="icon" className="text-indigo-400" onClick={() => setAiExerciseToAsk(ex)}><Bot className="h-4 w-4" /></Button><Button variant="secondary" size="sm" onClick={() => startLive(selectedDay.key, idx)}>{ex.videoUrl && <a href={ex.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center rounded-xl border border-red-700 bg-red-950/40 px-3 py-2 text-sm font-bold text-red-300 hover:bg-red-900/50"><Youtube className="ml-2 h-4 w-4" />סרטון</a>}<Button variant="secondary" size="sm" onClick={() => startLive(selectedDay.key, idx)}>לייב</Button></div></div>
-                    </div></CardContent></Card>
-                  );
-                })}
-              </div>
-              <div className="space-y-6"><Card><div className={`h-2 bg-gradient-to-r ${selectedDay.accent}`} /><CardHeader><CardTitle>תרגילי בונוס</CardTitle></CardHeader><CardContent className="space-y-3">{selectedDay.bonus.map((bonus) => (<div key={bonus.id} className="p-4 border border-zinc-800 rounded-2xl"><div className="font-bold">{bonus.name}</div><p dir="rtl" className="text-sm text-zinc-400 mt-1">{bonus.he}</p></div>))}</CardContent></Card></div>
+               {selectedDay.exercises.map((ex, idx) => {
+  const maxW = Math.max(...(exerciseHistory[ex.id] || []).map(h => h.weight), 0);
+
+  return (
+    <Card key={ex.id}>
+      <CardContent className="p-0">
+        <div className="grid sm:grid-cols-[180px_1fr]">
+          <div className="relative h-40 border-r border-zinc-800 sm:h-full">
+            <img
+              src={ex.imageUrl || imageByMuscle[ex.muscleGroup]}
+              className="h-full w-full object-cover opacity-70"
+            />
+            <div className="absolute top-3 left-3 rounded bg-black/60 px-2 py-1 text-xs font-bold">
+              {categoryHebrew[ex.category] ?? ex.category}
             </div>
           </div>
-        )}
 
-        {screen === "live" && (
-          <div className="space-y-6">
-            {phase === "done" ? (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center py-20"><CheckCircle2 className="h-32 w-32 text-emerald-400 mb-8" /><h2 className="text-6xl font-bold mb-4">אלוף.</h2><Button size="lg" onClick={() => setScreen("home")}>סיום</Button></motion.div>
-            ) : (
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="grid gap-6 lg:grid-cols-[1fr_450px]">
-                <div className="space-y-6">
-                  <Card className="relative"><div className="absolute top-0 left-0 w-full h-1"><div className={`h-full bg-gradient-to-r ${selectedDay.accent}`} style={{ width: `${((setIndex + (exerciseIndex * 10)) / (selectedDay.exercises.length * 10)) * 100}%` }} /></div><CardContent className="p-8 md:p-12"><div className="flex justify-between mb-6"><Badge variant="outline">{selectedDay.title}</Badge><Badge className={phase === "work" ? "bg-red-500/20 text-red-400" : "bg-blue-500/20 text-blue-400"}>{phaseHebrew[phase]}</Badge></div><div className="text-center mb-8"><h2 className="text-4xl md:text-5xl font-black mb-4">{liveExercise?.name}</h2><p dir="rtl" className="text-zinc-400 mb-4">{liveExercise?.he}</p><Button variant="outline" size="sm" onClick={() => setAiExerciseToAsk(liveExercise)}><Sparkles className="w-4 h-4 mr-2" /> שאל את המאמן</Button></div><div className="grid grid-cols-2 gap-4 mb-8"><div className="bg-zinc-950/50 rounded-3xl p-6 text-center"><div className="text-zinc-500 font-bold mb-2">סט</div><div className="text-5xl font-black">{setIndex + 1}/{liveExercise?.sets}</div></div><div className="bg-zinc-950/50 rounded-3xl p-6 text-center"><div className="text-zinc-500 font-bold mb-2">טיימר</div><div className="text-5xl font-black">{formatTime(secondsLeft)}</div></div></div><div className="bg-zinc-950/80 rounded-3xl p-6 border border-zinc-800"><div className="flex justify-between mb-4"><span className="font-bold flex items-center gap-2"><Flame className="w-4 h-4 text-amber-500"/> רישום סט</span>{previousSetRecord && <span className="text-emerald-400 text-sm">קודם: {previousSetRecord.weight}kg × {previousSetRecord.reps}</span>}</div><div className="grid grid-cols-3 gap-3 mb-6"><div><label className="text-xs text-zinc-500 mb-1">משקל</label><Input type="number" value={currentWeight} onChange={(e:any)=>setCurrentWeight(e.target.value)} className="text-center font-bold" /></div><div><label className="text-xs text-zinc-500 mb-1">חזרות</label><Input type="number" value={currentReps} onChange={(e:any)=>setCurrentReps(e.target.value)} className="text-center font-bold" /></div><div><label className="text-xs text-zinc-500 mb-1">RPE {currentRpe}</label><Slider value={[currentRpe]} min={5} max={10} step={0.5} onValueChange={(v:any)=>setCurrentRpe(v[0])} className="mt-3"/></div></div><div className="flex gap-3"><Button size="lg" className="flex-1" onClick={handleNextStep}><CheckCircle2 className="w-5 h-5 mr-2"/> שמור והבא</Button><Button size="lg" variant="outline" className={isWarmup ? 'text-amber-400' : ''} onClick={() => setIsWarmup(!isWarmup)}><Flame className="w-5 h-5 mr-2"/> חימום</Button></div></div></CardContent></Card>
-                </div>
-                <div className="space-y-6">
-                  <Card><CardHeader><CardTitle>שליטה</CardTitle></CardHeader><CardContent className="space-y-4"><Button variant={running ? "destructive" : "default"} className="w-full" onClick={togglePlayPause}>{running ? <Pause className="mr-2 h-4 w-4" /> : <Play className="mr-2 h-4 w-4" />} {running ? "השהה" : "המשך"}</Button><div className="flex justify-between items-center bg-zinc-950 p-3 rounded-xl"><div className="font-bold text-sm">מעבר אוטומטי</div><Switch checked={autoAdvance} onCheckedChange={setAutoAdvance} /></div><Button variant="outline" className="w-full" onClick={previousStep}>חזור אחורה</Button></CardContent></Card>
-                  <Card className="flex-1 max-h-[300px] flex flex-col"><CardHeader className="pb-2"><CardTitle>היסטוריה</CardTitle></CardHeader><CardContent className="overflow-y-auto flex-1 space-y-2 pb-4">{exerciseHistory[liveExercise?.id] ? [...exerciseHistory[liveExercise.id]].reverse().map((record, i) => (<div key={i} className="flex justify-between p-3 rounded-lg bg-zinc-950/50 border border-zinc-800"><div className="text-sm"><span className="text-zinc-500 block text-xs">{new Date(record.date).toLocaleDateString()}</span><span className="font-bold">{record.weight}kg × {record.reps}</span></div><div><Badge variant="outline">RPE {record.rpe}</Badge></div></div>)) : <div className="text-zinc-500 text-center py-4">עדיין אין סטים שמורים.</div>}</CardContent></Card>
-                </div>
-              </motion.div>
-            )}
-          </div>
-        )}
+          <div className="flex flex-col justify-between p-5">
+            <div>
+              <div className="flex justify-between">
+                <h4 className="text-xl font-bold">{ex.name}</h4>
+                <span className="text-xl text-zinc-700">{idx + 1}</span>
+              </div>
+              <p dir="rtl" className="mb-4 text-sm text-zinc-400">
+                {ex.he}
+              </p>
+            </div>
 
-        {screen === "analytics" && (
-          <div className="grid gap-6 md:grid-cols-2">
-             <Card><CardHeader><CardTitle className="flex items-center gap-2"><TrendingUp className="text-emerald-400" /> התקדמות</CardTitle></CardHeader><CardContent className="space-y-6">{analyticsData.length > 0 ? analyticsData.map((data, i) => (<div key={i} className="space-y-2"><div className="flex justify-between items-end"><span className="font-bold">{data.name}</span><span className="text-emerald-400 font-bold">+{data.progressPercent.toFixed(1)}%</span></div><div className="h-4 bg-zinc-950 rounded-full relative"><div className="absolute h-full bg-zinc-700" style={{ width: '40%' }}><span className="absolute right-2 text-[10px]">{data.firstW}kg</span></div>{data.progressPercent > 0 && <div className="absolute left-[40%] h-full bg-emerald-500" style={{ width: `${Math.min(data.progressPercent, 60)}%` }}><span className="absolute right-2 text-[10px] text-emerald-950 font-bold">{data.lastW}kg</span></div>}</div></div>)) : <div className="text-zinc-500 text-center py-10">שמור אימונים כדי לראות התקדמות!</div>}</CardContent></Card>
-             <Card><CardHeader><CardTitle>מפת נפח</CardTitle></CardHeader><CardContent><div className="flex flex-wrap gap-2">{Object.keys(weeklyProgress).reverse().slice(0, 14).map(key => (<div key={key} className="p-3 bg-emerald-500/20 text-emerald-300 rounded-xl text-xs font-bold">{key}</div>))}</div></CardContent></Card>
-          </div>
-        )}
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="secondary">
+                {ex.sets} × {ex.reps}
+              </Badge>
 
-        {screen === "settings" && (
-          <div className="max-w-3xl mx-auto space-y-6">
-             <Card className="border-indigo-500/30"><CardHeader><CardTitle className="text-2xl flex items-center gap-2"><Bot className="text-indigo-400 h-6 w-6"/> מאמן AI</CardTitle></CardHeader><CardContent className="space-y-6" dir="rtl"><div className="space-y-3"><label className="font-bold text-zinc-200">מפתח Gemini API</label><Input type="password" value={geminiApiKey} onChange={(e: any) => setGeminiApiKey(e.target.value)} /></div></CardContent></Card>
-             <Card><CardHeader><CardTitle className="text-2xl">הגדרות כלליות</CardTitle></CardHeader><CardContent className="space-y-8"><div className="flex justify-between items-center text-lg font-bold"><span>התראות</span><Button variant="outline" size="sm" onClick={requestPermission} className={pushEnabled ? "text-emerald-400" : ""}>{pushEnabled ? "פעיל" : "הפעל"}</Button></div><div className="space-y-4"><div className="flex justify-between font-bold"><span>בסיס זמן עבודה</span><span className="text-zinc-400">{globalWorkAdjust}%</span></div><Slider value={[globalWorkAdjust]} min={50} max={200} step={10} onValueChange={(v:any) => setGlobalWorkAdjust(v[0])} /></div><div className="space-y-4"><div className="flex justify-between font-bold"><span>בסיס זמן מנוחה</span><span className="text-zinc-400">{globalRestAdjust}%</span></div><Slider value={[globalRestAdjust]} min={50} max={200} step={10} onValueChange={(v:any) => setGlobalRestAdjust(v[0])} /></div><div className="pt-6 border-t border-zinc-800"><Button variant="destructive" className="w-full" onClick={() => { if(confirm("למחוק את כל ההיסטוריה?")) { window.localStorage.clear(); window.location.reload(); }}}>איפוס כל הנתונים</Button></div></CardContent></Card>
+              {maxW > 0 && (
+                <Badge className="text-emerald-300">
+                  שיא: {maxW}kg
+                </Badge>
+              )}
+
+              <div className="flex-1" />
+
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setSwapExerciseOrigin(ex)}
+              >
+                <RefreshCcw className="h-4 w-4" />
+              </Button>
+
+              <Button
+                variant="ghost"
+                size="icon"
+                className="text-indigo-400"
+                onClick={() => setAiExerciseToAsk(ex)}
+              >
+                <Bot className="h-4 w-4" />
+              </Button>
+
+              {ex.videoUrl && (
+                <a
+                  href={ex.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-xl border border-red-700 bg-red-950/40 px-3 py-2 text-sm font-bold text-red-300 hover:bg-red-900/50"
+                >
+                  <Youtube className="ml-2 h-4 w-4" />
+                  סרטון
+                </a>
+              )}
+
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => startLive(selectedDay.key, idx)}
+              >
+                לייב
+              </Button>
+            </div>
           </div>
-        )}
-      </div>
-    </div>
+        </div>
+      </CardContent>
+    </Card>
   );
-}
+})}
