@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { createRoot } from "react-dom/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, RotateCcw, SkipForward, SkipBack, Dumbbell, Flame, Clock3,
@@ -104,8 +103,7 @@ const phaseHebrew: Record<string, string> = {
   done: "סיום",
 };
 
-const yt = (query: string) =>
-  `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
+const yt = (query: string) => `https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`;
 
 const exerciseMedia: Record<string, { videoUrl: string; imageUrl: string }> = {
   e1:  { videoUrl: yt("Meadows Row tutorial"), imageUrl: imageByMuscle.Back },
@@ -114,28 +112,24 @@ const exerciseMedia: Record<string, { videoUrl: string; imageUrl: string }> = {
   e4:  { videoUrl: yt("Weighted Pull Ups tutorial"), imageUrl: imageByMuscle.Back },
   e5:  { videoUrl: yt("Bayesian Cable Curls tutorial"), imageUrl: imageByMuscle.Arms },
   e6:  { videoUrl: yt("Zottman Curls tutorial"), imageUrl: imageByMuscle.Arms },
-
   e7:  { videoUrl: yt("Low Incline Dumbbell Press tutorial"), imageUrl: imageByMuscle.Chest },
   e8:  { videoUrl: yt("Converging Chest Press Machine tutorial"), imageUrl: imageByMuscle.Chest },
   e9:  { videoUrl: yt("Cable Crossover tutorial"), imageUrl: imageByMuscle.Chest },
   e10: { videoUrl: yt("JM Press tutorial"), imageUrl: imageByMuscle.Arms },
   e11: { videoUrl: yt("Katana Extension triceps tutorial"), imageUrl: imageByMuscle.Arms },
   e12: { videoUrl: yt("Weighted Dips tutorial"), imageUrl: imageByMuscle.Chest },
-
   e13: { videoUrl: yt("Zercher Squat tutorial"), imageUrl: imageByMuscle.Legs },
   e14: { videoUrl: yt("Bulgarian Split Squat tutorial"), imageUrl: imageByMuscle.Legs },
   e15: { videoUrl: yt("Kas Glute Bridge tutorial"), imageUrl: imageByMuscle.Legs },
   e16: { videoUrl: yt("Nordic Hamstring Curl tutorial"), imageUrl: imageByMuscle.Legs },
   e17: { videoUrl: yt("Hanging Leg Raises tutorial"), imageUrl: imageByMuscle.Core },
   e18: { videoUrl: yt("Cable Crunches tutorial"), imageUrl: imageByMuscle.Core },
-
   e19: { videoUrl: yt("Z Press tutorial"), imageUrl: imageByMuscle.Shoulders },
   e20: { videoUrl: yt("Cable Lateral Raises tutorial"), imageUrl: imageByMuscle.Shoulders },
   e21: { videoUrl: yt("Lu Raises tutorial"), imageUrl: imageByMuscle.Shoulders },
   e22: { videoUrl: yt("Rear Delt Row tutorial"), imageUrl: imageByMuscle.Shoulders },
   e23: { videoUrl: yt("Heavy Dumbbell Shrugs tutorial"), imageUrl: imageByMuscle.Back },
   e24: { videoUrl: yt("Neck Extensions tutorial"), imageUrl: imageByMuscle.Back },
-
   e25: { videoUrl: yt("Landmine Thrusters tutorial"), imageUrl: imageByMuscle.FullBody },
   e26: { videoUrl: yt("Farmer Walk tutorial"), imageUrl: imageByMuscle.FullBody },
   e27: { videoUrl: yt("Renegade Row tutorial"), imageUrl: imageByMuscle.FullBody },
@@ -154,16 +148,8 @@ const initialDays: DayPlan[] =[
 
 const initialDaysWithMedia = initialDays.map(day => ({
   ...day,
-  exercises: day.exercises.map(ex => ({
-    ...ex,
-    videoUrl: exerciseMedia[ex.id]?.videoUrl,
-    imageUrl: exerciseMedia[ex.id]?.imageUrl ?? imageByMuscle[ex.muscleGroup],
-  })),
-  bonus: day.bonus.map(ex => ({
-    ...ex,
-    videoUrl: exerciseMedia[ex.id]?.videoUrl,
-    imageUrl: exerciseMedia[ex.id]?.imageUrl ?? imageByMuscle[ex.muscleGroup],
-  })),
+  exercises: day.exercises.map(ex => ({ ...ex, videoUrl: exerciseMedia[ex.id]?.videoUrl, imageUrl: exerciseMedia[ex.id]?.imageUrl ?? imageByMuscle[ex.muscleGroup] })),
+  bonus: day.bonus.map(ex => ({ ...ex, videoUrl: exerciseMedia[ex.id]?.videoUrl, imageUrl: exerciseMedia[ex.id]?.imageUrl ?? imageByMuscle[ex.muscleGroup] })),
 }));
 
 const allExercisesPool = initialDaysWithMedia.flatMap(d => d.exercises);
@@ -171,28 +157,15 @@ const iconByCategory = { pull: Dumbbell, push: Flame, legs: Trophy, armor: Sword
 
 // --- HOOKS ---
 function useLocalStorage<T>(key: string, initialValue: T) {
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") return initialValue;
-    try { const item = window.localStorage.getItem(key); return item ? JSON.parse(item) : initialValue; } catch (error) { return initialValue; }
-  });
-  const setValue = (value: T | ((val: T) => T)) => {
-    try { const valueToStore = value instanceof Function ? value(storedValue) : value; setStoredValue(valueToStore); if (typeof window !== "undefined") window.localStorage.setItem(key, JSON.stringify(valueToStore)); } catch (error) { console.error(error); }
-  };
+  const[storedValue, setStoredValue] = useState<T>(() => { try { const item = window.localStorage.getItem(key); return item ? JSON.parse(item) : initialValue; } catch (error) { return initialValue; } });
+  const setValue = (value: T | ((val: T) => T)) => { try { const valueToStore = value instanceof Function ? value(storedValue) : value; setStoredValue(valueToStore); if (typeof window !== "undefined") window.localStorage.setItem(key, JSON.stringify(valueToStore)); } catch (error) { console.error(error); } };
   return [storedValue, setValue] as const;
 }
 
 function useAudioBeep() {
   const ctxRef = useRef<AudioContext | null>(null);
-  const initAudio = useCallback(() => {
-    if (!ctxRef.current && typeof window !== "undefined") { const AudioCtx = window.AudioContext || (window as any).webkitAudioContext; if (AudioCtx) ctxRef.current = new AudioCtx(); }
-    if (ctxRef.current?.state === 'suspended') ctxRef.current.resume();
-  },[]);
-  const playBeep = useCallback(() => {
-    if (!ctxRef.current) return;
-    const ctx = ctxRef.current; const osc = ctx.createOscillator(); const gain = ctx.createGain();
-    osc.type = "sine"; osc.frequency.value = 880; gain.gain.setValueAtTime(0.02, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.3);
-  },[]);
+  const initAudio = useCallback(() => { if (!ctxRef.current && typeof window !== "undefined") { const AudioCtx = window.AudioContext || (window as any).webkitAudioContext; if (AudioCtx) ctxRef.current = new AudioCtx(); } if (ctxRef.current?.state === 'suspended') ctxRef.current.resume(); },[]);
+  const playBeep = useCallback(() => { if (!ctxRef.current) return; const ctx = ctxRef.current; const osc = ctx.createOscillator(); const gain = ctx.createGain(); osc.type = "sine"; osc.frequency.value = 880; gain.gain.setValueAtTime(0.02, ctx.currentTime); gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3); osc.connect(gain); gain.connect(ctx.destination); osc.start(); osc.stop(ctx.currentTime + 0.3); },[]);
   return { initAudio, playBeep };
 }
 
@@ -202,50 +175,33 @@ function useWakeLock(active: boolean) {
     if (typeof navigator === 'undefined' || !('wakeLock' in navigator)) return;
     const requestLock = async () => { try { wakeLockRef.current = await (navigator as any).wakeLock.request('screen'); } catch (err) {} };
     const releaseLock = async () => { if (wakeLockRef.current) { await wakeLockRef.current.release(); wakeLockRef.current = null; } };
-    if (active) requestLock(); else releaseLock();
-    return () => { releaseLock(); };
+    if (active) requestLock(); else releaseLock(); return () => { releaseLock(); };
   }, [active]);
 }
 
 function usePushNotifications() {
   const[enabled, setEnabled] = useLocalStorage("reacher_notifications", false);
-  const requestPermission = async () => {
-    if (!("Notification" in window)) return false;
-    if (Notification.permission === "granted") { setEnabled(true); return true; }
-    const perm = await Notification.requestPermission(); const isGranted = perm === "granted"; setEnabled(isGranted); return isGranted;
-  };
-  const notify = useCallback((title: string, body: string) => {
-    if (enabled && "Notification" in window && Notification.permission === "granted") { new Notification(title, { body, icon: "/favicon.ico" }); }
-  },[enabled]);
+  const requestPermission = async () => { if (!("Notification" in window)) return false; if (Notification.permission === "granted") { setEnabled(true); return true; } const perm = await Notification.requestPermission(); const isGranted = perm === "granted"; setEnabled(isGranted); return isGranted; };
+  const notify = useCallback((title: string, body: string) => { if (enabled && "Notification" in window && Notification.permission === "granted") { new Notification(title, { body, icon: "/favicon.ico" }); } },[enabled]);
   return { enabled, requestPermission, notify };
 }
 
 function formatTime(total: number) { const m = Math.floor(total / 60); const s = total % 60; return `${m}:${String(s).padStart(2, "0")}`; }
 
-// --- AI COACH ---
+// --- AI COACH MODAL ---
 function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKey: string, onClose: () => void }) {
-  const[question, setQuestion] = useState("");
-  const [loading, setLoading] = useState(false);
-  const[chatHistory, setChatHistory] = useState<{role: 'user'|'ai', text: string}[]>([{ role: 'ai', text: `מאמן ה-AI איתך! מטרה: מבנה של ריצ'ר. מה הבעיה עם ${exercise.name}?` }]);
+  const [question, setQuestion] = useState(""); const [loading, setLoading] = useState(false);
+  const [chatHistory, setChatHistory] = useState<{role: 'user'|'ai', text: string}[]>([{ role: 'ai', text: `מאמן ה-AI איתך! מטרה: מבנה של ריצ'ר. מה הבעיה עם ${exercise.name}?` }]);
 
-  const quickPrompts =[
-    { label: "כואב לי המפרק", icon: AlertTriangle, prompt: `כשאני עושה את התרגיל הזה כואב לי המפרק. מהן הטעויות הנפוצות ביציבה שגורמות לזה, ואיך לתקן?` },
-    { label: "לא מרגיש תשריר", icon: Sparkles, prompt: `אני לא מצליח להרגיש את השריר המטרה עובד. איך לשפר את הקשר מוח-שריר כאן?` },
-    { label: "גרסת חופשיות", icon: RefreshCcw, prompt: `אני רוצה להחליף למשקולות חופשיות. מה התחליף המדויק הכי טוב לזה?` }
-  ];
+  const quickPrompts =[ { label: "כואב לי המפרק", icon: AlertTriangle, prompt: `כשאני עושה את התרגיל הזה כואב לי המפרק. מהן הטעויות הנפוצות ביציבה שגורמות לזה, ואיך לתקן?` }, { label: "לא מרגיש תשריר", icon: Sparkles, prompt: `אני לא מצליח להרגיש את השריר המטרה עובד. איך לשפר את הקשר מוח-שריר כאן?` }, { label: "גרסת משקולות חופשיות", icon: RefreshCcw, prompt: `אני רוצה להחליף את זה למשקולות חופשיות. מה התחליף המדויק הכי טוב לזה?` } ];
 
-  const handleFallback = () => {
-    navigator.clipboard.writeText(`אני מתאמן על ${exercise.name} ומכוון למבנה גוף מאסיבי. תן לי דגשים לטכניקה נכונה וטיפ מקצועני אחד בעברית.`).then(() => { window.open("https://gemini.google.com/app", "_blank"); });
-  };
+  const handleFallback = () => { navigator.clipboard.writeText(`אני מתאמן על ${exercise.name} ומכוון למבנה גוף מאסיבי ופונקציונלי. תן לי דגשים לטכניקה נכונה וטיפ מקצועני אחד בעברית.`).then(() => { window.open("https://gemini.google.com/app", "_blank"); }); };
 
   const askGemini = async (text: string) => {
-    if (!text.trim()) return;
-    setChatHistory(prev => [...prev, { role: 'user', text }]); setQuestion(""); setLoading(true);
+    if (!text.trim()) return; setChatHistory(prev =>[...prev, { role: 'user', text }]); setQuestion(""); setLoading(true);
     try {
-      const prompt = `You are an elite bodybuilding coach. User wants a powerful, massive, athletic physique. Focus on: Maximum recruitment, free weights, biomechanical cues. Exercise: ${exercise.name}. Question: ${text}. Answer in HEBREW, be concise (3 short sentences max). No asterisks.`;
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] })
-      });
+      const prompt = `You are an elite bodybuilding coach. User wants a powerful physique. Focus on: Maximum recruitment, free weights, biomechanical cues. Exercise: ${exercise.name}. Question: ${text}. Answer in HEBREW, be concise (3 short sentences max). No asterisks.`;
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ contents:[{ parts:[{ text: prompt }] }] }) });
       const data = await res.json(); if (data.error) throw new Error(data.error.message);
       setChatHistory(prev =>[...prev, { role: 'ai', text: data.candidates[0].content.parts[0].text }]);
     } catch (e: any) { setChatHistory(prev =>[...prev, { role: 'ai', text: `שגיאה: ${e.message}` }]); }
@@ -255,32 +211,18 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
       <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="bg-zinc-900 border border-zinc-700 w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[85vh] max-h-[700px]">
-        <div className="bg-gradient-to-r from-indigo-900 to-zinc-900 p-4 border-b border-zinc-800 flex justify-between items-center">
-          <div className="flex items-center gap-3"><div className="bg-indigo-500/20 p-2 rounded-full border border-indigo-500/30"><Bot className="h-6 w-6 text-indigo-400" /></div><div><h3 className="font-bold text-lg text-white">Betesh BIST trainer AI</h3><p className="text-xs text-indigo-200">{exercise.name}</p></div></div>
-          <Button variant="ghost" size="icon" onClick={onClose} className="text-zinc-400 hover:text-white"><X className="h-5 w-5"/></Button>
-        </div>
+        <div className="bg-gradient-to-r from-indigo-900 to-zinc-900 p-4 border-b border-zinc-800 flex justify-between items-center"><div className="flex items-center gap-3"><div className="bg-indigo-500/20 p-2 rounded-full border border-indigo-500/30"><Bot className="h-6 w-6 text-indigo-400" /></div><div><h3 className="font-bold text-lg text-white">Betesh BIST trainer AI</h3><p className="text-xs text-indigo-200">{exercise.name}</p></div></div><Button variant="ghost" size="icon" onClick={onClose} className="text-zinc-400 hover:text-white"><X className="h-5 w-5"/></Button></div>
         <div className="flex-1 overflow-y-auto p-4 space-y-4" dir="rtl">
           {!apiKey ? (
-            <div className="h-full flex flex-col items-center justify-center text-center space-y-6 px-4">
-               <Bot className="h-16 w-16 text-zinc-600 mb-2" /><div><h4 className="text-xl font-bold mb-2">חסר מפתח AI</h4><p className="text-zinc-400 text-sm">הזן מפתח בהגדרות.</p></div>
-               <Button onClick={handleFallback} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 font-bold"><ExternalLink className="ml-2 w-5 h-5" /> פתח את ג'מיני לשאלה</Button>
-            </div>
+            <div className="h-full flex flex-col items-center justify-center text-center space-y-6 px-4"><Bot className="h-16 w-16 text-zinc-600 mb-2" /><div><h4 className="text-xl font-bold mb-2">חסר מפתח AI</h4><p className="text-zinc-400 text-sm">הזן מפתח בהגדרות.</p></div><Button onClick={handleFallback} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl h-12 font-bold"><ExternalLink className="ml-2 w-5 h-5" /> פתח את ג'מיני לשאלה</Button></div>
           ) : (
-            <>
-              {chatHistory.map((msg, i) => (<div key={i} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}><div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-zinc-800 border border-zinc-700 text-zinc-200 rounded-bl-sm'}`}>{msg.text}</div></div>))}
-              {loading && <div className="flex justify-end"><div className="bg-zinc-800 border border-zinc-700 text-zinc-400 p-3 rounded-2xl text-sm">...</div></div>}
-            </>
+            <>{chatHistory.map((msg, i) => (<div key={i} className={`flex ${msg.role === 'user' ? 'justify-start' : 'justify-end'}`}><div className={`max-w-[85%] p-3 rounded-2xl text-sm ${msg.role === 'user' ? 'bg-indigo-600 text-white rounded-br-sm' : 'bg-zinc-800 border border-zinc-700 text-zinc-200 rounded-bl-sm'}`}>{msg.text}</div></div>))} {loading && <div className="flex justify-end"><div className="bg-zinc-800 border border-zinc-700 text-zinc-400 p-3 rounded-2xl text-sm">...</div></div>}</>
           )}
         </div>
         {apiKey && (
           <div className="p-4 border-t border-zinc-800 bg-zinc-950 flex flex-col gap-3" dir="rtl">
-             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-               {quickPrompts.map((qp, idx) => { const Icon = qp.icon; return (<button key={idx} onClick={() => askGemini(qp.prompt)} className="whitespace-nowrap flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-3 py-1.5 rounded-full text-xs text-zinc-300"><Icon className="w-3.5 h-3.5 text-indigo-400" /> {qp.label}</button>); })}
-             </div>
-             <div className="flex gap-2">
-                <Button onClick={() => askGemini(question)} disabled={loading || !question.trim()} className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-4"><Send className="w-5 h-5" /></Button>
-                <Input value={question} onChange={(e: any) => setQuestion(e.target.value)} onKeyDown={(e: any) => e.key === 'Enter' && askGemini(question)} placeholder="הקלד שאלה..." className="flex-1 text-right" />
-             </div>
+             <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">{quickPrompts.map((qp, idx) => { const Icon = qp.icon; return (<button key={idx} onClick={() => askGemini(qp.prompt)} className="whitespace-nowrap flex items-center gap-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 px-3 py-1.5 rounded-full text-xs text-zinc-300"><Icon className="w-3.5 h-3.5 text-indigo-400" /> {qp.label}</button>); })}</div>
+             <div className="flex gap-2"><Button onClick={() => askGemini(question)} disabled={loading || !question.trim()} className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-4"><Send className="w-5 h-5" /></Button><Input value={question} onChange={(e: any) => setQuestion(e.target.value)} onKeyDown={(e: any) => e.key === 'Enter' && askGemini(question)} placeholder="הקלד שאלה..." className="flex-1 text-right" /></div>
           </div>
         )}
       </motion.div>
@@ -289,17 +231,17 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
 }
 
 // --- MAIN APP ---
-function ReacherApp() {
-  const[screen, setScreen] = useState<"home" | "day" | "live" | "analytics" | "settings">("home");
-  const [viewMode, setViewMode] = useState<"days" | "muscles">("days");
-  const [exerciseHistory, setExerciseHistory] = useLocalStorage<Record<string, SetRecord[]>>("reacher_history", {});
-  const [swaps, setSwaps] = useLocalStorage<Record<string, string>>("reacher_swaps", {});
-  const [weeklyProgress, setWeeklyProgress] = useLocalStorage<Record<string, boolean>>("reacher_weekly", {});
+export default function App() {
+  const [screen, setScreen] = useState<"home" | "day" | "live" | "analytics" | "settings">("home");
+  const[viewMode, setViewMode] = useState<"days" | "muscles">("days");
+  const[exerciseHistory, setExerciseHistory] = useLocalStorage<Record<string, SetRecord[]>>("reacher_history", {});
+  const[swaps, setSwaps] = useLocalStorage<Record<string, string>>("reacher_swaps", {});
+  const[weeklyProgress, setWeeklyProgress] = useLocalStorage<Record<string, boolean>>("reacher_weekly", {});
   const [geminiApiKey, setGeminiApiKey] = useLocalStorage<string>("reacher_gemini_api_key", "");
   const [soundOn, setSoundOn] = useLocalStorage("reacher_sound", true);
-  const [autoAdvance, setAutoAdvance] = useLocalStorage("reacher_auto", true);
+  const[autoAdvance, setAutoAdvance] = useLocalStorage("reacher_auto", true);
   const [globalWorkAdjust, setGlobalWorkAdjust] = useLocalStorage("reacher_work_adj", 100);
-  const [globalRestAdjust, setGlobalRestAdjust] = useLocalStorage("reacher_rest_adj", 100);
+  const[globalRestAdjust, setGlobalRestAdjust] = useLocalStorage("reacher_rest_adj", 100);
 
   const { initAudio, playBeep } = useAudioBeep();
   const { enabled: pushEnabled, requestPermission, notify } = usePushNotifications();
@@ -315,7 +257,7 @@ function ReacherApp() {
   const [currentWeight, setCurrentWeight] = useState<string>("");
   const [currentReps, setCurrentReps] = useState<string>("");
   const[currentRpe, setCurrentRpe] = useState<number>(8);
-  const [isWarmup, setIsWarmup] = useState(false);
+  const[isWarmup, setIsWarmup] = useState(false);
 
   const [aiExerciseToAsk, setAiExerciseToAsk] = useState<Exercise | null>(null);
   const [swapExerciseOrigin, setSwapExerciseOrigin] = useState<Exercise | null>(null);
@@ -460,14 +402,7 @@ function ReacherApp() {
                 {initialDaysWithMedia.map(d => {
                   const isDone = weeklyProgress[`${getCurrentWeekKey()}-${d.key}`];
                   return (
-                    <div
-                      key={d.key}
-                      className={`h-11 min-w-[54px] px-3 flex items-center justify-center rounded-2xl border text-sm font-bold ${
-                        isDone
-                          ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300'
-                          : 'border-zinc-800 bg-zinc-900/70 text-zinc-500'
-                      }`}
-                    >
+                    <div key={d.key} className={`h-11 min-w-[54px] px-3 flex items-center justify-center rounded-2xl border text-sm font-bold ${isDone ? 'border-emerald-500/50 bg-emerald-500/15 text-emerald-300' : 'border-zinc-800 bg-zinc-900/70 text-zinc-500'}`}>
                       {isDone ? <CheckCircle2 className="h-5 w-5" /> : dayKeyHebrew[d.key]}
                     </div>
                   );
@@ -481,14 +416,8 @@ function ReacherApp() {
           {[{ id: "home", icon: Home, label: "בית" }, { id: "day", icon: ListChecks, label: "אימון" }, { id: "live", icon: Play, label: "לייב" }, { id: "analytics", icon: TrendingUp, label: "התקדמות" }, { id: "settings", icon: Settings2, label: "הגדרות" }].map(tab => {
             const Icon = tab.icon; const isActive = screen === tab.id;
             return (
-              <button
-                key={tab.id}
-                dir="rtl"
-                onClick={() => setScreen(tab.id as any)}
-                className={`rounded-xl py-3 flex items-center justify-center text-xs sm:text-sm font-bold ${isActive ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-400'}`}
-              >
-                <span className="hidden sm:inline">{tab.label}</span>
-                <Icon className="sm:ml-2 h-4 w-4" />
+              <button key={tab.id} dir="rtl" onClick={() => setScreen(tab.id as any)} className={`rounded-xl py-3 flex items-center justify-center text-xs sm:text-sm font-bold ${isActive ? 'bg-zinc-800 text-white shadow-lg' : 'text-zinc-400'}`}>
+                <span className="hidden sm:inline">{tab.label}</span><Icon className="sm:ml-2 h-4 w-4" />
               </button>
             );
           })}
@@ -505,44 +434,17 @@ function ReacherApp() {
                 <motion.div key="days" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" dir="rtl">
                   {days.map((day) => (
                     <Card key={day.key} className="overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950/90 shadow-xl">
-                      <div className="relative h-52 overflow-hidden">
-                        <img
-                          src={day.exercises[0]?.imageUrl || imageByMuscle[day.exercises[0].muscleGroup]}
-                          alt={day.title}
-                          className="h-full w-full object-cover opacity-65"
-                        />
-                        <div className={`absolute inset-0 bg-gradient-to-t ${day.accent} from-10% via-transparent to-transparent`} />
-                        <div className="absolute inset-x-0 bottom-0 p-6 text-right">
-                          <div className="text-xs font-semibold text-white/80">{dayKeyHebrew[day.key] ?? day.key}</div>
-                          <div className="mt-1 text-3xl font-bold tracking-normal text-white">{day.title.replace(/^יום \d+ - /, "")}</div>
-                        </div>
-                      </div>
-                      <CardContent className="p-5 text-right">
-                        <div className="mb-5 text-sm text-zinc-300">{day.focusHe}</div>
-                        <div className="grid grid-cols-2 gap-3">
-                          <Button variant="outline" onClick={() => startLive(day.key)}>התחל</Button>
-                          <Button onClick={() => { setSelectedDayKey(day.key); setScreen("day"); }}>פרטים</Button>
-                        </div>
-                      </CardContent>
+                      <div className="relative h-52 overflow-hidden"><img src={day.exercises[0]?.imageUrl || imageByMuscle[day.exercises[0].muscleGroup]} alt={day.title} className="h-full w-full object-cover opacity-65" /><div className={`absolute inset-0 bg-gradient-to-t ${day.accent} from-10% via-transparent to-transparent`} /><div className="absolute inset-x-0 bottom-0 p-6 text-right"><div className="text-xs font-semibold text-white/80">{dayKeyHebrew[day.key] ?? day.key}</div><div className="mt-1 text-3xl font-bold tracking-normal text-white">{day.title.replace(/^יום \d+ - /, "")}</div></div></div>
+                      <CardContent className="p-5 text-right"><div className="mb-5 text-sm text-zinc-300">{day.focusHe}</div><div className="grid grid-cols-2 gap-3"><Button variant="outline" onClick={() => startLive(day.key)}>התחל</Button><Button onClick={() => { setSelectedDayKey(day.key); setScreen("day"); }}>פרטים</Button></div></CardContent>
                     </Card>
                   ))}
                 </motion.div>
               ) : (
                 <motion.div key="muscles" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" dir="rtl">
                   {Object.keys(imageByMuscle).map((muscle) => {
-                    const exs = allExercisesPool.filter(e => e.muscleGroup === muscle);
-                    if (exs.length === 0) return null;
+                    const exs = allExercisesPool.filter(e => e.muscleGroup === muscle); if (exs.length === 0) return null;
                     return (
-                      <Card key={muscle} className="overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950/90 shadow-xl">
-                        <div className="relative h-48">
-                          <img src={imageByMuscle[muscle as MuscleGroup]} alt={muscle} className="w-full h-full object-cover opacity-65" />
-                          <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" />
-                          <div className="absolute inset-x-0 bottom-0 p-6 text-right">
-                            <h2 className="text-3xl font-bold tracking-normal">{muscleHebrew[muscle] ?? muscle}</h2>
-                            <div className="mt-1 text-sm text-zinc-300">{exs.length} תרגילים</div>
-                          </div>
-                        </div>
-                      </Card>
+                      <Card key={muscle} className="overflow-hidden rounded-[2rem] border border-zinc-800 bg-zinc-950/90 shadow-xl"><div className="relative h-48"><img src={imageByMuscle[muscle as MuscleGroup]} alt={muscle} className="w-full h-full object-cover opacity-65" /><div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/20 to-transparent" /><div className="absolute inset-x-0 bottom-0 p-6 text-right"><h2 className="text-3xl font-bold tracking-normal">{muscleHebrew[muscle] ?? muscle}</h2><div className="mt-1 text-sm text-zinc-300">{exs.length} תרגילים</div></div></div></Card>
                     );
                   })}
                 </motion.div>
@@ -606,10 +508,4 @@ function ReacherApp() {
       </div>
     </div>
   );
-}
-
-const rootElement = document.getElementById("root");
-if (rootElement && !rootElement.innerHTML) {
-  const root = createRoot(rootElement);
-  root.render(<ReacherApp />);
 }
