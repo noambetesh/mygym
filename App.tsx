@@ -1,537 +1,293 @@
-// App.tsx v8 - "Project Reacher" - Light & Optimized
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createRoot } from "react-dom/client";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Play, Pause, RotateCcw, SkipForward, SkipBack, Dumbbell, Flame, Clock3,
+  CheckCircle2, Youtube, TimerReset, Volume2, VolumeX, Home, ListChecks,
+  Swords, Trophy, Settings2, Activity, CalendarDays, Weight, Eye,
+  Bot, Sparkles, X, Send, MessageCircle, ExternalLink, TrendingUp, RefreshCcw, AlertTriangle, Plus, Sparkle, 
+  Zap, BarChart3, Target, ShieldAlert, Cpu
+} from "lucide-react";
 
-// --- CONFIGURATION ---
-const GEMINI_API_KEY = "YOUR_GEMINI_API_KEY"; // Replace with your key
-const REACHER_IMAGE_URL = "./reacher_inspire.png"; // Placeholder for the generated image
+// --- THEME CONSTANTS ---
+const REACHER_BG = "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=1200&auto=format&fit=crop";
 
-const config = {
-  intervals: {
-    prep: 10,
-    work: 30,
-    rest: 10,
-  },
-  aiCoach: {
-    voiceLocale: 'he-IL',
-    apiKey: GEMINI_API_KEY,
-  }
-};
+const GlassCard = ({ className, children, onClick }: any) => (
+  <motion.div 
+    whileHover={{ scale: 1.01 }}
+    onClick={onClick}
+    className={`bg-white/10 backdrop-blur-2xl border border-white/20 rounded-[2.5rem] shadow-2xl overflow-hidden ${className || ''}`}
+  >
+    {children}
+  </motion.div>
+);
 
-const muscleCues = {
-  Chest: [
-    { cue: "Lean forward to engage lower chest", target: "Lower Chest" },
-    { cue: "Keep elbows tucked to minimize shoulder strain", target: "Shoulder Health" },
-    { cue: "Squeeze biceps against your chest for maximum contraction", target: "Inner Chest" },
-    { cue: "Drive up explosively, but descend with full control", target: "Hypertrophy" },
-  ],
-  Back: [
-    { cue: "Drive with your elbows, not your hands", target: "Lats" },
-    { cue: "Keep your chest high and upper back arched", target: "Shoulder Blades" },
-    { cue: "Focus on the stretch at the bottom without losing tension", target: "Lower Lats" },
-    { cue: "Maintain a neutral spine and engage your core", target: "Spinal Health" },
-  ],
-};
+// --- MAIN APPLICATION ---
+function ReacherApp() {
+  const [screen, setScreen] = useState<"splash" | "home" | "live" | "analytics" | "settings" | "ai-lab">("splash");
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem("reacher_api_key") || "");
+  const [isReacherMode, setIsReacherMode] = useState(false);
+  const [currentDay, setCurrentDay] = useState("day1");
+  const [exerciseIndex, setExerciseIndex] = useState(0);
+  const [isResting, setIsResting] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(0);
+  const [aiResponse, setAiResponse] = useState("מערכת AI מוכנה לפקודה, נעם.");
+  
+  const audioCtx = useRef<AudioContext | null>(null);
 
-const workoutPlan = {
-  Day1: {
-    name: "Pull & Legs A (Density Focus)",
-    exercises: [
-      { id: 101, name: "Barbell T-Bar Row", sets: 4, type: "Back", yt: "p1qV6WfI7eQ" },
-      { id: 102, name: "Weighted Pull-ups (Wide Grip)", sets: 3, type: "Back", yt: "8_800yM5h5M" },
-      { id: 103, name: "Dumbbell Seal Row", sets: 3, type: "Back", yt: "gC4L_tJ675g" },
-      { id: 104, name: "Deficit Deadlift", sets: 3, type: "Hams/Glutes", yt: "pY9F7Mv5G1c" },
-      { id: 105, name: "Seated Leg Curl", sets: 4, type: "Hams", yt: "k589F4P5W0c" },
-    ],
-  },
-  Day2: {
-    name: "Push & Legs B (Volume Focus)",
-    exercises: [
-      { id: 201, name: "Dumbbell Floor Press", sets: 4, type: "Chest", yt: "L8fFfN5mN_w" },
-      { id: 202, name: "Weighted Dips", sets: 4, type: "Chest", yt: "G2y1pD5vC90" },
-      { id: 203, name: "Barbell Overhead Press", sets: 3, type: "Shoulders", yt: "25z2Q3cM18s" },
-      { id: 204, name: "Bulgarian Split Squats (Front Foot Elevated)", sets: 3, type: "Quads", yt: "tG0_m2r_G90" },
-      { id: 205, name: "Pec Deck Fly", sets: 3, type: "Chest", yt: "yT7Mv7bW9Ww" },
-    ],
-  },
-};
-
-// --- CUSTOM HOOKS ---
-const useAudioBeep = () => {
-  const ctxRef = useRef<AudioContext | null>(null);
-
-  const initAudio = useCallback(() => {
-    if (!ctxRef.current) {
-      try {
-        ctxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-        console.log("AudioContext initialized.");
-      } catch (e) {
-        console.error("Failed to initialize AudioContext.", e);
-      }
+  // --- ENGINE ACTIVATION ---
+  const initEngines = useCallback(() => {
+    if (!audioCtx.current) {
+      audioCtx.current = new (window.AudioContext || (window as any).webkitAudioContext)();
     }
-    // Critical for mobile safari to resume context on interaction
-    if (ctxRef.current?.state === 'suspended') {
-      ctxRef.current.resume();
-    }
-  }, []);
-
-  const beep = useCallback((frequency: number, duration: number, volume: number) => {
-    initAudio(); // Ensure context is awake
-    if (!ctxRef.current || ctxRef.current.state === 'suspended') return;
-
-    const ctx = ctxRef.current;
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
-
-    osc.frequency.setValueAtTime(frequency, ctx.currentTime);
-    gainNode.gain.setValueAtTime(volume, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
-
-    osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
-
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + duration);
-  }, [initAudio]);
-
-  const playBeep = useCallback((type: 'prep' | 'work' | 'rest') => {
-    switch (type) {
-      case 'prep': beep(1000, 0.2, 0.4); break; // Short medium beep
-      case 'work': beep(1800, 0.5, 0.6); break; // High loud beep
-      case 'rest': beep(500, 0.3, 0.3); break; // Low beep
-    }
-  }, [beep]);
-
-  const playCountdown = useCallback((secondsLeft: number, timerType: 'prep' | 'work' | 'rest') => {
-    if (secondsLeft === 0) {
-      playBeep(timerType);
-    } else if (secondsLeft <= 3 && timerType !== 'rest') {
-      beep(timerType === 'prep' ? 800 : 1500, 0.1, 0.2); // Low ticks
-    }
-  }, [playBeep, beep]);
-
-  return { playBeep, playCountdown, initAudio };
-};
-
-const useAICoach = () => {
-  const synthesis = useRef<SpeechSynthesis | null>(null);
-  const voice = useRef<SpeechSynthesisVoice | null>(null);
-
-  useEffect(() => {
+    if (audioCtx.current.state === 'suspended') audioCtx.current.resume();
     if ('speechSynthesis' in window) {
-      synthesis.current = window.speechSynthesis;
-      const loadVoices = () => {
-        const voices = synthesis.current?.getVoices() || [];
-        voice.current = voices.find(v => v.lang === config.aiCoach.voiceLocale) || voices[0] || null;
-      };
-      loadVoices();
-      synthesis.current.onvoiceschanged = loadVoices;
+      const u = new SpeechSynthesisUtterance("");
+      window.speechSynthesis.speak(u);
     }
+    setScreen("home");
   }, []);
 
-  const speak = useCallback((text: string) => {
-    if (!synthesis.current || !voice.current) {
-      console.warn("AI Speech is not available or voice not loaded.");
-      return;
-    }
-    synthesis.current.cancel(); // Cancel any current speaking
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.voice = voice.current;
-    utterance.lang = config.aiCoach.voiceLocale;
-    utterance.rate = 1.0;
-    utterance.pitch = 1.1; // Slightly higher
-    synthesis.current.speak(utterance);
-  }, []);
+  const speak = (text: string) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'he-IL';
+    u.rate = 1.0;
+    u.pitch = isReacherMode ? 0.8 : 1.1;
+    window.speechSynthesis.speak(u);
+  };
 
-  const initAICoach = useCallback(() => {
-    // Basic speech activation on interaction
-    if (synthesis.current && 'SpeechSynthesisUtterance' in window) {
-        const u = new SpeechSynthesisUtterance("");
-        u.volume = 0;
-        synthesis.current.speak(u);
-    }
-  }, []);
+  const playBeep = (type: 'work' | 'rest') => {
+    if (!audioCtx.current) return;
+    const osc = audioCtx.current.createOscillator();
+    const gain = audioCtx.current.createGain();
+    osc.connect(gain); gain.connect(audioCtx.current.destination);
+    osc.frequency.value = type === 'work' ? 880 : 440;
+    gain.gain.setValueAtTime(0.2, audioCtx.current.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.current.currentTime + 0.5);
+    osc.start(); osc.stop(audioCtx.current.currentTime + 0.5);
+  };
 
-  const askGemini = useCallback(async (prompt: string): Promise<string> => {
-    if (!config.aiCoach.apiKey || config.aiCoach.apiKey === "YOUR_GEMINI_API_KEY") {
-        return "שיפור טכני ממוקד ריצ'ר יינתן כאן בקרוב. (מפתח API חסר)";
-    }
-
-    // Personalized Reacher Coach Prompt
-    const promptContext = `
-      You are an expert bodybuilding and biomechanics coach for Noam, a VLSI engineer.
-      His goal is massive, dense muscular growth like Jack Reacher, focusing on complete muscle recruitment. He prefers precise, biomechanical cues over generic motivation. Provide one specific, concise cue based on this prompt. Keep it professional, scientific, and impactful.
-      Prompt: ${prompt}
-    `;
-
+  // --- AI COACH LOGIC ---
+  const callAi = async (prompt: string, context = "general") => {
+    if (!apiKey) { setAiResponse("נעם, המוח כבוי. הזן מפתח API בהגדרות."); return; }
+    setAiResponse("מנתח ביו-מכניקה...");
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${config.aiCoach.apiKey}`, {
+      const system = context === "lab" 
+        ? "You are a bodybuilding AI specialist. Create a custom Reacher protocol for Noam. Use heavy compound exercises. Hebrew only."
+        : "You are the Reacher Coach. Give a 10-word professional biomechanical cue in Hebrew.";
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ contents: [{ parts: [{ text: promptContext }] }] }),
+        body: JSON.stringify({ contents: [{ parts: [{ text: system + prompt }] }] })
       });
-      const data = await response.json();
-      const cue = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "תתמקד בביצוע מושלם.";
-      speak(cue);
-      return cue;
-    } catch (e) {
-      console.error("Gemini API Error", e);
-      return "התמקדות בביצוע מלא של טווח התנועה.";
-    }
-  }, [speak]);
-
-  return { speak, askGemini, initAICoach };
-};
-
-// --- COMPONENTS ---
-const Header = () => (
-  <header className="bg-slate-900 text-white shadow-md p-5 border-b border-slate-700">
-    <div className="max-w-7xl mx-auto flex items-center justify-between">
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tighter">BITESH BIST TRAINER <span className="text-teal-400">v8</span></h1>
-        <p className="text-slate-300 text-sm mt-1">Project Reacher: VLSI Precision Bodybuilding</p>
-      </div>
-      <div className="text-teal-400 font-mono text-xs border border-teal-400 px-3 py-1 rounded-full">AI Coach Active</div>
-    </div>
-  </header>
-);
-
-const MuscleCueList = ({ cues }: { cues: typeof muscleCues.Chest }) => (
-  <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mt-8">
-    <h3 className="text-2xl font-bold mb-6 text-slate-900 tracking-tight">ביו-מכניקה מתקדמת (ריצ'ר פוקוס)</h3>
-    <div className="space-y-4">
-      {cues.map((item, index) => (
-        <div key={index} className="flex items-start bg-slate-50 p-4 rounded-xl border border-slate-100">
-          <div className="text-teal-600 mr-4 font-extrabold text-xl mt-1">#</div>
-          <div>
-            <p className="text-slate-900 font-medium">{item.cue}</p>
-            <p className="text-teal-700 text-sm font-semibold mt-1">מטרה: {item.target}</p>
-          </div>
-        </div>
-      ))}
-    </div>
-  </div>
-);
-
-const TimerDisplay = ({ label, seconds, type }: { label: string; seconds: number; type: 'prep' | 'work' | 'rest' }) => {
-  const colorMap = {
-    prep: "text-amber-600 bg-amber-50 border-amber-100",
-    work: "text-rose-600 bg-rose-50 border-rose-100",
-    rest: "text-teal-600 bg-teal-50 border-teal-100",
+      const data = await res.json();
+      const output = data.candidates[0].content.parts[0].text;
+      setAiResponse(output);
+      speak(output);
+    } catch (e) { setAiResponse("תקשורת AI נכשלה."); }
   };
+
+  // --- WORKOUT DATA (Non-Machine Focus) ---
+  const workouts: any = {
+    day1: { name: "REACHER DENSITY (PUSH)", exercises: [
+      { name: "Low-Incline DB Press", sets: 4, reps: "6-8", yt: "uIAyvYp97D8", cue: "מתיחה עמוקה, כיווץ דחוס." },
+      { name: "Weighted Dips", sets: 3, reps: "10", yt: "yZ8K_I_0H_o", cue: "הטיה קדימה לגיוס סיבי חזה." }
+    ]},
+    day2: { name: "REACHER WIDTH (PULL)", exercises: [
+      { name: "Meadows Row", sets: 4, reps: "12", yt: "p1qV6WfI7eQ", cue: "משיכה עם המרפק למותן." },
+      { name: "Weighted Pull-ups", sets: 3, reps: "6-8", yt: "8_800yM5h5M", cue: "חזה למעלה, מתיחה מלאה." }
+    ]}
+  };
+  const activeWorkout = workouts[currentDay];
+  const activeEx = activeWorkout.exercises[exerciseIndex];
+
   return (
-    <div className={`${colorMap[type]} p-6 rounded-2xl border flex items-center justify-between shadow-inner mt-4`}>
-      <span className="text-xl font-bold tracking-tight">{label}</span>
-      <span className="text-5xl font-extrabold tabular-nums tracking-tighter">{seconds}<span className="text-2xl ml-1">s</span></span>
-    </div>
-  );
-};
+    <div className={`min-h-screen transition-colors duration-1000 ${isReacherMode ? 'bg-red-950' : 'bg-slate-950'} text-white overflow-x-hidden`} dir="rtl">
+      
+      {/* Background Neon Glows */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        <div className={`absolute -top-40 -left-40 w-96 h-96 rounded-full blur-[150px] opacity-30 ${isReacherMode ? 'bg-red-600' : 'bg-teal-500'}`} />
+        <div className={`absolute -bottom-40 -right-40 w-96 h-96 rounded-full blur-[150px] opacity-30 ${isReacherMode ? 'bg-orange-600' : 'bg-indigo-500'}`} />
+      </div>
 
-// --- MAIN SCREENS ---
-const SplashScreen = ({ onEnter }: { onEnter: () => void }) => (
-    <div className="h-screen bg-black text-white flex flex-col items-center justify-center p-6 relative overflow-hidden">
-        {/* Background Image with Overlay for better text readability */}
-        <div className="absolute inset-0 z-0 opacity-60">
-            <img 
-                src={REACHER_IMAGE_URL} 
-                alt="Reacher Physique Inspiration" 
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                    e.currentTarget.style.display = 'none'; // Hide if failed
-                    console.error("Reacher image failed to load.");
-                }}
-            />
-             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/80 to-transparent"></div>
-        </div>
-
-        <div className="z-10 text-center max-w-xl space-y-6">
-            <h1 className="text-6xl font-extrabold tracking-tighter leading-tight bg-gradient-to-r from-teal-400 to-sky-400 bg-clip-text text-transparent">
-                BITESH<br/>BIST<br/>TRAINER<br/>
-                <span className="text-white text-5xl">PROJECT REACHER</span>
-            </h1>
-            <p className="text-slate-200 text-lg font-medium leading-relaxed">
-                מערכת אימון ביו-מכנית מתקדמת שנבנתה לנעם. פוקוס על תרגילים מורכבים, כיווץ אופטימלי, וגוף חזק, דחוס ועצום כמו של ריצ'ר.
-            </p>
-            <div className="pt-10">
-                <button 
-                    onClick={onEnter} 
-                    className="bg-teal-500 text-slate-900 font-bold px-12 py-5 rounded-full text-2xl shadow-2xl hover:bg-teal-400 transition-all duration-300 transform hover:scale-105"
-                >
-                    להתחיל להתאמן
-                </button>
-            </div>
-        </div>
-    </div>
-);
-
-const HomeView = ({ onSelectWorkout }: { onSelectWorkout: (day: keyof typeof workoutPlan) => void }) => (
-    <div className="space-y-10">
-        <div className="text-center bg-white p-8 rounded-3xl border border-slate-200 shadow-lg">
-            <p className="text-sm text-slate-500 font-medium">בוקר טוב נעם,</p>
-            <h2 className="text-5xl font-extrabold tracking-tighter text-slate-950 mt-2">המטרה: גוף ריצ'ר.</h2>
-            <p className="text-slate-700 mt-4 leading-relaxed max-w-2xl mx-auto">אימונים מבוססי ביו-מכניקה, התמקדות בתרגילים חופשיים ומורכבים. ה-AI Coach מוכן לתת לך דגשים מדויקים לכל חזרה.</p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {Object.entries(workoutPlan).map(([dayKey, dayData]) => (
-                <div key={dayKey} className="bg-white p-8 rounded-3xl border border-slate-200 shadow-lg space-y-5 transition-all hover:border-teal-300">
-                    <div>
-                        <span className="text-teal-600 font-semibold">{dayKey === "Day1" ? "יום ראשון/שני" : "יום רביעי/חמישי"}</span>
-                        <h3 className="text-3xl font-extrabold tracking-tight text-slate-950 mt-1">{dayData.name}</h3>
-                        <p className="text-slate-600 mt-2">{dayData.exercises.length} תרגילים • התמקדות במסה דחוסה</p>
-                    </div>
-                    <ul className="space-y-3 pt-3 border-t border-slate-100">
-                        {dayData.exercises.slice(0, 3).map(e => <li key={e.id} className="text-slate-800 font-medium">{e.name} ({e.sets} סטים)</li>)}
-                        {dayData.exercises.length > 3 && <li className="text-slate-500 text-sm">ועוד {dayData.exercises.length - 3} תרגילים...</li>}
-                    </ul>
-                    <button 
-                        onClick={() => onSelectWorkout(dayKey as keyof typeof workoutPlan)}
-                        className="bg-slate-900 text-white font-semibold w-full py-4 rounded-xl text-lg hover:bg-slate-800"
-                    >
-                        התחל אימון {dayData.name}
-                    </button>
-                </div>
-            ))}
-        </div>
-    </div>
-);
-
-const ExerciseSelectorView = ({ workoutKey, onSelectExercise, currentExerciseId, currentSet, onCompleteSet }: { 
-    workoutKey: keyof typeof workoutPlan;
-    onSelectExercise: (id: number) => void;
-    currentExerciseId: number | null;
-    currentSet: number;
-    onCompleteSet: () => void;
-}) => {
-  const workout = workoutPlan[workoutKey];
-  return (
-    <div className="space-y-8">
-        <h2 className="text-4xl font-extrabold text-slate-950">{workout.name} - בחירת תרגיל</h2>
-        <div className="space-y-6">
-            {workout.exercises.map((ex) => {
-                const isSelected = ex.id === currentExerciseId;
-                const isCurrent = currentExerciseId === null || isSelected;
-                return (
-                    <div key={ex.id} className={`bg-white p-6 rounded-2xl border ${isSelected ? 'border-teal-400' : 'border-slate-200'} shadow-sm space-y-4`}>
-                        <div className="flex items-start justify-between">
-                            <div>
-                                <span className={`inline-block text-xs font-bold px-3 py-1 rounded-full ${isSelected ? 'bg-teal-100 text-teal-800' : 'bg-slate-100 text-slate-700'}`}>{ex.type}</span>
-                                <h3 className="text-2xl font-bold text-slate-950 mt-2">{ex.name}</h3>
-                                <p className="text-slate-600">יעד: {ex.sets} סטים</p>
-                            </div>
-                            <div className="flex flex-col items-end gap-2">
-                                <a href={`https://youtu.be/${ex.yt}`} target="_blank" rel="noopener noreferrer" className="text-sky-600 text-sm font-semibold flex items-center">
-                                    <span className="mr-1.5">▶</span> צפה בסרטון הדרכה
-                                </a>
-                                {isSelected && (
-                                     <div className="text-slate-900 font-bold bg-slate-100 px-3 py-1 rounded-lg">סט {currentSet + 1} / {ex.sets}</div>
-                                )}
-                            </div>
-                        </div>
-
-                        {isSelected ? (
-                             <button onClick={onCompleteSet} className="bg-teal-600 text-white w-full py-4 rounded-xl font-bold text-lg shadow-lg">סימון סט כהושלם (ביפ!)</button>
-                        ) : (
-                             <button onClick={() => onSelectExercise(ex.id)} className="bg-slate-900 text-white w-full py-4 rounded-xl font-medium text-lg hover:bg-slate-800" disabled={currentExerciseId !== null && !isSelected}>בחר תרגיל להתחלה</button>
-                        )}
-                    </div>
-                );
-            })}
-        </div>
-    </div>
-  );
-};
-
-const LiveWorkoutView = ({ workoutKey, currentExerciseId, currentSet, onCompleteSet }: { 
-    workoutKey: keyof typeof workoutPlan;
-    currentExerciseId: number | null;
-    currentSet: number;
-    onCompleteSet: () => void;
-}) => {
-    const workout = workoutPlan[workoutKey];
-    const exercise = currentExerciseId ? workout.exercises.find(e => e.id === currentExerciseId) : null;
-    const { playCountdown } = useAudioBeep();
-    const { askGemini } = useAICoach();
-
-    const [timeLeft, setTimeLeft] = useState(config.intervals.rest);
-    const [aiCue, setAiCue] = useState<string | null>(null);
-
-    useEffect(() => {
-        // AI cue at start of rest
-        if (timeLeft === config.intervals.rest) {
-            askGemini(`Provide one precise biomechanical cue for Noam doing '${exercise?.name}' to maximize muscle density, Jack Reacher style.`)
-                .then(setAiCue);
-        }
-
-        const timer = setInterval(() => {
-            setTimeLeft(t => {
-                if (t <= 1) {
-                    clearInterval(timer);
-                    playCountdown(0, 'rest');
-                    // auto transition/notify here?
-                    return 0;
-                }
-                playCountdown(t - 1, 'rest');
-                return t - 1;
-            });
-        }, 1000);
-
-        return () => clearInterval(timer);
-    }, [timeLeft, playCountdown, askGemini, exercise?.name]);
-
-    if (!exercise) return null;
-
-    return (
-        <div className="space-y-8">
-            <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-lg text-center">
-                <span className="text-sm font-semibold text-rose-600 bg-rose-50 px-3 py-1 rounded-full">מנוחה</span>
-                <p className="text-slate-600 mt-3">מתכוננים לסט {currentSet + 2} / {exercise.sets}</p>
-                <h2 className="text-4xl font-extrabold text-slate-950 mt-1">{exercise.name}</h2>
-                <TimerDisplay label="ספירה לאחור לתחילת הסט" seconds={timeLeft} type="rest" />
-            </div>
-
-            {aiCue && (
-                <div className="bg-teal-950 p-6 rounded-2xl text-teal-100 border border-teal-800 shadow-xl space-y-2">
-                    <p className="font-bold text-lg text-teal-300">דגש מה-AI Coach של ריצ'ר:</p>
-                    <p className="text-xl font-medium leading-relaxed">"{aiCue}"</p>
-                </div>
-            )}
-             <button onClick={onCompleteSet} className="bg-slate-900 text-white w-full py-4 rounded-xl font-medium text-lg hover:bg-slate-800">התחל סט מוקדם יותר</button>
-        </div>
-    );
-};
-
-// --- NAVIGATION ---
-const FooterNav = ({ currentView, currentWorkout, setCurrentView, endWorkout }: {
-    currentView: 'home' | 'selector' | 'live';
-    currentWorkout: string | null;
-    setCurrentView: (view: 'home' | 'selector' | 'live') => void;
-    endWorkout: () => void;
-}) => {
-    const isWorkoutActive = currentView !== 'home';
-    return (
-        <footer className="bg-slate-900 text-slate-300 p-4 sticky bottom-0 border-t border-slate-700 mt-12 shadow-2xl">
-            <div className="max-w-7xl mx-auto flex items-center justify-between">
-                <button 
-                    onClick={() => setCurrentView('home')} 
-                    className={`font-semibold text-lg px-4 py-2 rounded-lg ${currentView === 'home' ? 'bg-slate-700 text-teal-400' : ''}`}
-                >בית</button>
-                {isWorkoutActive && (
-                    <div className="flex items-center gap-4">
-                        <p className="text-teal-400 text-sm font-medium">אימון: {currentWorkout}</p>
-                        <button 
-                            onClick={endWorkout}
-                            className="text-sm text-rose-400 font-semibold border border-rose-600 px-3 py-1 rounded-full hover:bg-rose-950"
-                        >סיום אימון</button>
-                    </div>
-                )}
-            </div>
-        </footer>
-    );
-};
-
-// --- APP ---
-const App = () => {
-    const [view, setView] = useState<'splash' | 'home' | 'selector' | 'live'>('splash');
-    const [selectedWorkoutKey, setSelectedWorkoutKey] = useState<keyof typeof workoutPlan | null>(null);
-    const [currentExerciseId, setCurrentExerciseId] = useState<number | null>(null);
-    const [currentSet, setCurrentSet] = useState(0);
-
-    const { initAudio, playBeep } = useAudioBeep();
-    const { initAICoach } = useAICoach();
-
-    const handleEnterApp = useCallback(() => {
-        initAudio(); // Activate AudioContext on first touch
-        initAICoach(); // Activate Speech
-        setView("home");
-    }, [initAudio, initAICoach]);
-
-    const handleSelectWorkout = (dayKey: keyof typeof workoutPlan) => {
-        setSelectedWorkoutKey(dayKey);
-        setCurrentExerciseId(null);
-        setCurrentSet(0);
-        setView("selector");
-    };
-
-    const handleSelectExercise = (exerciseId: number) => {
-        setCurrentExerciseId(exerciseId);
-        setCurrentSet(0);
-        // Still in selector, but highlighted
-    };
-
-    const handleCompleteSet = () => {
-        if (!selectedWorkoutKey || !currentExerciseId) return;
+      <AnimatePresence mode="wait">
         
-        const exercise = workoutPlan[selectedWorkoutKey].exercises.find(e => e.id === currentExerciseId);
-        if (!exercise) return;
+        {/* --- 1. SPLASH SCREEN --- */}
+        {screen === "splash" && (
+          <motion.div 
+            key="splash" exit={{ opacity: 0, scale: 1.1 }}
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center p-10 text-center"
+          >
+            <div className="absolute inset-0 z-0">
+              <img src={REACHER_BG} className="w-full h-full object-cover opacity-30 grayscale" alt="Reacher" />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent" />
+            </div>
+            <motion.div initial={{ y: 50, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="z-10 space-y-10">
+              <div className="flex justify-center gap-2 font-mono text-teal-400"><Cpu /> PROJECT REACHER v10</div>
+              <h1 className="text-8xl md:text-9xl font-black italic tracking-tighter leading-none">BUILT<br/><span className="text-teal-400">DIFFERENT</span></h1>
+              <p className="text-2xl text-slate-400 font-bold tracking-widest uppercase">Noam, Let's Build That Physique.</p>
+              <button 
+                onClick={initEngines}
+                className="group relative px-20 py-8 bg-white text-slate-950 text-3xl font-black rounded-full shadow-[0_0_50px_rgba(255,255,255,0.3)] hover:scale-105 transition-all"
+              >
+                IGNITION
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
 
-        playBeep('work'); // Final work beep
+        {/* --- 2. HOME SCREEN --- */}
+        {screen === "home" && (
+          <motion.div key="home" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="max-w-6xl mx-auto p-6 pt-16 space-y-12 pb-40">
+            <header className="flex justify-between items-end">
+              <div>
+                <h2 className="text-6xl font-black italic">היי נעם</h2>
+                <div className="flex gap-2 mt-2 font-bold text-teal-400">VLSI ENGINEER | PROJECT REACHER</div>
+              </div>
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => setIsReacherMode(!isReacherMode)}
+                  className={`p-5 rounded-3xl border-2 transition-all ${isReacherMode ? 'border-red-500 bg-red-500 shadow-[0_0_30px_rgba(239,68,68,0.5)]' : 'border-slate-800 bg-slate-900 text-slate-500'}`}
+                >
+                  <Zap fill={isReacherMode ? "white" : "none"} />
+                </button>
+                <button onClick={() => setScreen("settings")} className="p-5 rounded-3xl bg-slate-900 border border-slate-800 text-slate-400"><Settings2 /></button>
+              </div>
+            </header>
 
-        if (currentSet + 1 >= exercise.sets) {
-            // Finished Exercise
-            setCurrentExerciseId(null);
-            setCurrentSet(0);
-            setView("selector");
-        } else {
-            // Need Rest, Start Rest Timer
-            setCurrentSet(s => s + 1);
-            setView("live");
-        }
-    };
+            {/* AI HUD */}
+            <GlassCard className="p-10 border-teal-500/30">
+              <div className="flex gap-8 items-start">
+                <div className="p-6 bg-teal-500/20 rounded-full border border-teal-500/50"><Bot size={40} className="text-teal-400" /></div>
+                <div className="space-y-4 flex-1">
+                  <p className="text-3xl font-bold leading-tight text-teal-100 italic">"{aiResponse}"</p>
+                  <div className="flex gap-6">
+                    <button onClick={() => callAi("תן לי דגש ביו-מכני")} className="text-teal-400 font-black border-b-2 border-teal-400 pb-1">דגש מהיר</button>
+                    <button onClick={() => setScreen("ai-lab")} className="text-orange-400 font-black border-b-2 border-orange-400 pb-1">AI LAB 2.0</button>
+                  </div>
+                </div>
+              </div>
+            </GlassCard>
 
-    const endWorkout = () => {
-        setSelectedWorkoutKey(null);
-        setCurrentExerciseId(null);
-        setCurrentSet(0);
-        setView("home");
-    };
+            <div className="grid gap-8 md:grid-cols-2">
+              {Object.entries(workouts).map(([id, w]: any) => (
+                <GlassCard key={id} className="group cursor-pointer hover:border-teal-500" onClick={() => { setCurrentDay(id); setScreen("live"); }}>
+                  <div className="p-12 space-y-8">
+                    <h3 className="text-4xl font-black italic group-hover:text-teal-400 transition-colors">{w.name}</h3>
+                    <button className="w-full py-6 bg-white text-slate-950 rounded-3xl font-black text-xl group-hover:bg-teal-400 transition-colors">START SESSION</button>
+                  </div>
+                </GlassCard>
+              ))}
+            </div>
+          </motion.div>
+        )}
 
-    if (view === "splash") return <SplashScreen onEnter={handleEnterApp} />;
+        {/* --- 3. LIVE SESSION --- */}
+        {screen === "live" && (
+          <motion.div key="live" className="fixed inset-0 z-50 bg-slate-950 p-6 md:p-12 overflow-y-auto">
+             <div className="max-w-4xl mx-auto space-y-12 pb-32">
+                <button onClick={() => setScreen("home")} className="p-6 bg-white/5 rounded-full"><X /></button>
+                <div className="text-center space-y-4">
+                   <h1 className="text-7xl md:text-9xl font-black tracking-tighter italic uppercase">{activeEx.name}</h1>
+                   <p className="text-2xl text-slate-400 font-bold italic">"{activeEx.cue}"</p>
+                </div>
+                <GlassCard className={`p-16 text-center ${isResting ? 'border-orange-500' : 'border-teal-500'}`}>
+                   <div className="text-9xl font-black tabular-nums">{isResting ? timeLeft : "LIFT"}</div>
+                </GlassCard>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <button 
+                    onClick={() => {
+                      playBeep('work');
+                      setIsResting(true); setTimeLeft(60);
+                      const timer = setInterval(() => {
+                        setTimeLeft(p => {
+                           if (p <= 1) { clearInterval(timer); playBeep('rest'); setIsResting(false); return 0; }
+                           return p - 1;
+                        });
+                      }, 1000);
+                    }}
+                    className="py-10 bg-teal-500 text-slate-950 rounded-[2.5rem] text-4xl font-black shadow-xl"
+                  >
+                    COMPLETE SET
+                  </button>
+                  <button 
+                    onClick={() => window.open(`http://googleusercontent.com/youtube.com/6{activeEx.yt}`, '_blank')}
+                    className="py-10 bg-white/5 border border-white/10 rounded-[2.5rem] text-3xl font-black flex items-center justify-center gap-4"
+                  >
+                    <Youtube className="text-rose-500" size={40} /> VIDEO
+                  </button>
+                </div>
+             </div>
+          </motion.div>
+        )}
 
-    const workoutName = selectedWorkoutKey ? workoutPlan[selectedWorkoutKey].name : null;
+        {/* --- 4. AI LAB --- */}
+        {screen === "ai-lab" && (
+           <motion.div key="ai-lab" className="fixed inset-0 z-[60] bg-slate-950 p-8 flex flex-col items-center justify-center">
+              <button onClick={() => setScreen("home")} className="absolute top-10 right-10 p-4 bg-white/5 rounded-full"><X /></button>
+              <div className="max-w-3xl w-full text-center space-y-10">
+                 <Cpu size={64} className="text-orange-400 mx-auto" />
+                 <h2 className="text-7xl font-black italic uppercase">AI LAB <span className="text-orange-400">2.0</span></h2>
+                 <input 
+                    type="text" 
+                    placeholder="תאר אימון רצוי (למשל: 'גב רחב בלי מכונות')..."
+                    className="w-full p-8 bg-white/5 border-2 border-slate-800 rounded-[2.5rem] text-2xl font-bold focus:border-orange-500 transition-all text-center"
+                    onKeyDown={(e: any) => e.key === 'Enter' && callAi(e.target.value, 'lab')}
+                 />
+                 <GlassCard className="p-10 border-orange-500/30">
+                    <p className="text-3xl font-black italic text-orange-100">"{aiResponse}"</p>
+                 </GlassCard>
+              </div>
+           </motion.div>
+        )}
 
-    return (
-        <div className="min-h-screen bg-slate-50 text-slate-900 flex flex-col font-sans antialiased" dir="rtl">
-            <Header />
-
-            <main className="flex-grow p-6 md:p-10 max-w-7xl mx-auto w-full">
-                {view === "home" && <HomeView onSelectWorkout={handleSelectWorkout} />}
-                
-                {selectedWorkoutKey && view === "selector" && (
-                    <ExerciseSelectorView 
-                        workoutKey={selectedWorkoutKey}
-                        currentExerciseId={currentExerciseId}
-                        currentSet={currentSet}
-                        onSelectExercise={handleSelectExercise}
-                        onCompleteSet={handleCompleteSet}
+        {/* --- 5. SETTINGS --- */}
+        {screen === "settings" && (
+           <motion.div key="settings" className="max-w-2xl mx-auto p-12 pt-32 space-y-12">
+              <div className="flex justify-between items-center">
+                 <h2 className="text-6xl font-black italic">SETTINGS</h2>
+                 <button onClick={() => setScreen("home")} className="p-4 bg-white/5 rounded-full"><X /></button>
+              </div>
+              <GlassCard className="p-10 space-y-8">
+                 <div className="space-y-4">
+                    <label className="text-xs font-black text-slate-500 tracking-[0.3em]">GEMINI API KEY</label>
+                    <input 
+                      type="password" value={apiKey} onChange={(e) => { setApiKey(e.target.value); localStorage.setItem("reacher_api_key", e.target.value); }}
+                      className="w-full p-6 bg-white/5 border border-white/10 rounded-2xl text-xl font-bold focus:border-teal-500"
                     />
-                )}
+                 </div>
+                 <button 
+                   onClick={() => { localStorage.clear(); window.location.reload(); }}
+                   className="w-full py-5 text-rose-500 font-black border border-rose-500/30 rounded-2xl"
+                 >
+                   RESET SYSTEM
+                 </button>
+              </GlassCard>
+           </motion.div>
+        )}
 
-                {selectedWorkoutKey && currentExerciseId && view === "live" && (
-                    <LiveWorkoutView 
-                        workoutKey={selectedWorkoutKey}
-                        currentExerciseId={currentExerciseId}
-                        currentSet={currentSet}
-                        onCompleteSet={handleCompleteSet}
-                    />
-                )}
+      </AnimatePresence>
 
-                {/* Always show muscle cues for the selected workout in Selector view */}
-                {selectedWorkoutKey && view === "selector" && workoutPlan[selectedWorkoutKey].exercises[0]?.type === "Back" && (
-                    <MuscleCueList cues={muscleCues.Back} />
-                )}
-                 {selectedWorkoutKey && view === "selector" && workoutPlan[selectedWorkoutKey].exercises[0]?.type === "Chest" && (
-                    <MuscleCueList cues={muscleCues.Chest} />
-                )}
-            </main>
-
-            <FooterNav 
-                currentView={view as 'home' | 'selector' | 'live'}
-                currentWorkout={workoutName}
-                setCurrentView={setView}
-                endWorkout={endWorkout}
-            />
+      {/* Persistent Navigation */}
+      {screen !== "splash" && screen !== "live" && (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-6">
+           <div className="bg-slate-900/90 backdrop-blur-3xl border border-white/10 p-4 rounded-full flex justify-around items-center shadow-2xl">
+              <button onClick={() => setScreen("home")} className={`p-4 rounded-full ${screen === 'home' ? 'text-teal-400' : 'text-slate-500'}`}><Home /></button>
+              <button onClick={() => setScreen("ai-lab")} className={`p-4 rounded-full ${screen === 'ai-lab' ? 'text-orange-400' : 'text-slate-500'}`}><Cpu /></button>
+              <button onClick={() => setScreen("live")} className="p-4 text-indigo-400"><Play /></button>
+              <button onClick={() => setScreen("settings")} className="p-4 text-slate-500"><Settings2 /></button>
+           </div>
         </div>
-    );
-};
+      )}
+    </div>
+  );
+}
 
-export default App;
+// --- INITIALIZATION ---
+const container = document.getElementById("root");
+if (container) {
+  const root = createRoot(container);
+  root.render(<ReacherApp />);
+}
