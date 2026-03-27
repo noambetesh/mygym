@@ -543,4 +543,27 @@ export default function App() {
     </Card>
   );
 })}
+
 </div>
+
+<div className="space-y-6">
+  <Card>
+    <div className={`h-2 bg-gradient-to-r ${selectedDay.accent}`} />
+    <CardHeader>
+      <CardTitle>תרגילי בונוס</CardTitle>
+    </CardHeader>
+    <CardContent className="space-y-3">
+      {selectedDay.bonus.map((bonus) => (
+        <div key={bonus.id} className="p-4 border border-zinc-800 rounded-2xl">
+          <div className="font-bold">{bonus.name}</div>
+          <p dir="rtl" className="text-sm text-zinc-400 mt-1">
+            {bonus.he}
+          </p>
+        </div>
+      ))}
+    </CardContent>
+  </Card>
+</div>
+</div>
+</div>
+)}
