@@ -76,7 +76,6 @@ const Slider = ({ value, min, max, step, onValueChange, className }: any) => (
 
 const ScrollArea = ({ className, children }: any) => <div className={`overflow-y-auto overflow-x-hidden ${className || ''}`}>{children}</div>;
 
-
 // ==========================================
 // 2. CORE TYPES & DATA
 // ==========================================
@@ -254,7 +253,7 @@ function useLocalStorage<T>(key: string, initialValue: T) {
       console.error(error);
     }
   };
-  return[storedValue, setValue] as const;
+  return [storedValue, setValue] as const;
 }
 
 function useAudioBeep() {
@@ -331,7 +330,7 @@ function youtubeUrl(name: string) {
 // 4. AI COACH COMPONENT
 // ==========================================
 function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKey: string, onClose: () => void }) {
-  const [question, setQuestion] = useState("");
+  const[question, setQuestion] = useState("");
   const [loading, setLoading] = useState(false);
   const [chatHistory, setChatHistory] = useState<{role: 'user'|'ai', text: string}[]>([
     { role: 'ai', text: `מאמן ה-AI איתך! מטרה: מבנה של ריצ'ר. מה הבעיה עם ${exercise.name}?` }
@@ -352,7 +351,7 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
 
   const askGemini = async (text: string) => {
     if (!text.trim()) return;
-    setChatHistory(prev => [...prev, { role: 'user', text }]);
+    setChatHistory(prev =>[...prev, { role: 'user', text }]);
     setQuestion("");
     setLoading(true);
   
@@ -455,7 +454,6 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
     </div>
   );
 }
-
 // ==========================================
 // 5. MAIN APP COMPONENT
 // ==========================================
@@ -484,7 +482,7 @@ function ReacherApp() {
   const [secondsLeft, setSecondsLeft] = useState(0);
   const[targetTime, setTargetTime] = useState<number | null>(null);
   
-  const [currentWeight, setCurrentWeight] = useState<string>("");
+  const[currentWeight, setCurrentWeight] = useState<string>("");
   const [currentReps, setCurrentReps] = useState<string>("");
   const[currentRpe, setCurrentRpe] = useState<number>(8);
   const[isWarmup, setIsWarmup] = useState(false);
@@ -506,7 +504,7 @@ function ReacherApp() {
         return ex;
       })
     }));
-  }, [swaps]);
+  },[swaps]);
 
   const selectedDay = useMemo(() => days.find((d) => d.key === selectedDayKey) ?? days[0],[days, selectedDayKey]);
   const liveExercise = selectedDay.exercises[exerciseIndex];
