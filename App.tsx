@@ -215,7 +215,7 @@ function AiCoachModal({ exercise, apiKey, onClose }: { exercise: Exercise, apiKe
 }
 
 // --- MAIN APP ---
-function Betesh BIST trainerApp() {
+function BeteshBISTTrainerApp() {
   const[screen, setScreen] = useState<"home" | "day" | "live" | "analytics" | "settings">("home");
   const [viewMode, setViewMode] = useState<"days" | "muscles">("days");
   const [exerciseHistory, setExerciseHistory] = useLocalStorage<Record<string, SetRecord[]>>("reacher_history", {});
@@ -474,5 +474,6 @@ function Betesh BIST trainerApp() {
 const rootElement = document.getElementById("root");
 if (rootElement && !rootElement.innerHTML) {
   const root = createRoot(rootElement);
-  root.render(<Betesh BIST trainerApp />);
+    root.render(<BeteshBISTTrainerApp />);
+
 }
