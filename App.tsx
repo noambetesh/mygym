@@ -271,36 +271,14 @@ function ReacherApp() {
   // Data Logging
   const [weight, setWeight] = useState("");
   const [reps, setReps] = useState("");
-  const [logs, setLogs] = useState<SetRecord[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      return JSON.parse(window.localStorage.getItem("reacher_logs_v20") || "[]");
-    } catch {
-      return [];
-    }
-  });
-  const [history, setHistory] = useState<SessionData[]>(() => {
-    if (typeof window === "undefined") return [];
-    try {
-      return JSON.parse(window.localStorage.getItem("reacher_hist_v20") || "[]");
-    } catch {
-      return [];
-    }
-  });
+  const [logs, setLogs] = useState<SetRecord[]>(() => JSON.parse(localStorage.getItem("reacher_logs_v20") || "[]"));
+  const [history, setHistory] = useState<SessionData[]>(() => JSON.parse(localStorage.getItem("reacher_hist_v20") || "[]"));
 
   const audioCtx = useRef<AudioContext | null>(null);
 
   // Persistence
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("reacher_logs_v20", JSON.stringify(logs));
-    }
-  }, [logs]);
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem("reacher_hist_v20", JSON.stringify(history));
-    }
-  }, [history]);
+  useEffect(() => localStorage.setItem("reacher_logs_v20", JSON.stringify(logs)), [logs]);
+  useEffect(() => localStorage.setItem("reacher_hist_v20", JSON.stringify(history)), [history]);
 
   // Alert System
   const playAlert = (f: number) => {
@@ -616,36 +594,6 @@ function ReacherApp() {
                 </ApexCard>
               ))}
            </div>
-        </motion.div>
-      )}
-
-      {/* SETTINGS VIEW */}
-      {tab === "settings" && (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-10 max-w-4xl mx-auto px-2">
-           <header className="text-center space-y-4">
-              <h2 className="text-6xl font-black italic uppercase tracking-tighter">SYSTEM<br/>SETTINGS</h2>
-              <p className="text-slate-600 font-bold uppercase tracking-[0.4em] text-xs">Core preferences and persistent memory</p>
-           </header>
-
-           <ApexCard className="p-10 space-y-8">
-              <div className="flex items-center justify-between gap-6">
-                 <div className="space-y-2">
-                    <h3 className="text-2xl font-black italic uppercase">Stored Data</h3>
-                    <p className="text-slate-500 font-medium">האפליקציה שומרת היסטוריית אימונים וסטים מקומית בדפדפן.</p>
-                 </div>
-                 <ApexBadge variant="teal">{history.length} sessions</ApexBadge>
-              </div>
-              <div className="grid md:grid-cols-2 gap-6">
-                 <div className="bg-black/30 rounded-[2rem] p-6 border border-white/5">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Logged sets</p>
-                    <p className="text-4xl font-black italic text-white">{logs.length}</p>
-                 </div>
-                 <div className="bg-black/30 rounded-[2rem] p-6 border border-white/5">
-                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-3">Completed sessions</p>
-                    <p className="text-4xl font-black italic text-white">{history.length}</p>
-                 </div>
-              </div>
-           </ApexCard>
         </motion.div>
       )}
 
