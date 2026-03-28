@@ -819,24 +819,24 @@ function ReacherApp() {
     return (
       <>
         <AnimatePresence>{flashTone && <TransitionFlash tone={flashTone} />}</AnimatePresence>
-        <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-12 overflow-hidden text-center">
+        <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-4 sm:p-6 md:p-12 overflow-hidden text-center">
         <div className="absolute inset-0 opacity-10 blur-sm scale-110">
           <SafeImage src={REACHER_HERO} alt="hero" className="w-full h-full object-cover" fallbackSrc={DEFAULT_EXERCISE_IMAGE} />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
         </div>
-        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 space-y-12">
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 space-y-6 sm:space-y-8 md:space-y-12 max-w-[92vw] sm:max-w-2xl">
           <div className="flex flex-col items-center gap-4">
-            <div className="px-7 py-6 bg-teal-500 rounded-[2.5rem] flex items-center justify-center shadow-[0_0_50px_rgba(20,184,166,0.5)]">
-              <span className="text-slate-950 text-3xl font-black italic tracking-tight">askAI</span>
+            <div className="px-5 py-4 sm:px-6 sm:py-5 md:px-7 md:py-6 bg-teal-500 rounded-[1.5rem] sm:rounded-[2rem] md:rounded-[2.5rem] flex items-center justify-center shadow-[0_0_50px_rgba(20,184,166,0.5)]">
+              <span className="text-slate-950 text-xl sm:text-2xl md:text-3xl font-black italic tracking-tight">askAI</span>
             </div>
-            <p className="text-teal-400 font-mono text-[10px] uppercase tracking-[0.6em] mt-4"><Cpu size={14} className="inline mr-2" /> PLATINUM ENGINE v21.0</p>
+            <p className="text-teal-400 font-mono text-[8px] sm:text-[9px] md:text-[10px] uppercase tracking-[0.2em] sm:tracking-[0.35em] md:tracking-[0.6em] mt-3 sm:mt-4"><Cpu size={14} className="inline mr-2" /> PLATINUM ENGINE v21.0</p>
           </div>
-          <h1 className="text-7xl md:text-[9rem] font-black italic uppercase text-white tracking-tighter leading-[0.85]">Betesh<br /><span className="text-teal-500">training</span></h1>
-          <p className="text-slate-500 font-bold uppercase tracking-[0.28em] text-sm">Training, nutrition, recovery, progression.</p>
-          <p className="text-slate-300 text-sm font-semibold">Created by Noam Betesh</p>
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <ApexButton size="lg" className="px-14 py-10 text-2xl gap-3" onClick={() => navigateWithFlash("main", "teal")}><Dumbbell size={24} /> Workout Board</ApexButton>
-            <ApexButton variant="outline" size="lg" className="px-14 py-10 text-2xl gap-3 border-teal-500/30 text-white" onClick={() => navigateWithFlash("nutrition", "indigo")}><Flame size={24} /> Nutrition</ApexButton>
+          <h1 className="text-4xl sm:text-5xl md:text-7xl xl:text-[9rem] font-black italic uppercase text-white tracking-tighter leading-[0.9] md:leading-[0.85]">Betesh<br /><span className="text-teal-500">training</span></h1>
+          <p className="text-slate-500 font-bold uppercase tracking-[0.12em] sm:tracking-[0.2em] md:tracking-[0.28em] text-[11px] sm:text-xs md:text-sm">Training, nutrition, recovery, progression.</p>
+          <p className="text-slate-300 text-xs sm:text-sm font-semibold">Created by Noam Betesh</p>
+          <div className="flex flex-col md:flex-row gap-3 sm:gap-4 justify-center">
+            <ApexButton size="lg" className="px-6 py-4 text-base gap-2 sm:px-8 sm:py-5 sm:text-lg md:px-14 md:py-10 md:text-2xl md:gap-3" onClick={() => navigateWithFlash("main", "teal")}><Dumbbell size={24} /> Workout Board</ApexButton>
+            <ApexButton variant="outline" size="lg" className="px-6 py-4 text-base gap-2 sm:px-8 sm:py-5 sm:text-lg md:px-14 md:py-10 md:text-2xl md:gap-3 border-teal-500/30 text-white" onClick={() => navigateWithFlash("nutrition", "indigo")}><Flame size={24} /> Nutrition</ApexButton>
           </div>
         </motion.div>
       </div>
@@ -1497,8 +1497,8 @@ function ReacherApp() {
         )}
       </div>
 
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-lg px-8">
-        <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-5 rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]">
+      <div className="fixed bottom-4 sm:bottom-6 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md sm:max-w-lg px-4 sm:px-6 md:px-8">
+        <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 sm:p-4 md:p-5 rounded-[1.8rem] sm:rounded-[2.3rem] md:rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]">
           {[
             { id: "dashboard", icon: Home },
             { id: "vault", icon: LayoutGrid },
@@ -1507,9 +1507,9 @@ function ReacherApp() {
             <button
               key={item.id}
               onClick={() => setTab(item.id as MainTab)}
-              className={`p-5 rounded-[1.5rem] transition-all duration-500 relative group ${tab === item.id ? "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.5)] scale-110" : "text-slate-600 hover:text-white"}`}
+              className={`p-3 sm:p-4 md:p-5 rounded-[1rem] sm:rounded-[1.25rem] md:rounded-[1.5rem] transition-all duration-500 relative group ${tab === item.id ? "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.5)] scale-110" : "text-slate-600 hover:text-white"}`}
             >
-              <item.icon size={28} />
+              <item.icon size={22} className="sm:w-6 sm:h-6 md:w-7 md:h-7" />
               {tab === item.id && <motion.div layoutId="nav-glow" className="absolute -top-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-teal-400 rounded-full" />}
             </button>
           ))}
@@ -1521,9 +1521,8 @@ function ReacherApp() {
 }
 
 // --- INITIALIZATION ---
-// const rootElement = document.getElementById("root");
-// if (rootElement) {
- // const root = createRoot(rootElement);
- // root.render(<ReacherApp />);
-// }
-export default ReacherApp;
+const rootElement = document.getElementById("root");
+if (rootElement) {
+  const root = createRoot(rootElement);
+  root.render(<ReacherApp />);
+}
