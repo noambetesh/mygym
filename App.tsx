@@ -18,7 +18,7 @@ import {
 const REACHER_HERO = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600";
 
 // --- GLOBAL TYPES ---
-type MuscleGroup = "Back" | "Chest" | "Legs" | "Glutes"  "Shoulders" | "Arms" | "Core" | "FullBody";
+type MuscleGroup = "Back" | "Chest" | "Legs" | "Glutes" | "Shoulders" | "Arms" | "Core" | "FullBody";
 type Category = "pull" | "push" | "legs" | "armor" | "power" | "core" | "isolation";
 
 interface Exercise {
