@@ -18,7 +18,7 @@ import {
 const REACHER_HERO = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600";
 
 // --- GLOBAL TYPES ---
-type MuscleGroup = "Back" | "Chest" | "Legs" | "Shoulders" | "Arms" | "Core" | "FullBody";
+type MuscleGroup = "Back" | "Chest" | "Legs" | "Glutes"  "Shoulders" | "Arms" | "Core" | "FullBody";
 type Category = "pull" | "push" | "legs" | "armor" | "power" | "core" | "isolation";
 
 interface Exercise {
@@ -104,6 +104,14 @@ const MASTER_VAULT: Exercise[] = [
   { id: "l14", name: "Adductor Machine", sets: 3, reps: "15", he: "קירוב ירכיים במכונה. מחזק את השרירים המקרבים בירך הפנימית ומונע פציעות במפרק הירך.", work: 30, rest: 60, category: "isolation", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/watch?v=adductor", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Standard" },
   { id: "l15", name: "Step-Ups (High Box)", sets: 3, reps: "12/leg", he: "עלייה על קופסה גבוהה עם משקולות. בונה כוח חד צדדי ויציבות ליבה מטורפת. דגש על דחיפת העקב.", work: 45, rest: 75, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/watch?v=highstepups", imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800", difficulty: "Standard" },
 
+{ id: "g1", name: "Barbell Hip Thrust", sets: 4, reps: "8-12", he: "השען על ספסל, הנח מוט על האגן ודחוף את האגן למעלה עד כיווץ מלא. תרגיל בסיס חזק מאוד לישבן.", work: 45, rest: 90, category: "legs", muscleGroup: "Glutes", videoUrl: "https://www.youtube.com/results?search_query=Barbell+Hip+Thrust", imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800", difficulty: "Advanced" },
+
+{ id: "g2", name: "Cable Glute Kickback", sets: 3, reps: "15/leg", he: "פשיטת ירך לאחור בכבל עם שליטה מלאה וסחיטה בשיא. בידוד מצוין לישבן.", work: 35, rest: 60, category: "isolation", muscleGroup: "Glutes", videoUrl: "https://www.youtube.com/results?search_query=Cable+Glute+Kickback", imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800", difficulty: "Standard" },
+
+{ id: "g3", name: "Frog Pumps", sets: 3, reps: "20-25", he: "שכיבה על הגב, כפות רגליים צמודות וברכיים פתוחות, דחיפת אגן מהירה למעלה. פאמפ חזק לישבן.", work: 30, rest: 45, category: "isolation", muscleGroup: "Glutes", videoUrl: "https://www.youtube.com/results?search_query=Frog+Pumps", imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800", difficulty: "Standard" },
+
+{ id: "g4", name: "Romanian Deadlift (Glute Bias)", sets: 4, reps: "10", he: "RDL עם דגש חזק על דחיפת האגן לאחור ועבודה דרך הישבן. שמור על גב יציב.", work: 45, rest: 100, category: "legs", muscleGroup: "Glutes", videoUrl: "https://www.youtube.com/results?search_query=Romanian+Deadlift+Glute+Bias", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Advanced" },
+  
   // --- SHOULDERS (15) ---
   { id: "s1", name: "Z-Press", sets: 4, reps: "8-10", he: "לחיצת כתפיים בישיבה על הרצפה. מנטרל את הרגליים ומאלץ את הכתפיים והבטן לעבוד ב-100% מהזמן.", work: 45, rest: 120, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/watch?v=0_fL9S0v00A", imageUrl: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800", difficulty: "Elite" },
   { id: "s2", name: "Lu Raises", sets: 3, reps: "15", he: "הרמה צידית מלאה עד מעל הראש. בונה ניידות וכתפיים רחבות בצורה יוצאת דופן ומכסה את כל טווח התנועה.", work: 35, rest: 75, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/watch?v=luraises", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Advanced" },
@@ -149,13 +157,20 @@ const MASTER_VAULT: Exercise[] = [
   { id: "f3", name: "Medicine Ball Slam", sets: 3, reps: "15", he: "הטחת כדור כוח ברצפה בכל הכוח תוך שימוש בבטן ובכתפיים. תרגיל מעולה לשריפת קלוריות וכוח מתפרץ.", work: 30, rest: 60, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/watch?v=ballslam", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Standard" },
   { id: "f4", name: "Turkish Get-Up", sets: 3, reps: "5/side", he: "מעבר משכיבה על הגב לעמידה מלאה כשיד אחת מחזיקה משקולת מעל הראש. שיא היציבות והקואורדינציה.", work: 90, rest: 90, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/watch?v=getup", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
   { id: "f5", name: "Kettlebell Swing", sets: 4, reps: "20", he: "הנפת קטלבל בעזרת כוח מתפרץ מהיר של הירכיים והישבן. בונה כוח בשרשרת האחורית וסיבולת לב-ריאה.", work: 45, rest: 60, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/watch?v=kbswing", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Standard" }
+
 ];
 
 // --- APP HELPERS ---
 const muscleHebrew: Record<string, string> = {
-  Back: "גב", Chest: "חזה", Legs: "רגליים", Shoulders: "כתפיים", Arms: "ידיים", Core: "ליבה", FullBody: "כל הגוף"
+  Back: "גב",
+  Chest: "חזה",
+  Legs: "רגליים",
+  Glutes: "ישבן",
+  Shoulders: "כתפיים",
+  Arms: "ידיים",
+  Core: "ליבה",
+  FullBody: "כל הגוף"
 };
-
 const categoryHebrew: Record<string, string> = {
   pull: "משיכה", push: "דחיפה", legs: "רגליים", armor: "שריון", power: "כוח", core: "ליבה", isolation: "בידוד"
 };
@@ -164,6 +179,7 @@ const muscleGroupImages: Record<MuscleGroup, string> = {
   Back: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800",
   Chest: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800",
   Legs: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800",
+  Glutes: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800",
   Shoulders: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800",
   Arms: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800",
   Core: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800",
@@ -1137,9 +1153,10 @@ function ReacherApp() {
       <div className="relative z-10 max-w-7xl mx-auto px-6 pb-40">
         <div className="flex bg-slate-900/80 p-2 rounded-[2.5rem] w-full max-w-2xl mx-auto mb-16 border border-white/10 backdrop-blur-3xl shadow-2xl">
           {[
-            { id: "dashboard", label: "דאשבורד", icon: Home },
-            { id: "vault", label: "המאגר", icon: LayoutGrid },
-            { id: "stats", label: "ביצועים", icon: BarChart3 }
+            { id: "dashboard", label: "בית", icon: Home },
+            { id: "vault", label: "מאגר תרגילים", icon: LayoutGrid },
+            { id: "stats", label: "הביצועים שלי", icon: BarChart3 }
+      
           ].map(t => (
             <button
               key={t.id}
