@@ -6,427 +6,243 @@ import {
   CheckCircle2, Youtube, TimerReset, Volume2, VolumeX, Home, ListChecks,
   Swords, Trophy, Settings2, Activity, CalendarDays, Weight, Eye,
   Bot, Sparkles, X, Send, MessageCircle, ExternalLink, TrendingUp, RefreshCcw, AlertTriangle, Plus, Zap, Cpu, Target, Music,
-  ChevronRight, Info, History, ShieldCheck, ZapOff, ArrowRightLeft, LayoutGrid, List
+  ChevronRight, Info, History, ShieldCheck, ZapOff, ArrowRightLeft, LayoutGrid, List, Search, Save, Trash2, Edit3, User, BarChart3, HeartPulse
 } from "lucide-react";
 
 /**
- * REACHER APEX PROJECT - VERSION 15.0
- * Ultra-Stable Engine | Expanded Dataset | Pro-Coaching Explanations
- * Built for Noam.
+ * REACHER APEX PLATINUM - THE ULTIMATE TRAINING ENGINE
+ * Version: 18.0.5 // Final Release for Noam
+ * Stability: Redundant // Features: All-In
  */
 
 // --- TYPES & INTERFACES ---
 type MuscleGroup = "Back" | "Chest" | "Legs" | "Shoulders" | "Arms" | "Core" | "FullBody";
-type Category = "pull" | "push" | "legs" | "armor" | "power" | "core" | "bonus";
+type Category = "pull" | "push" | "legs" | "armor" | "power" | "core" | "isolation";
 
 interface Exercise {
   id: string;
   name: string;
   sets: number;
   reps: string;
-  he: string; // Hebrew Detailed Explanation (No Quotes)
+  he: string; 
   work: number;
   rest: number;
   category: Category;
   muscleGroup: MuscleGroup;
   videoUrl: string;
   imageUrl: string;
-  originalId?: string;
+  difficulty: "Elite" | "Advanced" | "Standard";
 }
 
-interface DayPlan {
-  key: string;
-  title: string;
-  subtitle: string;
-  focusHe: string;
-  accent: string;
-  exercises: Exercise[];
-  bonus: Exercise[];
+interface SetRecord {
+  weight: number;
+  reps: number;
+  timestamp: number;
+  exerciseId: string;
 }
 
-interface UserStats {
-  totalWorkouts: number;
+interface WorkoutHistory {
+  id: string;
+  date: string;
+  workoutTitle: string;
   totalVolume: number;
-  streak: number;
-  lastDate: string;
+  exercisesCompleted: number;
+  duration: number;
 }
 
-// --- CONSTANTS & DICTIONARIES ---
-const REACHER_HERO = "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=1400&auto=format&fit=crop";
+// --- DATASET: THE COMPLETE REACHER VAULT (80+ EXERCISES) ---
+
+const MASTER_VAULT: Exercise[] = [
+  // BACK (15)
+  { id: "b1", name: "Meadows Row", sets: 4, reps: "10-12", he: "עמוד בניצב למוט חופשי. אחוז בקצה המוט ביד אחת. שמור על גב מקביל לרצפה ומשוך את המוט לכיוון המותן תוך הוצאת מרפק החוצה. התרגיל בונה עובי משמעותי בגב העליון והלטים.", work: 45, rest: 90, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=meadows+row", imageUrl: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800", difficulty: "Advanced" },
+  { id: "b2", name: "Weighted Pull-Ups", sets: 4, reps: "6-8", he: "השתמש בחגורת משקולות. אחוז במוט ברוחב כתפיים. משוך את עצמך עד שהסנטר עובר את המוט. התנועה בונה את רוחב הגב ומחזקת את כוח המשיכה הבסיסי.", work: 40, rest: 120, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=weighted+pullups", imageUrl: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=800", difficulty: "Elite" },
+  { id: "b3", name: "Iliac Lat Pulldown", sets: 3, reps: "12-15", he: "משיכה מצד אחד תוך הטיית הגוף. המטרה היא להביא את המרפק עמוק לכיוון האגן כדי לבודד את סיבי הלטיסימוס התחתונים.", work: 35, rest: 75, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=iliac+lat+pulldown", imageUrl: "https://images.unsplash.com/photo-1590239068512-0f3eff9cca18?q=80&w=800", difficulty: "Advanced" },
+  { id: "b4", name: "T-Bar Row (Supported)", sets: 3, reps: "10", he: "הצמד את החזה לכרית. אחוז בידיות ומשוך לכיוון השכמות. תרגיל זה מנטרל את הגב התחתון ומאפשר בידוד מוחלט של הגב העליון.", work: 40, rest: 90, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=t+bar+row", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Standard" },
+  { id: "b5", name: "Rack Pulls", sets: 4, reps: "5-8", he: "משיכת מוט מהכלוב החל מגובה הברך. בונה גב תחתון וזוקפים חזקים כמו בטון. תרגיל ליבה לבניית כוח אבסולוטי.", work: 30, rest: 150, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=rack+pulls", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
+  { id: "b6", name: "Seal Row", sets: 3, reps: "10-12", he: "שכיבה על ספסל מוגבה ומשיכת מוט מלמטה. מנטרל לחלוטין את הרגליים והמומנטום. הדרך הטובה ביותר לבודד את הגב ללא לחץ על עמוד השדרה.", work: 40, rest: 90, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=seal+row", imageUrl: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800", difficulty: "Advanced" },
+  { id: "b7", name: "Lat Prayer", sets: 3, reps: "15", he: "משיכה עם ידיים ישרות בפולי עליון. תרגיל בידוד מושלם ללטים שמלמד איך להשתמש בגב ללא מעורבות של הבייספס.", work: 35, rest: 60, category: "isolation", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=lat+prayer", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "b8", name: "Pendlay Row", sets: 4, reps: "8", he: "חתירה מתפרצת מהרצפה כאשר הגב מקביל לחלוטין לקרקע. המוט חוזר לרצפה בכל חזרה. בונה כוח מתפרץ ושליטה בשכמות.", work: 45, rest: 120, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=pendlay+row", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Elite" },
+  { id: "b9", name: "Kroc Rows", sets: 3, reps: "20+", he: "חתירה עם משקולת כבדה מאוד בסטים של חזרות גבוהות. שימוש במומנטום מבוקר. התרגיל בונה אחיזה חזקה וגב עליון רחב.", work: 60, rest: 120, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=kroc+row", imageUrl: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800", difficulty: "Elite" },
+  { id: "b10", name: "Snatch Grip High Pull", sets: 4, reps: "6", he: "משיכה מהירה של המוט עד גובה החזה באחיזה רחבה מאוד. תרגיל כוח מתפרץ שעובד על הטרפזים והכתפיים האחוריות.", work: 30, rest: 150, category: "power", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=high+pull", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Elite" },
+  { id: "b11", name: "Incline DB Row", sets: 3, reps: "12", he: "שכיבה על ספסל בשיפוע עם הפנים למטה. משיכת משקולות תוך כדי הצמדת השכמות. מבודד את הגב העליון.", work: 40, rest: 90, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=incline+dumbbell+row", imageUrl: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800", difficulty: "Advanced" },
+  { id: "b12", name: "Chin-Ups", sets: 3, reps: "10", he: "עליות מתח באחיזה הפוכה וצרה. דגש חזק על הבייספס והלטים התחתונים.", work: 40, rest: 90, category: "pull", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=chin+ups", imageUrl: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=800", difficulty: "Standard" },
+  { id: "b13", name: "Face Pulls (Back Focus)", sets: 4, reps: "20", he: "משיכה לכיוון המצח עם דגש על פתיחת ידיים רחבה לחיזוק הטרפזים והכתף האחורית.", work: 40, rest: 60, category: "isolation", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=face+pulls", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Standard" },
+  { id: "b14", name: "Barbell Shrugs", sets: 4, reps: "12-15", he: "הרמת כתפיים כלפי מעלה עם מוט כבד. בונה את עובי הטרפז העליון והצוואר.", work: 35, rest: 90, category: "isolation", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=barbell+shrugs", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Advanced" },
+  { id: "b15", name: "Superman Holds", sets: 3, reps: "45s", he: "שכיבה על הבטן והרמת ידיים ורגליים באוויר. חיזוק שרירי הזוקפים והגב התחתון בצורה בטוחה.", work: 45, rest: 60, category: "core", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=superman+exercise", imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800", difficulty: "Standard" },
+
+  // CHEST (15)
+  { id: "c1", name: "Low-Incline DB Press", sets: 4, reps: "8-10", he: "לחיצת משקולות בשיפוע קל של 15-30 מעלות. השיפוע הנמוך מאפשר גיוס מקסימלי של החזה העליון תוך שמירה על בריאות הכתף.", work: 45, rest: 100, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=incline+dumbbell+press", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Advanced" },
+  { id: "c2", name: "Weighted Dips", sets: 4, reps: "8-12", he: "מקבילים עם תוספת משקל. הטה את הגוף קדימה כדי להעביר את העומס מהטריספס לחזה התחתון והאמצעי.", work: 40, rest: 100, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=weighted+dips", imageUrl: "https://images.unsplash.com/photo-1534367957981-2940263f382a?q=80&w=800", difficulty: "Elite" },
+  { id: "c3", name: "Converging Press", sets: 3, reps: "10-12", he: "לחיצה במכונה שבה הידיות מתקרבות אחת לשנייה בשיא התנועה. מאפשר סחיטה מקסימלית של סיבי החזה הפנימיים.", work: 40, rest: 90, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=machine+chest+press", imageUrl: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800", difficulty: "Standard" },
+  { id: "c4", name: "Floor Press", sets: 3, reps: "8", he: "לחיצה בשכיבה על הרצפה. עוצר את התנועה ב-90 מעלות במרפקים. מצוין לשיפור כוח הנעילה ומניעת פציעות כתף.", work: 40, rest: 90, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=floor+press", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Advanced" },
+  { id: "c5", name: "Cable Flyes", sets: 3, reps: "15", he: "משיכת כבלים מלמעלה למטה. מתמקד בחלק התחתון והחיצוני של החזה. שמור על חזה נפוח וכתפיים משוכות לאחור.", work: 35, rest: 60, category: "isolation", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=cable+flyes", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "c6", name: "Hex Press", sets: 3, reps: "12", he: "הצמד את המשקולות אחת לשנייה לאורך כל הלחיצה. יוצר מתח תמידי בחלק המרכזי של החזה.", work: 35, rest: 75, category: "isolation", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=hex+press", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Standard" },
+  { id: "c7", name: "Landmine Press", sets: 3, reps: "10-12", he: "דחיפת המוט קדימה ומעלה בלנדמיין. תנועה אלכסונית שבונה עוצמה בחזה העליון ומורידה עומס מהכתפיים.", work: 40, rest: 90, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=landmine+press", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Advanced" },
+  { id: "c8", name: "Low-To-High Flyes", sets: 3, reps: "15", he: "משיכת כבלים מלמטה למעלה לכיוון מרכז הפנים. מתמקד בסיבים העליונים והפנימיים של החזה.", work: 35, rest: 60, category: "isolation", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=low+to+high+flyes", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "c9", name: "Guillotine Press", sets: 3, reps: "8-10", he: "לחיצת חזה כאשר המוט יורד לכיוון הצוואר. תרגיל מתקדם ביותר לבידוד מלא של סיבי החזה העליונים.", work: 45, rest: 100, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=guillotine+press", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
+  { id: "c10", name: "Deficit Push-Ups", sets: 3, reps: "12-15", he: "שכיבות סמיכה עם ידיים על הגבהות. מאפשר טווח תנועה עמוק יותר ומתיחה מקסימלית בתחתית.", work: 45, rest: 75, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=deficit+pushups", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Advanced" },
+  { id: "c11", name: "Pec Deck Fly", sets: 3, reps: "15", he: "בידוד מושלם של החזה במכונה. התמקד בסחיטה של הידיות אחת לשנייה בשיא התנועה.", work: 35, rest: 60, category: "isolation", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=pec+deck", imageUrl: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800", difficulty: "Standard" },
+  { id: "c12", name: "Dumbbell Pullover", sets: 3, reps: "12", he: "מתיחת משקולת מעבר לראש בשכיבה על ספסל. עובד על החזה והלטים ומרחיב את כלוב הצלעות.", work: 40, rest: 80, category: "isolation", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=dumbbell+pullover", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "c13", name: "Incline Barbell Press", sets: 4, reps: "6-8", he: "לחיצת מוט בשיפוע חיובי של 30-45 מעלות. בונה את מסת החזה העליון בצורה הבסיסית ביותר.", work: 45, rest: 120, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=incline+barbell+press", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Advanced" },
+  { id: "c14", name: "Svend Press", sets: 3, reps: "20", he: "הצמדת שתי פלטות משקולת בין הידיים ודחיפה קדימה תוך כיווץ חזק. תרגיל סיום מעולה להזרמת דם.", work: 30, rest: 45, category: "isolation", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=svend+press", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Standard" },
+  { id: "c15", name: "Decline Bench Press", sets: 3, reps: "10", he: "לחיצת מוט בשיפוע שלילי. מתמקד בחלק התחתון של החזה ומאפשר הרמת משקלים גבוהים יותר.", work: 45, rest: 90, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=decline+bench+press", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Advanced" },
+
+  // LEGS (15)
+  { id: "l1", name: "Zercher Squat", sets: 4, reps: "8-10", he: "החזק את המוט בעיקולי המרפקים מול החזה. רד עמוק. התרגיל דורש יציבות ליבה מטורפת ובונה רגליים של לוחם.", work: 50, rest: 150, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=zercher+squat", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Elite" },
+  { id: "l2", name: "Bulgarian Split Squat", sets: 3, reps: "10/leg", he: "רגל אחת על ספסל. רד עד שהברך האחורית נוגעת ברצפה. התרגיל הכי אפקטיבי לבניית קוואדס ויציבות.", work: 45, rest: 90, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=bulgarian+split+squat", imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800", difficulty: "Advanced" },
+  { id: "l3", name: "Romanian Deadlift", sets: 4, reps: "10-12", he: "מוט צמוד לרגליים, גב ישר, מתיחה מקסימלית של ההמסטרינג. בונה את כל השרשרת האחורית.", work: 45, rest: 100, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=romanian+deadlift", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Advanced" },
+  { id: "l4", name: "Nordic Hamstring Curl", sets: 3, reps: "5-8", he: "בלום את עצמך בירידה איטית לכיוון הרצפה רק בעזרת הרגליים. המלך של תרגילי ההמסטרינג למניעת פציעות.", work: 30, rest: 120, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=nordic+curl", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Elite" },
+  { id: "l5", name: "Kas Glute Bridge", sets: 3, reps: "12-15", he: "טווח תנועה קטן וממוקד לישבן על ספסל. סחיטה חזקה בשיא התנועה.", work: 40, rest: 90, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=kas+glute+bridge", imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800", difficulty: "Standard" },
+  { id: "l6", name: "Leg Press (High Foot)", sets: 4, reps: "12-15", he: "הנח את הרגליים בחלק העליון של הפלטה. דחיפה מהעקבים. מעביר את הדגש מהקוואדס לישבן ולהמסטרינג.", work: 45, rest: 90, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=high+foot+leg+press", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Standard" },
+  { id: "l7", name: "Seated Leg Curls", sets: 3, reps: "15", he: "שב עם גב צמוד למשענת. כווץ את ההמסטרינג עד הסוף ושחרר לאט. בידוד מושלם לירך האחורי.", work: 35, rest: 60, category: "isolation", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=seated+leg+curl", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Standard" },
+  { id: "l8", name: "Walking Lunges", sets: 3, reps: "20 Steps", he: "צעדים גדולים קדימה עם משקולות. בונה כוח דינמי וסיבולת שריר גבוהה ברגליים.", work: 60, rest: 90, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=walking+lunges", imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800", difficulty: "Advanced" },
+  { id: "l9", name: "Cyclist Squat", sets: 3, reps: "15", he: "עמוד עם עקבים מוגבהים. ירידה עמוקה מאוד. מיקוד אגרסיבי בקוואדס (VMO).", work: 40, rest: 75, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=cyclist+squat", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Advanced" },
+  { id: "l10", name: "Stiff-Legged Deadlift", sets: 4, reps: "8-10", he: "מוט יורד לאט קרוב לרגליים עם ברכיים ישרות. דגש על מתיחה מקסימלית של ההמסטרינג והזוקפים.", work: 45, rest: 120, category: "pull", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=stiff+legged+deadlift", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
+  { id: "l11", name: "Standing Calf Raises", sets: 4, reps: "15-20", he: "עלייה על קצות האצבעות עם משקל כבד. סחיטה בשיא הכיווץ ומתיחה מלאה בתחתית.", work: 30, rest: 60, category: "isolation", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=calf+raises", imageUrl: "https://images.unsplash.com/photo-1434682881908-b43d0467b798?q=80&w=800", difficulty: "Standard" },
+  { id: "l12", name: "Heavy Sled Push", sets: 4, reps: "20m", he: "דחיפת מזחלת כבדה בצעדים קטנים וחזקים. תרגיל כוח מתפרץ וסיבולת לב-ריאה מהקשים ביותר.", work: 60, rest: 120, category: "power", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=sled+push", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
+  { id: "l13", name: "Box Squat", sets: 4, reps: "6-8", he: "סקוואט עד לישיבה מלאה על קופסה ועצירה. מבטל את ה-Stretch Reflex ומאלץ את הגוף לייצר כוח נקי.", work: 45, rest: 150, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=box+squat", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Advanced" },
+  { id: "l14", name: "High Box Step-Ups", sets: 3, reps: "10/leg", he: "עלייה על קופסה גבוהה מאוד עם רגל אחת. דגש על דחיפה דרך העקב. כוח חד-צדדי.", work: 45, rest: 90, category: "legs", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=step+ups", imageUrl: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800", difficulty: "Standard" },
+  { id: "l15", name: "Leg Extensions", sets: 3, reps: "15-20", he: "בידוד מושלם לקוואדס במכונה. התמקד בנעילה מלאה של הברכיים ושליטה בירידה.", work: 30, rest: 60, category: "isolation", muscleGroup: "Legs", videoUrl: "https://www.youtube.com/results?search_query=leg+extensions", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Standard" },
+
+  // ARMS (15)
+  { id: "a1", name: "Bayesian Cable Curls", sets: 3, reps: "12-15", he: "כפיפת מרפקים כשהגב לכבל. מתיחה עצומה של הראש הארוך של הבייספס.", work: 35, rest: 60, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=bayesian+curls", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Advanced" },
+  { id: "a2", name: "Katana Extension", sets: 3, reps: "12-15", he: "פשיטת מרפקים מעבר לראש עם כבל. המתיחה האידיאלית לראש הארוך של הטריספס.", work: 35, rest: 60, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=katana+extension", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Advanced" },
+  { id: "a3", name: "Hammer Curls", sets: 3, reps: "12", he: "כפיפה עם אחיזה ניטרלית. בונה את שריר הברכיאליס ואת האמות. נותן מראה עבה לזרוע.", work: 35, rest: 75, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=hammer+curls", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "a4", name: "Close-Grip Bench", sets: 4, reps: "8", he: "לחיצת חזה באחיזה צרה. מעביר את רוב העומס לטריספס. בונה כוח בסיסי עצום בזרועות.", work: 45, rest: 100, category: "push", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=close+grip+bench", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Advanced" },
+  { id: "a5", name: "Preacher Curls", sets: 3, reps: "12", he: "כפיפה על ספסל פריצ'ר. מונע שימוש במומנטום ומבודד את הבייספס בצורה הכי נקייה.", work: 35, rest: 75, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=preacher+curls", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "a6", name: "Skull Crushers", sets: 3, reps: "10-12", he: "שכיבה על ספסל, הורדת המוט למצח ופשיטה למעלה. מלך התרגילים לטריספס.", work: 40, rest: 90, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=skull+crushers", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Advanced" },
+  { id: "a7", name: "Spider Curls", sets: 3, reps: "12", he: "שכיבה עם החזה על ספסל בשיפוע, ידיים תלויות למטה. בידוד מושלם ללא תנופה.", work: 35, rest: 75, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=spider+curls", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Advanced" },
+  { id: "a8", name: "Rope Pushdowns", sets: 4, reps: "15", he: "לחיצת חבל למטה. פתח את החבל בסוף התנועה לסחיטה מקסימלית.", work: 30, rest: 60, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=rope+pushdown", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Standard" },
+  { id: "a9", name: "Concentration Curls", sets: 3, reps: "12-15", he: "ביצוע כפיפה בישיבה כאשר המרפק נתמך בירך. בונה את שיא השריר (The Peak).", work: 30, rest: 60, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=concentration+curls", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "a10", name: "Reverse Barbell Curl", sets: 3, reps: "12", he: "כפיפה באחיזה הפוכה. עובד חזק על הברכיאליס ועל האמות. חיוני למראה זרוע עבה.", work: 35, rest: 75, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=reverse+curls", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Standard" },
+  { id: "a11", name: "French Press", sets: 3, reps: "10-12", he: "פשיטת מרפקים מעבר לראש עם משקולת בודדת. בונה את הראש הארוך של הטריספס.", work: 40, rest: 90, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=french+press", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Advanced" },
+  { id: "a12", name: "Diamond Push-Ups", sets: 3, reps: "Max", he: "שכיבות סמיכה כאשר הידיים צמודות בצורת יהלום. תרגיל משקל גוף מעולה לסיום.", work: 40, rest: 60, category: "push", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=diamond+push+ups", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Advanced" },
+  { id: "a13", name: "Zottman Curls", sets: 3, reps: "12", he: "עלייה כבייספס רגיל, ירידה עם ידיים הפוכות. בונה כוח אחיזה וזרועות עוצמתיות.", work: 35, rest: 75, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=zottman+curls", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Advanced" },
+  { id: "a14", name: "Cross-Body Hammer Curl", sets: 3, reps: "12/side", he: "כפיפת משקולת לרוחב הגוף לכיוון הכתף הנגדית. מדגיש את הראש הצידי של הבייספס.", work: 35, rest: 60, category: "isolation", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=cross+body+hammer+curl", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "a15", name: "Dips (Tricep Focus)", sets: 3, reps: "Max", he: "מקבילים עם גוף זקוף ומרפקים צמודים. מעביר את כל העומס לטריספס.", work: 40, rest: 90, category: "push", muscleGroup: "Arms", videoUrl: "https://www.youtube.com/results?search_query=tricep+dips", imageUrl: "https://images.unsplash.com/photo-1534367957981-2940263f382a?q=80&w=800", difficulty: "Advanced" },
+
+  // SHOULDERS (15)
+  { id: "s1", name: "Z-Press", sets: 4, reps: "8-10", he: "לחיצת כתפיים בישיבה על הרצפה עם רגליים ישרות. מנטרל את הרגליים ומאלץ את הכתפיים והבטן לעבוד ב-100%.", work: 45, rest: 120, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=z+press", imageUrl: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800", difficulty: "Elite" },
+  { id: "s2", name: "Lu Raises", sets: 3, reps: "15", he: "הרמה צידית מלאה עד שהידיים נפגשות מעל הראש. בונה ניידות בכתפיים ומכסה את כל טווח התנועה של הדלתואיד.", work: 35, rest: 75, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=lu+raises", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Advanced" },
+  { id: "s3", name: "Face Pulls", sets: 4, reps: "20", he: "משיכת חבל לכיוון המצח עם סיבוב חיצוני של הכתף. התרגיל הכי חשוב ליציבה ובריאות הכתף האחורית.", work: 40, rest: 60, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=face+pulls", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Standard" },
+  { id: "s4", name: "Arnold Press", sets: 3, reps: "10", he: "לחיצה עם סיבוב של הידיים מחזית הגוף כלפי חוץ ומעלה. עובד על כל שלושת ראשי הכתף.", work: 45, rest: 90, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=arnold+press", imageUrl: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800", difficulty: "Advanced" },
+  { id: "s5", name: "Cable Lateral Raises", sets: 4, reps: "15", he: "הרמה צידית עם כבל מאחורי הגוף. שומר על מתח תמידי לאורך כל טווח התנועה. בונה רוחב.", work: 35, rest: 60, category: "isolation", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=cable+lateral+raises", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "s6", name: "Rear Delt Row", sets: 3, reps: "12-15", he: "חתירה כאשר המרפקים מצביעים החוצה. מיקוד בכתף האחורית ובשרירי השכמות העליונים.", work: 40, rest: 75, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=rear+delt+row", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Standard" },
+  { id: "s7", name: "Push Press", sets: 4, reps: "6", he: "לחיצת כתפיים עם עזרה קלה מהרגליים. דגש על כוח מתפרץ בעלייה ושליטה בירידה.", work: 40, rest: 150, category: "power", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=push+press", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
+  { id: "s8", name: "Dumbbell Shrugs", sets: 4, reps: "12", he: "הרמת כתפיים כלפי מעלה עם משקולות כבדות. החזקה בשיא הכיווץ. בונה טרפזים עוצמתיים.", work: 35, rest: 90, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=dumbbell+shrugs", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Advanced" },
+  { id: "s9", name: "Front Plate Raises", sets: 3, reps: "15", he: "הרמת פלטה מלפנים עד גובה העיניים. עבודה ממוקדת על הכתף הקדמית.", work: 35, rest: 60, category: "isolation", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=plate+front+raises", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Standard" },
+  { id: "s10", name: "Y-Raises", sets: 3, reps: "15", he: "הרמת ידיים לצורת Y בשיפוע. מחזק את הטרפזים התחתונים ואת הכתף האחורית.", work: 35, rest: 60, category: "isolation", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=y+raises", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "s11", name: "Bus Drivers", sets: 3, reps: "45s", he: "החזקת פלטה מול החזה וסיבוב ימינה ושמאלה. בונה סיבולת בכתף הקדמית.", work: 45, rest: 60, category: "isolation", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=bus+drivers", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Standard" },
+  { id: "s12", name: "W-Raises", sets: 3, reps: "15", he: "הרמת משקולות תוך סיבוב חיצוני לצורת W. מחזק את מסובבי הכתף (Rotator Cuff).", work: 35, rest: 60, category: "isolation", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=w+raises", imageUrl: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800", difficulty: "Standard" },
+  { id: "s13", name: "Single-Arm Cable Lateral", sets: 3, reps: "15", he: "הרמה צידית עם כבל יד אחת בכל פעם. מאפשר בידוד עמוק ומתח קבוע.", work: 35, rest: 60, category: "isolation", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=one+arm+cable+lateral+raise", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard" },
+  { id: "s14", name: "Bradford Press", sets: 3, reps: "12", he: "לחיצת מוט מלפנים ומאחורי הראש לסירוגין ללא נעילה. יוצר מתח תמידי בכתפיים.", work: 45, rest: 90, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=bradford+press", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Advanced" },
+  { id: "s15", name: "Barbell Upright Row", sets: 3, reps: "12", he: "משיכת מוט קרוב לגוף עד גובה החזה. בונה את הראש הצידי של הכתף והטרפזים.", work: 40, rest: 90, category: "armor", muscleGroup: "Shoulders", videoUrl: "https://www.youtube.com/results?search_query=upright+row", imageUrl: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800", difficulty: "Advanced" },
+
+  // CORE & FULL BODY (10)
+  { id: "cr1", name: "Dragon Flags", sets: 3, reps: "5-8", he: "הרמת כל הגוף כיחידה אחת בשכיבה על ספסל והורדה איטית. תנועה מתקדמת ביותר לשליטה בבטן.", work: 40, rest: 90, category: "core", muscleGroup: "Core", videoUrl: "https://www.youtube.com/results?search_query=dragon+flags", imageUrl: "https://images.unsplash.com/photo-1599058917233-57c0e6244a4d?q=80&w=800", difficulty: "Elite" },
+  { id: "cr2", name: "Hanging Leg Raises", sets: 4, reps: "15", he: "תלייה על מוט והרמת רגליים ישרות. עובד חזק על הבטן התחתונה ועל שרירי הליבה העמוקים.", work: 40, rest: 60, category: "core", muscleGroup: "Core", videoUrl: "https://www.youtube.com/results?search_query=hanging+leg+raises", imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800", difficulty: "Advanced" },
+  { id: "cr3", name: "Ab Wheel Rollouts", sets: 3, reps: "12", he: "גלישה קדימה עם גלגל בטן. התרגיל הכי קשוח לבניית קיר בטן חזק ויציב.", work: 40, rest: 90, category: "core", muscleGroup: "Core", videoUrl: "https://www.youtube.com/results?search_query=ab+wheel", imageUrl: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800", difficulty: "Elite" },
+  { id: "f1", name: "Landmine Thrusters", sets: 4, reps: "10", he: "סקוואט ודחיפה של המוט מעל הראש בתנועה אחת. בונה כוח מתפרץ בכל הגוף.", work: 60, rest: 120, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/results?search_query=landmine+thrusters", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Advanced" },
+  { id: "f2", name: "Farmer's Walk", sets: 3, reps: "40m", he: "הליכה עם משקולות כבדות מאוד. בונה אחיזה, גב עליון ויציבות ליבה אדירה.", work: 45, rest: 120, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/results?search_query=farmers+walk", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
+  { id: "f3", name: "Medicine Ball Slams", sets: 3, reps: "15", he: "הטחת כדור כוח ברצפה בכל הכוח. תרגיל מעולה לשריפת קלוריות וכוח מתפרץ.", work: 30, rest: 60, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/results?search_query=ball+slams", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Standard" },
+  { id: "f4", name: "Turkish Get-Up", sets: 3, reps: "5/side", he: "מעבר משכיבה לעמידה מלאה עם משקולת מעל הראש. שיא היציבות והקואורדינציה.", work: 90, rest: 90, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/results?search_query=turkish+get+up", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Elite" },
+  { id: "f5", name: "Kettlebell Swings", sets: 4, reps: "20", he: "הנפת קטלבל בעזרת כוח הירכיים. בונה כוח בשרשרת האחורית וסיבולת גבוהה.", work: 45, rest: 60, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/results?search_query=kettlebell+swings", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Standard" },
+  { id: "f6", name: "Wall Balls", sets: 3, reps: "20", he: "סקוואט וזריקת כדור כוח גבוה על הקיר. תרגיל קרוספיט קלאסי לסיבולת וכוח.", work: 45, rest: 75, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/results?search_query=wall+balls", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Standard" },
+  { id: "f7", name: "Renegade Rows", sets: 3, reps: "10/side", he: "חתירה במצב פלאנק. דורש יציבות ליבה מטורפת יחד עם כוח משיכה.", work: 50, rest: 90, category: "power", muscleGroup: "FullBody", videoUrl: "https://www.youtube.com/results?search_query=renegade+row", imageUrl: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800", difficulty: "Advanced" }
+];
+
+// --- APP DATA & CONSTANTS ---
 
 const muscleHebrew: Record<string, string> = {
   Back: "גב", Chest: "חזה", Legs: "רגליים", Shoulders: "כתפיים", Arms: "ידיים", Core: "ליבה", FullBody: "כל הגוף"
 };
 
 const categoryHebrew: Record<string, string> = {
-  pull: "משיכה", push: "דחיפה", legs: "רגליים", armor: "שריון כתפיים", power: "כוח מתפרץ", core: "ליבה", bonus: "בונוס"
+  pull: "משיכה", push: "דחיפה", legs: "רגליים", armor: "שריון", power: "כוח", core: "ליבה", isolation: "בידוד"
 };
 
-const muscleColors: Record<string, string> = {
-  Back: "teal", Chest: "blue", Legs: "emerald", Shoulders: "violet", Arms: "rose", Core: "indigo", FullBody: "orange"
+const muscleGroupImages: Record<MuscleGroup, string> = {
+  Back: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800",
+  Chest: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800",
+  Legs: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800",
+  Shoulders: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800",
+  Arms: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800",
+  Core: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?q=80&w=800",
+  FullBody: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800"
 };
 
-// --- IMAGE MAPPING (UNIQUE PER EXERCISE) ---
-const EX_IMAGES = {
-  meadows: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800",
-  lat_pull: "https://images.unsplash.com/photo-1590239068512-0f3eff9cca18?q=80&w=800",
-  t_bar: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800",
-  pullups: "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=800",
-  curls: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800",
-  db_press: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800",
-  dips: "https://images.unsplash.com/photo-1534367957981-2940263f382a?q=80&w=800",
-  squat: "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800",
-  bulgarian: "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=800",
-  dragon: "https://images.unsplash.com/photo-1599058917233-57c0e6244a4d?q=80&w=800",
-  z_press: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800",
-  facepull: "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=800",
-  landmine: "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=800",
-  farmer: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800",
-  generic_back: "https://images.unsplash.com/photo-1603287611837-f2146f5de8e8?q=80&w=800",
-  generic_chest: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800"
-};
-
-// --- DATASET: THE COMPLETE REACHER PROTOCOL ---
-const initialDays: DayPlan[] = [
-  {
-    key: "day1",
-    title: "יום 1 - גב",
-    subtitle: "רוחב ועובי מקסימלי",
-    focusHe: "מיקוד בבניית לטים רחבים וגב עליון דחוס",
-    accent: "teal",
-    exercises: [
-      {
-        id: "e1",
-        name: "Meadows Row",
-        sets: 4,
-        reps: "10-12",
-        he: "עמוד בניצב למוט כאשר הוא מונח על הקרקע בתוך לנדמיין או פינה. אחוז בקצה העליון של המוט ביד אחת באחיזה מעבר. שמור על גב ישר ומקביל לרצפה. משוך את המוט לכיוון המותן תוך כדי הוצאת המרפק החוצה וסחיטה חזקה של הלטיסימוס והשכמה. הקפד על ירידה מבוקרת ומתיחה מלאה בתחתית התנועה ללא סיבוב המותן.",
-        work: 45,
-        rest: 90,
-        category: "pull",
-        muscleGroup: "Back",
-        videoUrl: "https://www.youtube.com/watch?v=2v-re_6_23w",
-        imageUrl: EX_IMAGES.meadows
-      },
-      {
-        id: "e2",
-        name: "Single-Arm Lat Pulldown",
-        sets: 4,
-        reps: "12",
-        he: "התיישב או כרע ברך מול פולי עליון עם ידית בודדת. אחוז בידית והטה את הגוף קלות לכיוון היד העובדת. משוך את המרפק למטה לכיוון הכיס האחורי במכנסיים. שמור על חזה מורם ואל תיתן לכתף לקרוס קדימה. בשיא הכיווץ לחץ את המרפק לצד הגוף ושחרר לאט למתיחה מלאה של הלטיסימוס.",
-        work: 40,
-        rest: 75,
-        category: "pull",
-        muscleGroup: "Back",
-        videoUrl: "https://www.youtube.com/watch?v=f-V9_H9_z8A",
-        imageUrl: EX_IMAGES.lat_pull
-      },
-      {
-        id: "e3",
-        name: "Chest-Supported T-Bar Row",
-        sets: 3,
-        reps: "10",
-        he: "הנח את החזה על הכרית של מכשיר ה-T-Bar. אחוז בידיות באחיזה ניטרלית. משוך את המוט לכיוון הגוף תוך כדי הצמדת השכמות אחת לשנייה. המטרה היא בידוד מוחלט של הגב העליון ללא שימוש במומנטום של הרגליים או הגב התחתון. שמור על צוואר בקו ישר עם הגב.",
-        work: 40,
-        rest: 80,
-        category: "pull",
-        muscleGroup: "Back",
-        videoUrl: "https://www.youtube.com/watch?v=j3Igk5nyZE4",
-        imageUrl: EX_IMAGES.t_bar
-      },
-      {
-        id: "e4",
-        name: "Weighted Pull-Ups",
-        sets: 4,
-        reps: "6-8",
-        he: "תלה משקל על חגורת משקולות או החזק משקולת בין הרגליים. אחוז במוט המתח באחיזה רחבה מעט יותר מרוחב כתפיים. משוך את עצמך למעלה עד שהסנטר עובר את המוט תוך כדי הוצאת חזה קדימה. רד למטה בשליטה עד למתיחה מלאה של הזרועות. אל תבצע תנועות קיפינג.",
-        work: 35,
-        rest: 120,
-        category: "pull",
-        muscleGroup: "Back",
-        videoUrl: "https://www.youtube.com/watch?v=p1qV6WfI7eQ",
-        imageUrl: EX_IMAGES.pullups
-      },
-      {
-        id: "e5",
-        name: "Bayesian Cable Curls",
-        sets: 3,
-        reps: "12-15",
-        he: "עמוד עם הגב למכשיר הקרוסאובר כאשר הכבל מכוון למיקום נמוך. אחוז בידית וצעד קדימה כך שהיד נמתחת לאחור מאחורי קו הגוף. בצע כפיפה של המרפק תוך שמירה על הזרוע יציבה ולא נעה קדימה. התרגיל שם דגש עצום על הראש הארוך של הדו-ראשי בזכות המתיחה ההתחלתית.",
-        work: 35,
-        rest: 60,
-        category: "pull",
-        muscleGroup: "Arms",
-        videoUrl: "https://www.youtube.com/watch?v=6id88qL2vXk",
-        imageUrl: EX_IMAGES.curls
-      }
-    ],
-    bonus: [
-      {
-        id: "b1",
-        name: "Dead Hang",
-        sets: 3,
-        reps: "Max Time",
-        he: "היתלה על מוט המתח ושחרר את כל משקל הגוף למטה. החזק זמן מקסימלי לשיפור האחיזה ושחרור לחץ מהחוליות.",
-        work: 60,
-        rest: 60,
-        category: "bonus",
-        muscleGroup: "Back",
-        videoUrl: "",
-        imageUrl: EX_IMAGES.pullups
-      }
-    ]
-  },
-  {
-    key: "day2",
-    title: "יום 2 - חזה",
-    subtitle: "כוח לחיצה ושריון קדמי",
-    focusHe: "מיקוד בחזה עליון ויכולת דחיפה מתפרצת",
-    accent: "blue",
-    exercises: [
-      {
-        id: "e6",
-        name: "Low-Incline DB Press",
-        sets: 4,
-        reps: "8-10",
-        he: "כוון את הספסל לשיפוע נמוך מאוד של 15 עד 30 מעלות. אחוז בזוג משקולות ולחץ אותן מעל החזה. רד לאט עד שהמשקולות נוגעות קלות בצדי החזה תוך מתיחה חזקה. דחף למעלה בעוצמה אך שמור על שליטה. השיפוע הנמוך ממקסם את העבודה על סיבי החזה העליונים ללא עומס מיותר על הכתף הקדמית.",
-        work: 45,
-        rest: 100,
-        category: "push",
-        muscleGroup: "Chest",
-        videoUrl: "https://www.youtube.com/watch?v=8iP_u5h_8E0",
-        imageUrl: EX_IMAGES.db_press
-      },
-      {
-        id: "e7",
-        name: "Weighted Dips",
-        sets: 4,
-        reps: "8",
-        he: "השתמש בחגורת משקולות להוספת התנגדות. עלה על מכשיר המקבילים והטה את הגוף קדימה בערך ב-30 מעלות. רד למטה עד שהמרפקים בזווית של 90 מעלות ומרגישים מתיחה בחזה. דחף חזרה למעלה תוך כיווץ החזה והימנע מנעילה חזקה מדי של המרפקים בסוף התנועה.",
-        work: 45,
-        rest: 100,
-        category: "push",
-        muscleGroup: "Chest",
-        videoUrl: "https://www.youtube.com/watch?v=2z8JmcrW-As",
-        imageUrl: EX_IMAGES.dips
-      },
-      {
-        id: "e8",
-        name: "JM Press",
-        sets: 3,
-        reps: "10",
-        he: "שכב על ספסל ישר ואחוז במוט באחיזה צרה. הורד את המוט לכיוון הצוואר או הסנטר על ידי שילוב של כפיפת מרפקים ותנועת כתף קלה. המרפקים צריכים להצביע קדימה. ברגע שהאמות נוגעות בדו-ראשי דחף את המוט חזרה למעלה בעזרת הטריספס. זהו תרגיל כוח מעולה שמשלב לחיצה ופשיטה.",
-        work: 40,
-        rest: 90,
-        category: "push",
-        muscleGroup: "Arms",
-        videoUrl: "https://www.youtube.com/watch?v=mG0UPv_bX2E",
-        imageUrl: EX_IMAGES.generic_chest
-      }
-    ],
-    bonus: []
-  },
-  {
-    key: "day3",
-    title: "יום 3 - רגליים",
-    subtitle: "בסיס עוצמתי ויציבות",
-    focusHe: "בניית כוח מתפרץ ברגליים ושיפור טווחי תנועה",
-    accent: "emerald",
-    exercises: [
-      {
-        id: "e9",
-        name: "Zercher Squat",
-        sets: 4,
-        reps: "8-10",
-        he: "מקם את המוט בגובה המרפקים. אחוז במוט בעיקולי המרפקים והצמד את האגרופים לחזה. עמוד בפיסוק רחב מעט מרוחב כתפיים. רד לסקוואט עמוק תוך שמירה על גב זקוף מאוד. המשקל ממוקם מקדימה ולכן מאלץ את הליבה והזוקפים לעבוד קשה מאוד יחד עם הקוואדס. זהו תרגיל פונקציונלי אדיר.",
-        work: 50,
-        rest: 150,
-        category: "legs",
-        muscleGroup: "Legs",
-        videoUrl: "https://www.youtube.com/watch?v=U2OKweR-N-g",
-        imageUrl: EX_IMAGES.squat
-      },
-      {
-        id: "e10",
-        name: "Bulgarian Split Squat",
-        sets: 3,
-        reps: "8/leg",
-        he: "עמוד לפני ספסל והנח רגל אחת עליו מאחוריך. החזק משקולות בצדי הגוף. רד למטה עד שהברך האחורית כמעט נוגעת ברצפה. הקפד שהברך הקדמית לא תעבור משמעותית את קצות האצבעות. דחף דרך כל כף היד הקדמית חזרה למעלה. תרגיל זה בונה יציבות ומבודד כל רגל בצורה מושלמת.",
-        work: 45,
-        rest: 90,
-        category: "legs",
-        muscleGroup: "Legs",
-        videoUrl: "https://www.youtube.com/watch?v=2C-uNgKwPLE",
-        imageUrl: EX_IMAGES.bulgarian
-      }
-    ],
-    bonus: []
-  },
-  {
-    key: "day4",
-    title: "יום 4 - בטן (CORE)",
-    subtitle: "ליבת פלדה",
-    focusHe: "חיזוק שרירי הליבה העמוקים ויצירת קוביות דחוסות",
-    accent: "indigo",
-    exercises: [
-      {
-        id: "e11",
-        name: "Dragon Flags",
-        sets: 3,
-        reps: "5-8",
-        he: "שכב על ספסל ישר ואחוז בצדדיו מאחורי הראש. הרם את כל הגוף עד למצב אנכי כשרק השכמות נוגעות בספסל. רד למטה לאט מאוד תוך שמירה על גוף ישר כמו קרש. אל תיתן לגב התחתון להתקשת. זוהי תנועה מתקדמת ביותר הדורשת שליטה אבסולוטית בבטן. אם קשה מדי ניתן לבצע עם ברכיים כפופות.",
-        work: 40,
-        rest: 90,
-        category: "core",
-        muscleGroup: "Core",
-        videoUrl: "https://www.youtube.com/watch?v=moyFIvRrS0E",
-        imageUrl: EX_IMAGES.dragon
-      }
-    ],
-    bonus: []
-  },
-  {
-    key: "day5",
-    title: "יום 5 - כתפיים",
-    subtitle: "כתפיים רחבות ושריון צוואר",
-    focusHe: "בניית כתפיים תלת-ממדיות ויציבה של לוחם",
-    accent: "violet",
-    exercises: [
-      {
-        id: "e12",
-        name: "Z-Press",
-        sets: 4,
-        reps: "8-10",
-        he: "התיישב על הרצפה עם רגליים ישרות קדימה בפיסוק קל. אחוז במוט או משקולות בגובה הכתפיים. לחץ את המשקל מעל הראש ללא תנופה מהרגליים או הישענות לאחור. הישיבה על הרצפה מנטרלת כל עזרה מהגוף התחתון ומאלצת את הכתפיים והליבה לעבוד בצורה מבודדת וחזקה. שמור על גב זקוף לאורך כל התנועה.",
-        work: 45,
-        rest: 100,
-        category: "armor",
-        muscleGroup: "Shoulders",
-        videoUrl: "https://www.youtube.com/watch?v=0_fL9S0v00A",
-        imageUrl: EX_IMAGES.z_press
-      },
-      {
-        id: "e13",
-        name: "Face Pulls",
-        sets: 4,
-        reps: "15",
-        he: "כוון את הפולי לגובה המצח והשתמש בחבל. אחוז בחבל ומשוך אותו לכיוון הפנים תוך כדי הפרדת הידיים הצידה. בסוף התנועה המרפקים צריכים להיות בקו הכתפיים והאגרופים לצדי האוזניים. סחט את הכתף האחורית והשכמות. זהו תרגיל קריטי לבריאות הכתף ויציבה זקופה.",
-        work: 40,
-        rest: 60,
-        category: "armor",
-        muscleGroup: "Shoulders",
-        videoUrl: "https://www.youtube.com/watch?v=rep-qVOkqgk",
-        imageUrl: EX_IMAGES.facepull
-      }
-    ],
-    bonus: []
-  }
+const AI_TIPS = [
+  "נועם, שמור על גב ישר. הליבה היא הבסיס לכל תנועה כבדה.",
+  "אל תשכח לנשום. הוצא אוויר במאמץ והכנס אוויר במתיחה.",
+  "זמן המנוחה הוא קדוש. תן לשריר להתאושש כדי להפציץ בסט הבא.",
+  "הטכניקה חשובה מהמשקל. שליטה אבסולוטית בונה שריר איכותי.",
+  "תרגיש את השריר עובד. חיבור מוח-שריר הוא המפתח לשינוי.",
+  "אם זה היה קל, זה לא היה משנה אותך. תן הכל!",
+  "הירידה צריכה להיות איטית ובשליטה. שם קורית רוב הבנייה.",
+  "נועם, אתה בונה פה שריון. כל חזרה מקרבת אותך ליעד."
 ];
 
-const allExercisesPool = initialDays.flatMap(day => [
-  ...day.exercises.map(ex => ({ ...ex, videoUrl: ex.videoUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise')}` })),
-  ...day.bonus.map(ex => ({ ...ex, videoUrl: ex.videoUrl || `https://www.youtube.com/results?search_query=${encodeURIComponent(ex.name + ' exercise')}` }))
-]);
+// --- UI COMPONENTS ---
 
-// --- UI SUB-COMPONENTS ---
-
-const GlassCard = ({ className, children, onClick }: any) => (
+const ApexCard = ({ children, className, onClick }: any) => (
   <motion.div 
-    whileHover={onClick ? { scale: 1.01, borderColor: "rgba(20, 184, 166, 0.4)", backgroundColor: "rgba(15, 23, 42, 0.6)" } : {}}
-    whileTap={onClick ? { scale: 0.98 } : {}}
+    whileHover={onClick ? { scale: 1.01, borderColor: "rgba(20, 184, 166, 0.4)" } : {}}
     onClick={onClick}
-    className={`bg-slate-900/40 backdrop-blur-2xl border border-white/5 rounded-[2.5rem] shadow-2xl overflow-hidden transition-all duration-300 ${className || ''}`}
+    className={`bg-slate-900/60 backdrop-blur-3xl border border-white/5 rounded-[2.5rem] overflow-hidden transition-all duration-300 ${className || ''}`}
   >
     {children}
   </motion.div>
 );
 
-const ActionButton = React.forwardRef(({ className, variant = 'default', size = 'default', children, ...props }: any, ref: any) => {
+const ApexButton = React.forwardRef(({ className, variant = 'default', size = 'default', children, ...props }: any, ref: any) => {
   const base = "inline-flex items-center justify-center font-black transition-all active:scale-95 disabled:opacity-50 cursor-pointer select-none";
   const variants: any = { 
     default: "bg-teal-500 text-slate-950 hover:bg-teal-400 shadow-[0_0_20px_rgba(20,184,166,0.3)]", 
     outline: "border border-white/10 bg-white/5 hover:bg-white/10 text-white/90",
     ghost: "bg-transparent text-white/40 hover:text-white hover:bg-white/5",
     danger: "bg-rose-600 text-white shadow-[0_0_20px_rgba(225,29,72,0.3)]",
-    secondary: "bg-indigo-600 text-white hover:bg-indigo-500 shadow-[0_0_20px_rgba(79,70,229,0.3)]"
+    premium: "bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-xl"
   };
   const sizes: any = { 
-    default: "h-14 px-8 rounded-2xl text-base", 
-    sm: "h-10 px-4 rounded-xl text-xs", 
+    default: "h-14 px-8 rounded-2xl text-sm", 
+    sm: "h-10 px-4 rounded-xl text-[10px]", 
     lg: "h-20 px-12 rounded-3xl text-xl", 
     icon: "h-12 w-12 rounded-xl" 
   };
   return <button ref={ref} className={`${base} ${variants[variant]} ${sizes[size]} ${className || ''}`} {...props}>{children}</button>;
 });
 
-const Badge = ({ children, variant = "default" }: any) => {
+const ApexBadge = ({ children, variant = "default" }: any) => {
   const styles: any = { 
     default: "bg-white/5 text-white/50 border-white/5", 
     teal: "bg-teal-500/10 text-teal-400 border-teal-500/20",
-    blue: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    emerald: "bg-emerald-500/10 text-emerald-400 border-emerald-500/20",
-    rose: "bg-rose-500/10 text-rose-400 border-rose-500/20",
-    violet: "bg-violet-500/10 text-violet-400 border-violet-500/20"
+    elite: "bg-rose-500/10 text-rose-400 border-rose-500/20 animate-pulse"
   };
-  return (
-    <div className={`px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border ${styles[variant] || styles.default}`}>
-      {children}
-    </div>
-  );
+  return <div className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest border ${styles[variant]}`}>{children}</div>;
 };
 
-// --- MODALS ---
+// --- HELPER COMPONENTS ---
 
-function AiCoachModal({ exercise, onClose }: { exercise: Exercise, onClose: () => void }) {
+function SwapModal({ currentEx, onSwap, onClose }: { currentEx: Exercise, onSwap: (e: Exercise) => void, onClose: () => void }) {
+  const alts = useMemo(() => MASTER_VAULT.filter(e => e.muscleGroup === currentEx.muscleGroup && e.id !== currentEx.id), [currentEx]);
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/95 backdrop-blur-2xl p-6">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }} 
-        animate={{ opacity: 1, scale: 1, y: 0 }} 
-        className="bg-slate-900 border border-white/10 w-full max-w-2xl rounded-[3rem] overflow-hidden shadow-[0_0_100px_rgba(20,184,166,0.15)]"
-      >
-        <div className="p-10 space-y-8">
+    <div className="fixed inset-0 z-[500] bg-black/95 backdrop-blur-2xl flex items-center justify-center p-6">
+      <motion.div initial={{ scale: 0.9, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="bg-slate-900 border border-white/10 w-full max-w-4xl rounded-[3rem] overflow-hidden">
+        <div className="p-8 space-y-6">
           <div className="flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-teal-500/20 rounded-2xl flex items-center justify-center text-teal-400 border border-teal-500/20">
-                <Bot size={32}/>
-              </div>
-              <div>
-                <h3 className="text-2xl font-black italic uppercase tracking-tight">Reacher AI Coach</h3>
-                <p className="text-teal-500/50 text-[10px] font-bold uppercase tracking-widest">Protocol Optimizer v4.2</p>
-              </div>
-            </div>
-            <ActionButton variant="ghost" size="icon" onClick={onClose} className="rounded-full"><X/></ActionButton>
+            <h3 className="text-3xl font-black italic uppercase">SWAP PROTOCOL</h3>
+            <ApexButton variant="ghost" size="icon" onClick={onClose}><X/></ApexButton>
           </div>
-
-          <div className="space-y-6 text-right" dir="rtl">
-             <div className="bg-white/5 p-8 rounded-[2rem] border border-white/5 relative overflow-hidden group">
-                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity"><Sparkles size={40}/></div>
-                <p className="text-teal-400 font-black mb-4 text-lg">דגש ביו-מכני עבור {exercise.name}:</p>
-                <p className="text-xl leading-relaxed font-medium italic text-slate-200">
-                  נועם, בתרגיל זה המפתח הוא שליטה בשלב האקסצנטרי. אל תאפשר למשקל ליפול. 
-                  שמור על מתח קבוע בסיבי השריר המטרתיים. וודא שאתה מוציא אוויר במאמץ 
-                  ומכניס אוויר בשלב המתיחה. הטכניקה חשובה יותר מהמשקל על המוט.
-                </p>
-             </div>
-             
-             <div className="grid grid-cols-2 gap-4">
-                <div className="p-6 bg-slate-950/50 rounded-2xl border border-white/5">
-                   <p className="text-[10px] font-black text-slate-500 uppercase mb-2">מיקוד מטבולי</p>
-                   <p className="text-sm font-bold">היפרטרופיה פונקציונלית</p>
+          <div className="grid md:grid-cols-2 gap-4 max-h-[60vh] overflow-y-auto pr-2">
+            {alts.map(ex => (
+              <ApexCard key={ex.id} className="p-4 flex items-center gap-4 cursor-pointer hover:bg-white/5" onClick={() => { onSwap(ex); onClose(); }}>
+                <img src={ex.imageUrl} className="w-16 h-16 rounded-xl object-cover" />
+                <div className="text-right">
+                  <h4 className="font-black italic text-lg">{ex.name}</h4>
+                  <p className="text-[10px] text-slate-500 font-bold uppercase">{ex.difficulty}</p>
                 </div>
-                <div className="p-6 bg-slate-950/50 rounded-2xl border border-white/5">
-                   <p className="text-[10px] font-black text-slate-500 uppercase mb-2">סיכון פציעה</p>
-                   <p className="text-sm font-bold text-emerald-400">נמוך - טווח בטוח</p>
-                </div>
-             </div>
-          </div>
-
-          <div className="pt-4 flex flex-col gap-4">
-             <ActionButton className="w-full h-16 text-lg uppercase italic font-black" onClick={() => window.open(`https://gemini.google.com/app`, "_blank")}>
-               התחל שיחה מלאה עם AI
-             </ActionButton>
-             <p className="text-center text-[10px] text-slate-600 font-bold uppercase tracking-widest">Powered by Reacher Systems Intelligence</p>
+              </ApexCard>
+            ))}
           </div>
         </div>
       </motion.div>
@@ -434,584 +250,370 @@ function AiCoachModal({ exercise, onClose }: { exercise: Exercise, onClose: () =
   );
 }
 
-// --- MAIN APP ---
+// --- MAIN APPLICATION CORE ---
 
 function ReacherApp() {
-  // Navigation & View State
-  const [screen, setScreen] = useState<"splash" | "home" | "day" | "live" | "analytics" | "settings">("splash");
-  const [viewMode, setViewMode] = useState<"days" | "muscles">("days");
-  
-  // Data State
-  const [history, setHistory] = useState<UserStats>(() => {
-    const saved = localStorage.getItem("reacher_v15_stats");
-    return saved ? JSON.parse(saved) : { totalWorkouts: 0, totalVolume: 0, streak: 0, lastDate: "" };
-  });
-  
-  const [selectedDayKey, setSelectedDayKey] = useState("day1");
-  const [selectedMuscle, setSelectedMuscle] = useState<MuscleGroup | null>(null);
-  
-  // Workout Execution State
-  const [exerciseIndex, setExerciseIndex] = useState(0);
-  const [setIndex, setSetIndex] = useState(0);
-  const [phase, setPhase] = useState<"work" | "rest" | "done">("work");
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [running, setRunning] = useState(false);
-  
-  // UI State
-  const [activeAiModal, setActiveAiModal] = useState<Exercise | null>(null);
+  // Navigation
+  const [screen, setScreen] = useState<"splash" | "main">("splash");
+  const [tab, setTab] = useState<"dashboard" | "vault" | "analytics" | "settings">("dashboard");
+  const [catalogFilter, setCatalogFilter] = useState<MuscleGroup | "All">("All");
+
+  // Workout Session
+  const [sessionList, setSessionList] = useState<Exercise[]>([]);
+  const [inSession, setInSession] = useState(false);
+  const [curExIdx, setCurExIdx] = useState(0);
+  const [curSet, setCurSet] = useState(1);
+  const [phase, setPhase] = useState<"work" | "rest">("work");
+  const [timer, setTimer] = useState(0);
+  const [isRunning, setIsRunning] = useState(false);
+  const [tip, setTip] = useState(AI_TIPS[0]);
+  const [weight, setWeight] = useState("");
+  const [reps, setReps] = useState("");
+  const [showSwap, setShowSwap] = useState(false);
+
+  // Stats & History
+  const [logs, setLogs] = useState<SetRecord[]>(() => JSON.parse(localStorage.getItem("reacher_logs_v18") || "[]"));
+  const [history, setHistory] = useState<WorkoutHistory[]>(() => JSON.parse(localStorage.getItem("reacher_hist_v18") || "[]"));
+
   const audioCtx = useRef<AudioContext | null>(null);
 
-  // Persistence Effects
-  useEffect(() => localStorage.setItem("reacher_v15_stats", JSON.stringify(history)), [history]);
+  // Persistence
+  useEffect(() => localStorage.setItem("reacher_logs_v18", JSON.stringify(logs)), [logs]);
+  useEffect(() => localStorage.setItem("reacher_hist_v18", JSON.stringify(history)), [history]);
 
-  // Audio & Haptic Logic
-  const initEngines = useCallback(() => {
-    if (!audioCtx.current) audioCtx.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    if (audioCtx.current.state === 'suspended') audioCtx.current.resume();
-    setScreen("home");
-  }, []);
-
-  const playBeep = (f = 880) => {
-    if (!audioCtx.current) return;
-    const o = audioCtx.current.createOscillator();
+  // Audio Engine
+  const playSound = (freq: number) => {
+    if (!audioCtx.current) audioCtx.current = new AudioContext();
+    const osc = audioCtx.current.createOscillator();
     const g = audioCtx.current.createGain();
-    o.connect(g); g.connect(audioCtx.current.destination);
-    o.frequency.value = f;
-    g.gain.setValueAtTime(0.05, audioCtx.current.currentTime);
-    g.gain.exponentialRampToValueAtTime(0.01, audioCtx.current.currentTime + 0.3);
-    o.start(); o.stop(audioCtx.current.currentTime + 0.3);
+    osc.connect(g); g.connect(audioCtx.current.destination);
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.1, audioCtx.current.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.01, audioCtx.current.currentTime + 0.4);
+    osc.start(); osc.stop(audioCtx.current.currentTime + 0.4);
   };
 
-  const openApp = (url: string, fallback: string) => {
-    const now = Date.now();
-    window.location.href = url;
-    setTimeout(() => { if (Date.now() - now < 1500) window.open(fallback, "_blank"); }, 800);
-  };
-
-  // Helper: Get active exercises based on current context
-  const workoutList = useMemo(() => {
-    if (selectedMuscle) {
-      return allExercisesPool.filter(e => e.muscleGroup === selectedMuscle);
-    }
-    const day = initialDays.find(d => d.key === selectedDayKey);
-    return day ? day.exercises : [];
-  }, [selectedDayKey, selectedMuscle]);
-
-  const activeEx = useMemo(() => {
-    return workoutList[exerciseIndex] || workoutList[0];
-  }, [workoutList, exerciseIndex]);
-
-  // TIMER CORE LOGIC
+  // Timer Logic
   useEffect(() => {
     let t: any;
-    if (running && timeLeft > 0) {
-      t = setInterval(() => setTimeLeft(p => p - 1), 1000);
-    } else if (running && timeLeft === 0) {
-      playBeep(phase === 'work' ? 440 : 1200);
-      
-      if (phase === "work") {
-        setPhase("rest");
-        setTimeLeft(activeEx?.rest || 60);
-      } else {
-        if (setIndex + 1 < (activeEx?.sets || 3)) {
-          setSetIndex(p => p + 1);
-          setPhase("work");
-          setTimeLeft(activeEx?.work || 45);
-        } else if (exerciseIndex + 1 < workoutList.length) {
-          setExerciseIndex(p => p + 1);
-          setSetIndex(0);
-          setPhase("work");
-          setTimeLeft(workoutList[exerciseIndex + 1].work);
-        } else {
-          setPhase("done");
-          setRunning(false);
-          setHistory(prev => ({ ...prev, totalWorkouts: prev.totalWorkouts + 1 }));
-        }
-      }
+    if (isRunning && timer > 0) {
+      t = setInterval(() => setTimer(v => v - 1), 1000);
+    } else if (isRunning && timer === 0) {
+      handleStep();
     }
     return () => clearInterval(t);
-  }, [running, timeLeft, phase, activeEx, workoutList, exerciseIndex, setIndex]);
+  }, [isRunning, timer]);
 
-  // SCREEN RENDERING
+  const handleStep = () => {
+    const ex = sessionList[curExIdx];
+    playSound(phase === "work" ? 500 : 1000);
+    if (phase === "work") {
+      setPhase("rest"); setTimer(ex.rest);
+      setTip(AI_TIPS[Math.floor(Math.random() * AI_TIPS.length)]);
+    } else {
+      if (curSet < ex.sets) {
+        setCurSet(s => s + 1); setPhase("work"); setTimer(ex.work);
+      } else if (curExIdx + 1 < sessionList.length) {
+        setCurExIdx(i => i + 1); setCurSet(1); setPhase("work"); setTimer(sessionList[curExIdx+1].work);
+      } else {
+        finishWorkout();
+      }
+    }
+  };
+
+  const finishWorkout = () => {
+    const newHist: WorkoutHistory = {
+      id: Math.random().toString(36),
+      date: new Date().toLocaleDateString('he-IL'),
+      workoutTitle: "Custom Apex Protocol",
+      totalVolume: logs.slice(-10).reduce((a, b) => a + (b.weight * b.reps), 0),
+      exercisesCompleted: sessionList.length,
+      duration: 0
+    };
+    setHistory(p => [newHist, ...p]);
+    setInSession(false); setSessionList([]); setIsRunning(false);
+    alert("אימון הושלם! כל הכבוד נועם.");
+  };
+
+  const logSet = () => {
+    const rec: SetRecord = { 
+      weight: parseInt(weight) || 0, 
+      reps: parseInt(reps) || 0, 
+      timestamp: Date.now(), 
+      exerciseId: sessionList[curExIdx].id 
+    };
+    setLogs(p => [...p, rec]); setWeight(""); setReps("");
+    playSound(800);
+  };
+
+  // UI RENDERERS
+
+  if (screen === "splash") {
+    return (
+      <div className="fixed inset-0 bg-slate-950 flex flex-col items-center justify-center p-10 text-center overflow-hidden">
+        <div className="absolute inset-0 opacity-20">
+          <img src={REACHER_HERO} className="w-full h-full object-cover grayscale blur-sm" />
+          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
+        </div>
+        <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="relative z-10 space-y-12">
+           <div className="flex flex-col items-center gap-4">
+              <div className="w-24 h-24 bg-teal-500 rounded-[2rem] flex items-center justify-center shadow-2xl">
+                <Swords size={48} className="text-slate-950" />
+              </div>
+              <p className="text-teal-400 font-mono text-[10px] uppercase tracking-[0.5em]"><Cpu size={14} className="inline mr-2"/>PLATINUM ENGINE v18.0</p>
+           </div>
+           <h1 className="text-8xl md:text-[11rem] font-black italic tracking-tighter uppercase leading-[0.75] text-white">REACHER<br/><span className="text-teal-500">APEX</span></h1>
+           <ApexButton size="lg" className="px-24" onClick={() => setScreen("main")}>INITIALIZE</ApexButton>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-teal-500/20 overflow-x-hidden" dir="rtl">
+    <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-teal-500/30 overflow-x-hidden" dir="rtl">
       
-      {/* Dynamic Ambient Background */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-        <div className="absolute top-[-20%] left-[-10%] w-[100%] h-[80%] bg-teal-500/5 blur-[180px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[70%] bg-indigo-500/5 blur-[150px] rounded-full" />
-        <div className="absolute top-[30%] left-[40%] w-1 h-1 bg-white/20 rounded-full blur-sm" />
+      {/* Dynamic Background */}
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-full h-full bg-teal-500/5 blur-[120px] rounded-full" />
       </div>
 
-      <AnimatePresence mode="wait">
-        
-        {/* --- 1. SPLASH SCREEN --- */}
-        {screen === "splash" && (
-          <motion.div key="splash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0, scale: 1.1 }} className="fixed inset-0 z-[300] flex flex-col items-center justify-center p-12 text-center">
-            <div className="absolute inset-0 z-0">
-              <img src={REACHER_HERO} className="w-full h-full object-cover opacity-20 grayscale scale-110" alt="Reacher Background" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent" />
-            </div>
-            <motion.div initial={{ y: 40, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.2 }} className="z-10 space-y-12 max-w-2xl">
-              <div className="flex flex-col items-center gap-4">
-                 <div className="w-20 h-20 bg-teal-500 rounded-3xl flex items-center justify-center shadow-[0_0_50px_rgba(20,184,166,0.5)] rotate-3">
-                   <Swords size={48} className="text-slate-950 -rotate-3" />
-                 </div>
-                 <div className="flex items-center gap-3 font-mono text-teal-400 text-xs uppercase tracking-[0.4em] mt-4">
-                   <Cpu size={14}/> SYSTEM VERSION 15.0.4
-                 </div>
-              </div>
-              <h1 className="text-8xl md:text-[12rem] font-black tracking-tighter uppercase italic leading-[0.75]">
-                REACHER<br/><span className="text-teal-500">APEX</span>
-              </h1>
-              <p className="text-slate-400 text-base font-bold uppercase tracking-[0.3em] max-w-md mx-auto leading-relaxed">
-                Elite Training Protocol. <br/> Built Ruthless for Noam.
-              </p>
-              <div className="pt-8">
-                <ActionButton size="lg" onClick={initEngines} className="px-24 py-10 text-3xl shadow-[0_20px_60px_rgba(20,184,166,0.3)] group relative overflow-hidden">
-                  <span className="relative z-10 uppercase italic font-black">IGNITION</span>
-                  <div className="absolute inset-0 bg-white/20 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                </ActionButton>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-
-        {/* --- 2. HOME SCREEN --- */}
-        {screen === "home" && (
-          <motion.div key="home" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 max-w-7xl mx-auto p-6 pt-16 pb-48 space-y-16">
+      <AnimatePresence>
+        {!inSession ? (
+          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="relative z-10 max-w-7xl mx-auto p-6 pt-12 pb-48 space-y-16">
+            
+            {/* Header */}
             <header className="flex justify-between items-end px-4">
-              <div className="space-y-2">
-                <h2 className="text-5xl font-black italic tracking-tighter uppercase leading-none">COMMAND<br/>CENTER</h2>
-                <div className="flex items-center gap-3 font-black text-teal-500 uppercase tracking-widest text-[11px]">
-                  <div className="w-2 h-2 bg-teal-500 rounded-full animate-ping" />
-                  Apex Engine: Operational
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <ActionButton variant="outline" size="icon" onClick={() => openApp("spotify://", "https://open.spotify.com")} className="rounded-2xl border-white/5 hover:border-teal-500/30">
-                  <Music size={22}/>
-                </ActionButton>
-                <ActionButton variant="outline" size="icon" onClick={() => setScreen("settings")} className="rounded-2xl border-white/5">
-                  <Settings2 size={24} />
-                </ActionButton>
-              </div>
+               <div className="space-y-1">
+                  <h2 className="text-5xl font-black italic uppercase tracking-tighter leading-none">COMMAND<br/>CENTER</h2>
+                  <div className="flex items-center gap-2 text-teal-500 font-black uppercase text-[10px] tracking-widest">
+                     <div className="w-2 h-2 bg-teal-500 rounded-full animate-ping" /> OPERATIONAL
+                  </div>
+               </div>
+               <div className="flex gap-3">
+                  <ApexButton variant="outline" size="icon" onClick={() => window.open('spotify://', '_blank')}><Music size={22}/></ApexButton>
+                  <ApexButton variant="outline" size="icon" onClick={() => setTab("settings")}><Settings2 size={24}/></ApexButton>
+               </div>
             </header>
 
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6 px-2">
-              {[
-                { label: "אימונים", val: history.totalWorkouts, icon: Activity, col: "text-teal-400", bg: "bg-teal-400/5" },
-                { label: "פרוטוקולים", val: allExercisesPool.length, icon: ShieldCheck, col: "text-blue-400", bg: "bg-blue-400/5" },
-                { label: "AI SYNC", val: "ACTIVE", icon: Bot, col: "text-indigo-400", bg: "bg-indigo-400/5" },
-                { label: "STREAK", val: `${history.streak}D`, icon: Trophy, col: "text-amber-400", bg: "bg-amber-400/5" }
-              ].map((s, i) => (
-                <GlassCard key={i} className={`p-8 flex flex-col items-center justify-center text-center space-y-3 ${s.bg}`}>
-                  <s.icon size={24} className={s.col} />
-                  <div className="text-3xl font-black italic tracking-tight">{s.val}</div>
-                  <div className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{s.label}</div>
-                </GlassCard>
-              ))}
+            {/* Dashboard Navigation Tabs */}
+            <div className="flex bg-slate-900/80 p-2 rounded-[2rem] w-full max-w-lg mx-auto border border-white/5 backdrop-blur-3xl shadow-2xl">
+               {[
+                 { id: "dashboard", label: "לוח בקרה", icon: Home },
+                 { id: "vault", label: "מאגר", icon: LayoutGrid },
+                 { id: "analytics", label: "מדדים", icon: BarChart3 }
+               ].map(t => (
+                 <button 
+                  key={t.id} onClick={() => setTab(t.id as any)}
+                  className={`flex-1 flex items-center justify-center gap-2 py-4 rounded-[1.5rem] text-[11px] font-black uppercase tracking-widest transition-all ${tab === t.id ? 'bg-white text-slate-950 shadow-xl' : 'text-slate-500 hover:text-white'}`}
+                 >
+                   <t.icon size={16}/> {t.label}
+                 </button>
+               ))}
             </div>
 
-            {/* Main Selection Toggle */}
-            <div className="flex bg-slate-900/80 p-2 rounded-[2rem] w-full max-w-md mx-auto border border-white/5 backdrop-blur-3xl shadow-2xl">
-              <button 
-                onClick={() => setViewMode("days")} 
-                className={`flex-1 flex items-center justify-center gap-3 py-5 rounded-[1.5rem] text-xs font-black uppercase tracking-widest transition-all duration-500 ${viewMode === 'days' ? 'bg-white text-slate-950 shadow-xl scale-[1.02]' : 'text-slate-500 hover:text-white'}`}
-              >
-                <LayoutGrid size={16}/> ימים
-              </button>
-              <button 
-                onClick={() => setViewMode("muscles")} 
-                className={`flex-1 flex items-center justify-center gap-3 py-5 rounded-[1.5rem] text-xs font-black uppercase tracking-widest transition-all duration-500 ${viewMode === 'muscles' ? 'bg-white text-slate-950 shadow-xl scale-[1.02]' : 'text-slate-500 hover:text-white'}`}
-              >
-                <Target size={16}/> שרירים
-              </button>
-            </div>
+            {/* --- DASHBOARD VIEW --- */}
+            {tab === "dashboard" && (
+              <div className="space-y-12">
+                 {/* Stats */}
+                 <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {[
+                      { label: "אימונים", val: history.length, icon: Activity, col: "text-teal-400" },
+                      { label: "שיאי כוח", val: "14", icon: Trophy, col: "text-amber-400" },
+                      { label: "נפח שבועי", val: "18K", icon: Weight, col: "text-blue-400" },
+                      { label: "דופק מטרה", val: "165", icon: HeartPulse, col: "text-rose-400" }
+                    ].map((s, i) => (
+                      <ApexCard key={i} className="p-8 text-center space-y-3">
+                         <s.icon size={24} className={`mx-auto ${s.col}`} />
+                         <div className="text-3xl font-black italic">{s.val}</div>
+                         <div className="text-[10px] font-black text-slate-500 uppercase">{s.label}</div>
+                      </ApexCard>
+                    ))}
+                 </div>
 
-            {/* Grid Display */}
-            <div className="grid gap-10 md:grid-cols-2 lg:grid-cols-3 px-2">
-              {viewMode === "days" ? (
-                initialDays.map((day) => (
-                  <GlassCard 
-                    key={day.key} 
-                    className="group cursor-pointer relative" 
-                    onClick={() => { setSelectedDayKey(day.key); setSelectedMuscle(null); setScreen("day"); }}
-                  >
-                    <div className="relative h-72 overflow-hidden">
-                       <img src={day.exercises[0].imageUrl} className="w-full h-full object-cover opacity-30 group-hover:scale-110 group-hover:opacity-40 transition-all duration-1000" />
-                       <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/40 to-transparent" />
-                       <div className="absolute top-8 right-8">
-                         <Badge variant={day.accent as any}>{day.exercises.length} Protocols</Badge>
-                       </div>
-                       <div className="absolute bottom-10 right-10 left-10 flex justify-between items-end">
-                          <div className="space-y-2">
-                             <h3 className="text-5xl font-black italic uppercase leading-none tracking-tighter">{day.title}</h3>
-                             <p className="text-slate-400 text-xs font-bold uppercase tracking-widest">{day.subtitle}</p>
-                          </div>
-                          <div className="w-14 h-14 bg-white/10 rounded-2xl flex items-center justify-center group-hover:bg-teal-500 group-hover:text-slate-950 transition-all duration-500">
-                            <ChevronRight size={28} className="rotate-180" />
-                          </div>
-                       </div>
-                    </div>
-                    <div className="p-10 bg-slate-900/20 border-t border-white/5">
-                       <p className="text-sm text-slate-400 font-medium leading-relaxed mb-8">{day.focusHe}</p>
-                       <ActionButton className="w-full py-7 text-sm font-black italic uppercase tracking-widest">
-                         Engage Protocol
-                       </ActionButton>
-                    </div>
-                  </GlassCard>
-                ))
-              ) : (
-                Object.keys(muscleHebrew).map((m) => (
-                  <GlassCard 
-                    key={m} 
-                    className="h-40 relative group overflow-hidden cursor-pointer" 
-                    onClick={() => { setSelectedMuscle(m as MuscleGroup); setScreen("day"); }}
-                  >
-                     <img src={EX_IMAGES[`generic_${m.toLowerCase()}` as keyof typeof EX_IMAGES] || REACHER_HERO} className="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:scale-110 transition-all duration-1000" />
-                     <div className="absolute inset-0 bg-gradient-to-l from-[#020617] via-transparent to-transparent" />
-                     <div className="relative h-full flex items-center justify-between px-12">
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-teal-500 uppercase tracking-widest">Muscle Group</p>
-                          <h4 className="text-4xl font-black italic uppercase tracking-tighter leading-none">{muscleHebrew[m]}</h4>
-                        </div>
-                        <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center group-hover:bg-white group-hover:text-slate-950 transition-all">
-                          <Target size={20} />
-                        </div>
-                     </div>
-                  </GlassCard>
-                ))
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {/* --- 3. DAY VIEW (DETAILED LIST) --- */}
-        {screen === "day" && (
-          <motion.div key="day" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="relative z-10 max-w-5xl mx-auto p-6 pt-20 pb-48 space-y-12">
-            <header className="flex justify-between items-center px-4">
-              <ActionButton variant="ghost" size="icon" onClick={() => { setSelectedMuscle(null); setScreen("home"); }} className="rounded-full">
-                <X size={24} />
-              </ActionButton>
-              <div className="text-center">
-                <p className="text-teal-500 text-[10px] font-black uppercase tracking-[0.4em] mb-2">Selected Session</p>
-                <h2 className="text-5xl font-black italic uppercase tracking-tighter">
-                  {selectedMuscle ? muscleHebrew[selectedMuscle] : initialDays.find(d => d.key === selectedDayKey)?.title}
-                </h2>
-              </div>
-              <ActionButton 
-                variant="secondary" 
-                size="sm" 
-                onClick={() => { setExerciseIndex(0); setSetIndex(0); setPhase("work"); setTimeLeft(workoutList[0]?.work || 45); setRunning(true); setScreen("live"); }}
-              >
-                START ALL
-              </ActionButton>
-            </header>
-
-            <div className="space-y-8">
-              {workoutList.length > 0 ? workoutList.map((ex, i) => (
-                <GlassCard key={ex.id} className="p-8 flex flex-col md:flex-row items-center gap-10 border-white/5 relative group">
-                  {/* Exercise Image Wrapper */}
-                  <div className="h-44 w-full md:w-64 rounded-[2rem] overflow-hidden border border-white/10 bg-slate-950 relative">
-                     <img src={ex.imageUrl} className="w-full h-full object-cover opacity-60 group-hover:scale-110 transition-all duration-1000" alt={ex.name} />
-                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
-                     <div className="absolute bottom-4 left-4 right-4 flex justify-between items-center">
-                        <Badge variant={muscleColors[ex.muscleGroup] as any}>{muscleHebrew[ex.muscleGroup]}</Badge>
-                        <div className="flex gap-2">
-                           <ActionButton variant="outline" size="icon" onClick={() => openApp(`youtube://results?search_query=${encodeURIComponent(ex.name)}`, ex.videoUrl)} className="h-10 w-10 bg-black/40 backdrop-blur-md border-white/10">
-                              <Youtube size={18} className="text-rose-500" />
-                           </ActionButton>
-                        </div>
-                     </div>
-                  </div>
-
-                  {/* Exercise Info */}
-                  <div className="flex-1 text-right space-y-4">
-                     <div className="flex justify-start items-center gap-3">
-                        <Badge>{categoryHebrew[ex.category]}</Badge>
-                        <h4 className="text-3xl font-black italic uppercase tracking-tight leading-none">{ex.name}</h4>
-                     </div>
-                     <p className="text-slate-300 text-base font-medium leading-relaxed">
-                        {ex.he}
-                     </p>
-                     
-                     <div className="flex justify-start gap-10 pt-2">
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Sets</p>
-                          <p className="text-2xl font-black italic">{ex.sets}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Reps</p>
-                          <p className="text-2xl font-black italic">{ex.reps}</p>
-                        </div>
-                        <div className="space-y-1">
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Rest</p>
-                          <p className="text-2xl font-black italic">{ex.rest}s</p>
-                        </div>
-                     </div>
-
-                     <div className="flex justify-start gap-4 pt-4">
-                        <ActionButton variant="outline" size="sm" onClick={() => setActiveAiModal(ex)} className="gap-2 border-teal-500/20 text-teal-400">
-                          <Sparkles size={14}/> ASK COACH
-                        </ActionButton>
-                        <ActionButton variant="outline" size="sm" className="gap-2 opacity-50 cursor-not-allowed">
-                          <ArrowRightLeft size={14}/> SWAP
-                        </ActionButton>
-                     </div>
-                  </div>
-
-                  <div className="flex flex-col gap-2">
-                    <ActionButton 
-                      onClick={() => { setExerciseIndex(i); setSetIndex(0); setPhase("work"); setTimeLeft(ex.work); setRunning(true); setScreen("live"); }}
-                      className="w-full md:w-32 py-8 text-xs font-black italic"
-                    >
-                      GO LIVE
-                    </ActionButton>
-                  </div>
-                </GlassCard>
-              )) : (
-                <div className="text-center py-20 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                  <ZapOff size={48} className="mx-auto text-slate-700 mb-4" />
-                  <p className="text-slate-500 font-bold uppercase tracking-widest">No protocols found for this selection</p>
-                </div>
-              )}
-            </div>
-          </motion.div>
-        )}
-
-        {/* --- 4. LIVE SESSION (THE ACTIVE TIMER) --- */}
-        {screen === "live" && (
-          <motion.div key="live" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 bg-[#020617] z-[400] flex flex-col p-8 overflow-y-auto">
-            <header className="flex justify-between items-center mb-10">
-               <ActionButton variant="ghost" size="icon" onClick={() => { setRunning(false); setScreen("day"); }} className="rounded-full bg-white/5">
-                 <X size={24} />
-               </ActionButton>
-               <div className="text-center">
-                  <p className="text-teal-500 text-[10px] font-black uppercase tracking-[0.6em] mb-2">REACHER PROTOCOL ACTIVE</p>
-                  <div className="flex items-center gap-3 justify-center">
-                    <div className="w-2 h-2 bg-teal-500 rounded-full animate-pulse" />
-                    <h2 className="text-2xl font-black italic uppercase tracking-tighter">
-                      {selectedMuscle ? muscleHebrew[selectedMuscle] : initialDays.find(d => d.key === selectedDayKey)?.title}
-                    </h2>
-                  </div>
-               </div>
-               <ActionButton variant="outline" size="icon" onClick={() => openApp("spotify://", "https://open.spotify.com")} className="rounded-2xl">
-                 <Music size={20} />
-               </ActionButton>
-            </header>
-
-            <div className="flex-1 flex flex-col items-center justify-center space-y-16 py-10">
-               {/* Exercise Identity */}
-               <div className="text-center space-y-6 max-w-3xl px-6">
-                  <Badge variant="teal">{categoryHebrew[activeEx?.category || 'pull']}</Badge>
-                  <h1 className="text-6xl md:text-9xl font-black italic tracking-tighter uppercase leading-none">
-                    {activeEx?.name}
-                  </h1>
-                  <p className="text-slate-400 text-xl md:text-2xl font-medium leading-relaxed italic max-w-2xl mx-auto">
-                    {activeEx?.he}
-                  </p>
-               </div>
-
-               {/* Central Timer Unit */}
-               <div className="relative flex items-center justify-center">
-                  {/* Ambient Glows */}
-                  <motion.div 
-                    animate={running ? { scale: [1, 1.1, 1], opacity: [0.3, 0.6, 0.3] } : {}}
-                    transition={{ repeat: Infinity, duration: 3 }}
-                    className={`absolute h-[32rem] w-[32rem] rounded-full border-2 ${phase === 'rest' ? 'border-amber-500/10' : 'border-teal-500/10'}`}
-                  />
-                  
-                  {/* Timer Ring */}
-                  <div className={`relative h-[28rem] w-[28rem] rounded-full border-4 flex flex-col items-center justify-center transition-all duration-1000 shadow-[0_0_100px_rgba(0,0,0,0.5)] ${phase === 'rest' ? 'border-amber-500/30 bg-amber-500/5' : 'border-teal-500/40 bg-teal-500/5'}`}>
-                     <div className="absolute inset-0 rounded-full bg-gradient-to-br from-white/5 to-transparent opacity-50" />
-                     
-                     <span className={`text-[15rem] font-black italic tabular-nums leading-none tracking-tighter transition-colors ${phase === 'rest' ? 'text-amber-400' : 'text-white'}`}>
-                        {timeLeft}
-                     </span>
-                     
-                     <div className="flex flex-col items-center mt-6">
-                        <div className={`h-1.5 w-24 rounded-full mb-4 ${phase === 'rest' ? 'bg-amber-500' : 'bg-teal-500'}`} />
-                        <span className="text-[12px] font-black uppercase tracking-[0.8em] text-slate-500">
-                          {phase === 'work' ? "WORK PHASE" : phase === 'rest' ? "REST PHASE" : "SESSION COMPLETE"}
-                        </span>
-                     </div>
-                  </div>
-               </div>
-
-               {/* Meta Stats */}
-               <div className="flex gap-20 justify-center w-full">
-                  <div className="text-center group">
-                     <p className="text-slate-600 text-xs font-black uppercase tracking-widest mb-3 group-hover:text-teal-500 transition-colors">Current Set</p>
-                     <p className="text-8xl font-black italic tracking-tighter">
-                       {setIndex + 1}<span className="text-3xl text-slate-800 mx-2">/</span><span className="text-3xl text-slate-600">{activeEx?.sets}</span>
-                     </p>
-                  </div>
-                  <div className="text-center group">
-                     <p className="text-slate-600 text-xs font-black uppercase tracking-widest mb-3 group-hover:text-teal-500 transition-colors">Rep Target</p>
-                     <p className="text-8xl font-black italic tracking-tighter">{activeEx?.reps}</p>
-                  </div>
-               </div>
-            </div>
-
-            {/* Bottom Controls */}
-            <div className="max-w-4xl mx-auto w-full pb-16 grid grid-cols-2 gap-8">
-               <ActionButton 
-                 variant={phase === 'rest' ? 'secondary' : 'default'}
-                 className="h-28 text-4xl shadow-2xl uppercase italic font-black" 
-                 onClick={() => { playBeep(); setTimeLeft(0); }}
-               >
-                 {phase === 'work' ? 'SET COMPLETE' : 'SKIP REST'}
-               </ActionButton>
-               <ActionButton 
-                 variant="outline" 
-                 className="h-28 text-4xl border-white/10" 
-                 onClick={() => { initEngines(); setRunning(!running); }}
-               >
-                 {running ? <Pause size={48} /> : <Play size={48} className="translate-x-1" />}
-               </ActionButton>
-            </div>
-          </motion.div>
-        )}
-
-        {/* --- 5. ANALYTICS --- */}
-        {screen === "analytics" && (
-           <motion.div key="analytics" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="max-w-5xl mx-auto p-10 pt-32 pb-48 space-y-16 relative z-10">
-              <header className="text-center space-y-4">
-                 <h2 className="text-7xl font-black italic uppercase tracking-tighter">Performance</h2>
-                 <p className="text-slate-500 font-bold uppercase tracking-[0.5em]">Data Harvesting Protocol</p>
-              </header>
-
-              <div className="grid md:grid-cols-2 gap-8">
-                 <GlassCard className="p-12 space-y-8">
-                    <div className="flex justify-between items-center">
-                       <h3 className="text-2xl font-black italic uppercase">Workout Volume</h3>
-                       <TrendingUp className="text-teal-400" />
-                    </div>
-                    <div className="h-64 flex items-end justify-around gap-2 px-4">
-                       {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
-                          <div key={i} className="group relative flex flex-col items-center flex-1">
-                             <motion.div 
-                               initial={{ height: 0 }} animate={{ height: `${h}%` }} 
-                               className="w-full bg-gradient-to-t from-teal-500/20 to-teal-500 rounded-xl"
-                             />
-                             <span className="text-[10px] font-black text-slate-600 mt-4">D{i+1}</span>
-                          </div>
+                 {/* Focus Groups */}
+                 <div className="space-y-6">
+                    <h4 className="text-xl font-black italic uppercase tracking-[0.3em] px-4 text-slate-500">Muscle Focus</h4>
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                       {Object.keys(muscleGroupImages).map((m: any) => (
+                         <div key={m} onClick={() => { setCatalogFilter(m); setTab("vault"); }} className="relative h-40 rounded-[2rem] overflow-hidden border border-white/5 group cursor-pointer">
+                            <img src={muscleGroupImages[m as MuscleGroup]} className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-60 transition-all duration-700" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent" />
+                            <div className="absolute bottom-4 right-4 left-4 text-center">
+                               <span className="text-sm font-black italic uppercase tracking-tighter">{muscleHebrew[m] || m}</span>
+                            </div>
+                         </div>
                        ))}
                     </div>
-                 </GlassCard>
+                 </div>
 
-                 <div className="space-y-8">
-                    <GlassCard className="p-8 flex items-center gap-8">
-                       <div className="w-20 h-20 bg-emerald-500/10 rounded-3xl flex items-center justify-center text-emerald-400">
-                          <Trophy size={40} />
-                       </div>
-                       <div>
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Personal Records</p>
-                          <h4 className="text-3xl font-black italic uppercase">14 New Maxes</h4>
-                       </div>
-                    </GlassCard>
-                    <GlassCard className="p-8 flex items-center gap-8">
-                       <div className="w-20 h-20 bg-blue-500/10 rounded-3xl flex items-center justify-center text-blue-400">
-                          <Clock3 size={40} />
-                       </div>
-                       <div>
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Time Under Tension</p>
-                          <h4 className="text-3xl font-black italic uppercase">42.5 Hours</h4>
-                       </div>
-                    </GlassCard>
-                    <GlassCard className="p-8 flex items-center gap-8">
-                       <div className="w-20 h-20 bg-rose-500/10 rounded-3xl flex items-center justify-center text-rose-400">
-                          <Flame size={40} />
-                       </div>
-                       <div>
-                          <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Metabolic Burn</p>
-                          <h4 className="text-3xl font-black italic uppercase">18.2K CAL</h4>
-                       </div>
-                    </GlassCard>
+                 {/* Session Queue */}
+                 {sessionList.length > 0 && (
+                   <ApexCard className="p-10 border-teal-500/30 bg-teal-500/5">
+                      <div className="flex justify-between items-center mb-8">
+                         <h3 className="text-3xl font-black italic uppercase">Session Queue</h3>
+                         <ApexBadge variant="teal">{sessionList.length} Protocols Loaded</ApexBadge>
+                      </div>
+                      <div className="space-y-4">
+                         {sessionList.map((ex, i) => (
+                           <div key={i} className="flex justify-between items-center bg-black/40 p-4 rounded-2xl">
+                              <span className="font-black italic uppercase">{ex.name}</span>
+                              <button onClick={() => setSessionList(p => p.filter((_, idx) => idx !== i))}><Trash2 size={16} className="text-rose-500"/></button>
+                           </div>
+                         ))}
+                      </div>
+                      <ApexButton variant="premium" className="w-full h-20 mt-8 text-xl italic" onClick={() => { setInSession(true); setTimer(sessionList[0].work); setIsRunning(true); }}>
+                        ENGAGE PROTOCOL
+                      </ApexButton>
+                   </ApexCard>
+                 )}
+              </div>
+            )}
+
+            {/* --- VAULT VIEW --- */}
+            {tab === "vault" && (
+              <div className="space-y-12">
+                 <div className="flex flex-col md:flex-row gap-6">
+                    <div className="flex-1 relative">
+                       <Search className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-500" />
+                       <input type="text" placeholder="SEARCH VAULT..." className="w-full h-16 bg-slate-900/50 border border-white/5 rounded-2xl pr-16 text-white font-bold outline-none focus:border-teal-500" />
+                    </div>
+                    <div className="flex overflow-x-auto gap-3 pb-2 scrollbar-hide">
+                       {["All", ...Object.keys(muscleHebrew)].map((m: any) => (
+                         <button key={m} onClick={() => setCatalogFilter(m)} className={`px-8 h-16 rounded-2xl text-[10px] font-black uppercase tracking-widest whitespace-nowrap transition-all ${catalogFilter === m ? 'bg-teal-500 text-slate-950 shadow-lg' : 'bg-slate-900 text-slate-500 border border-white/5'}`}>{muscleHebrew[m] || m}</button>
+                       ))}
+                    </div>
+                 </div>
+                 <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                    {MASTER_VAULT.filter(ex => catalogFilter === "All" || ex.muscleGroup === catalogFilter).map(ex => (
+                      <ApexCard key={ex.id} className="group flex flex-col h-full">
+                         <div className="h-56 relative overflow-hidden">
+                            <img src={ex.imageUrl} className="w-full h-full object-cover opacity-50 group-hover:scale-110 transition-all duration-1000" />
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 to-transparent" />
+                            <div className="absolute bottom-4 right-4 flex gap-2">
+                               <ApexButton variant="outline" size="icon" className="h-10 w-10 bg-black/40" onClick={() => window.open(ex.videoUrl, '_blank')}><Youtube size={18} className="text-rose-500"/></ApexButton>
+                               <ApexButton variant="premium" size="icon" className="h-10 w-10" onClick={() => setSessionList(p => [...p, ex])}><Plus size={18}/></ApexButton>
+                            </div>
+                            <div className="absolute top-4 right-4"><ApexBadge variant={ex.difficulty === 'Elite' ? 'elite' : 'teal'}>{ex.difficulty}</ApexBadge></div>
+                         </div>
+                         <div className="p-6 flex-1 flex flex-col">
+                            <h4 className="text-2xl font-black italic uppercase mb-2">{ex.name}</h4>
+                            <p className="text-slate-400 text-xs font-medium leading-relaxed mb-6 flex-1">{ex.he}</p>
+                            <div className="flex justify-between items-center pt-4 border-t border-white/5">
+                               <div className="flex gap-4 text-center">
+                                  <div><p className="text-[8px] font-black text-slate-600 uppercase">Sets</p><p className="font-black italic">{ex.sets}</p></div>
+                                  <div><p className="text-[8px] font-black text-slate-600 uppercase">Reps</p><p className="font-black italic">{ex.reps}</p></div>
+                               </div>
+                               <ApexBadge>{categoryHebrew[ex.category]}</ApexBadge>
+                            </div>
+                         </div>
+                      </ApexCard>
+                    ))}
                  </div>
               </div>
-           </motion.div>
-        )}
+            )}
 
-        {/* --- 6. SETTINGS --- */}
-        {screen === "settings" && (
-           <motion.div key="settings" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="max-w-3xl mx-auto p-10 pt-32 space-y-16 relative z-10">
-              <header className="flex justify-between items-center">
-                 <h2 className="text-6xl font-black italic uppercase tracking-tighter">System</h2>
-                 <ActionButton variant="ghost" size="icon" onClick={() => setScreen("home")} className="rounded-full">
-                   <X size={24} />
-                 </ActionButton>
-              </header>
-
-              <div className="space-y-6">
-                 <GlassCard className="p-10 space-y-10">
-                    <div className="flex justify-between items-center">
-                       <div className="flex items-center gap-4">
-                          <div className="p-3 bg-teal-500/10 rounded-xl text-teal-400"><Info size={24}/></div>
-                          <h3 className="text-xl font-black italic uppercase">Apex Engine Version</h3>
+            {/* --- ANALYTICS VIEW --- */}
+            {tab === "analytics" && (
+              <div className="space-y-12">
+                 <div className="grid md:grid-cols-2 gap-8">
+                    <ApexCard className="p-10 space-y-8">
+                       <h3 className="text-xl font-black italic uppercase">Workload Distribution</h3>
+                       <div className="h-64 flex items-end justify-between gap-2 px-4">
+                          {[40, 70, 45, 90, 65, 80, 100].map((h, i) => (
+                             <div key={i} className="flex-1 bg-teal-500/20 rounded-t-lg relative group">
+                                <motion.div initial={{ height: 0 }} animate={{ height: `${h}%` }} className="absolute bottom-0 inset-x-0 bg-teal-500 rounded-t-lg opacity-60 group-hover:opacity-100 transition-opacity" />
+                             </div>
+                          ))}
                        </div>
-                       <span className="text-slate-500 font-mono font-bold">v15.0.4 - Build 9932</span>
+                    </ApexCard>
+                    <div className="space-y-6">
+                       <h3 className="text-xl font-black italic uppercase px-4">Recent Sessions</h3>
+                       {history.map(h => (
+                         <ApexCard key={h.id} className="p-6 flex justify-between items-center bg-slate-900/20 border-white/5">
+                            <div className="text-right">
+                               <h5 className="font-black italic uppercase">{h.workoutTitle}</h5>
+                               <p className="text-[9px] text-slate-500 font-bold uppercase">{h.date}</p>
+                            </div>
+                            <div className="text-center"><p className="text-[9px] font-black text-slate-600 uppercase mb-1">Volume</p><p className="text-2xl font-black italic text-teal-400">{h.totalVolume}kg</p></div>
+                         </ApexCard>
+                       ))}
                     </div>
-
-                    <div className="h-px bg-white/5" />
-
-                    <div className="space-y-4">
-                       <p className="text-sm font-black text-slate-400 uppercase tracking-widest">AI Core Status</p>
-                       <div className="flex items-center gap-3 p-6 bg-emerald-500/5 border border-emerald-500/20 rounded-2xl">
-                          <ShieldCheck className="text-emerald-500" />
-                          <span className="text-emerald-500 font-bold uppercase text-xs">Neural Network Synchronized</span>
-                       </div>
-                    </div>
-
-                    <div className="h-px bg-white/5" />
-
-                    <div className="flex flex-col gap-4">
-                       <ActionButton variant="danger" className="w-full h-16" onClick={() => { if(confirm("Are you sure? This will wipe all performance data.")) { localStorage.clear(); window.location.reload(); } }}>
-                         FACTORY RESET ENGINE
-                       </ActionButton>
-                       <p className="text-center text-[10px] text-slate-700 font-bold uppercase tracking-[0.3em]">Warning: This action is permanent and irreversible</p>
-                    </div>
-                 </GlassCard>
+                 </div>
               </div>
-           </motion.div>
+            )}
+
+          </motion.div>
+        ) : (
+          /* --- LIVE SESSION VIEW --- */
+          <motion.div key="session" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="fixed inset-0 z-[400] bg-[#020617] flex flex-col p-6 overflow-y-auto">
+             <header className="flex justify-between items-center mb-10">
+                <ApexButton variant="ghost" size="icon" onClick={() => setInSession(false)}><X size={24}/></ApexButton>
+                <div className="text-center">
+                   <p className="text-teal-500 font-black text-[9px] tracking-[0.5em] uppercase mb-1">Apex Session Active</p>
+                   <h2 className="text-2xl font-black italic uppercase">{sessionList[curExIdx]?.name}</h2>
+                </div>
+                <ApexButton variant="outline" size="icon" onClick={() => setShowSwap(true)}><RefreshCcw size={18}/></ApexButton>
+             </header>
+
+             <div className="flex-1 flex flex-col items-center justify-center space-y-12">
+                <div className="text-center space-y-4 max-w-2xl">
+                   <ApexBadge variant="elite">{sessionList[curExIdx]?.muscleGroup}</ApexBadge>
+                   <h1 className="text-7xl md:text-9xl font-black italic uppercase tracking-tighter leading-none">{sessionList[curExIdx]?.name}</h1>
+                   <p className="text-slate-400 text-lg md:text-xl font-medium italic">{sessionList[curExIdx]?.he}</p>
+                </div>
+
+                <div className="flex flex-col md:flex-row items-center gap-16">
+                   {/* Timer Ring */}
+                   <div className="relative">
+                      <motion.div animate={isRunning ? { scale: [1, 1.1, 1], opacity: [0.2, 0.4, 0.2] } : {}} transition={{ repeat: Infinity, duration: 3 }} className={`absolute -inset-12 rounded-full border-2 ${phase === 'rest' ? 'border-amber-500/20' : 'border-teal-500/20'}`} />
+                      <div className={`h-[24rem] w-[24rem] rounded-full border-4 flex flex-col items-center justify-center shadow-2xl transition-all duration-1000 ${phase === 'rest' ? 'border-amber-500/40 bg-amber-500/5' : 'border-teal-500/40 bg-teal-500/5'}`}>
+                         <span className={`text-[11rem] font-black italic tracking-tighter tabular-nums ${phase === 'rest' ? 'text-amber-400' : 'text-white'}`}>{timer}</span>
+                         <span className="text-[10px] font-black uppercase tracking-[0.8em] text-slate-600">{phase === 'work' ? 'EXECUTION' : 'RECOVERY'}</span>
+                      </div>
+                   </div>
+
+                   {/* Data Entry */}
+                   <ApexCard className="p-8 w-full max-w-xs space-y-6">
+                      <div className="flex justify-between items-center"><h4 className="font-black italic uppercase">Log Set</h4><ApexBadge variant="teal">{curSet} / {sessionList[curExIdx]?.sets}</ApexBadge></div>
+                      <div className="space-y-4">
+                         <input type="number" value={weight} onChange={e => setWeight(e.target.value)} placeholder="WEIGHT (KG)" className="w-full h-14 bg-black/40 border border-white/10 rounded-xl text-2xl font-black italic text-center outline-none focus:border-teal-500" />
+                         <input type="number" value={reps} onChange={e => setReps(e.target.value)} placeholder="REPS" className="w-full h-14 bg-black/40 border border-white/10 rounded-xl text-2xl font-black italic text-center outline-none focus:border-teal-500" />
+                         <ApexButton variant="premium" className="w-full" onClick={logSet}>LOG RECENT SET</ApexButton>
+                      </div>
+                   </ApexCard>
+                </div>
+
+                {/* AI Spotter Bubble */}
+                {phase === 'rest' && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="bg-teal-500/5 border border-teal-500/20 p-6 rounded-[2rem] max-w-xl text-center">
+                    <p className="text-teal-400 font-bold italic text-lg leading-relaxed">"{tip}"</p>
+                  </motion.div>
+                )}
+             </div>
+
+             <div className="max-w-4xl mx-auto w-full pb-12 grid grid-cols-2 gap-8">
+                <ApexButton className="h-24 text-3xl italic font-black" onClick={() => setTimer(0)}>{phase === 'work' ? 'SET COMPLETE' : 'SKIP REST'}</ApexButton>
+                <ApexButton variant="outline" className="h-24" onClick={() => setIsRunning(!isRunning)}>{isRunning ? <Pause size={40}/> : <Play size={40} className="translate-x-1"/>}</ApexButton>
+             </div>
+
+             {showSwap && <SwapModal currentEx={sessionList[curExIdx]} onSwap={e => { const s = [...sessionList]; s[curExIdx] = e; setSessionList(s); }} onClose={() => setShowSwap(false)} />}
+          </motion.div>
         )}
-
       </AnimatePresence>
 
-      {/* --- PERSISTENT MODALS --- */}
-      <AnimatePresence>
-        {activeAiModal && <AiCoachModal exercise={activeAiModal} onClose={() => setActiveAiModal(null)} />}
-      </AnimatePresence>
-
-      {/* --- PERSISTENT NAVIGATION BAR --- */}
-      {screen !== 'splash' && screen !== 'live' && (
-        <div className="fixed bottom-12 left-1/2 -translate-x-1/2 z-[150] w-full max-w-lg px-8">
-           <motion.div 
-             initial={{ y: 100, opacity: 0 }}
-             animate={{ y: 0, opacity: 1 }}
-             className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-5 rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.8)]"
-           >
+      {/* Persistent Nav */}
+      {!inSession && screen !== 'splash' && (
+        <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-lg px-8">
+           <div className="bg-slate-900/90 backdrop-blur-3xl border border-white/10 p-5 rounded-[3rem] flex justify-around items-center shadow-2xl">
               {[
-                { scr: "home", icon: Home },
-                { scr: "day", icon: ListChecks },
-                { scr: "analytics", icon: TrendingUp },
-                { scr: "settings", icon: Settings2 }
-              ].map((item, i) => (
-                <button 
-                  key={i}
-                  onClick={() => setScreen(item.scr as any)} 
-                  className={`p-5 rounded-3xl transition-all duration-500 relative group ${screen === item.scr ? 'bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.5)] scale-110' : 'text-slate-600 hover:text-white hover:bg-white/5'}`}
-                >
-                  <item.icon size={28} />
-                  {screen === item.scr && (
-                    <motion.div layoutId="nav-dot" className="absolute -top-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-teal-500 rounded-full" />
-                  )}
-                </button>
+                { id: "dashboard", icon: Home },
+                { id: "vault", icon: LayoutGrid },
+                { id: "analytics", icon: barChart3 },
+                { id: "settings", icon: Settings2 }
+              ].map(t => (
+                <button key={t.id} onClick={() => setTab(t.id as any)} className={`p-5 rounded-3xl transition-all ${tab === t.id ? 'bg-teal-500 text-slate-950 shadow-lg scale-110' : 'text-slate-600 hover:text-white'}`}><t.icon size={28} /></button>
               ))}
-           </motion.div>
+           </div>
         </div>
       )}
     </div>
@@ -1019,14 +621,8 @@ function ReacherApp() {
 }
 
 // --- INITIALIZATION ---
-const container = document.getElementById("root");
-if (container) {
-  const root = createRoot(container);
+const rootEl = document.getElementById("root");
+if (rootEl) {
+  const root = createRoot(rootEl);
   root.render(<ReacherApp />);
 }
-
-/**
- * REACHER APEX SYSTEM v15.0.4
- * End of File. 
- * Code Total: ~1100 Lines (Full Functional Engine)
- */
