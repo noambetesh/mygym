@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { createRoot } from "react-dom/client";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Play, Pause, RotateCcw, SkipForward, SkipBack, Dumbbell, Flame, Clock3,
@@ -18,7 +17,7 @@ import {
 const REACHER_HERO = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600";
 
 // --- GLOBAL TYPES ---
-type MuscleGroup = "Back" | "Chest" | "Legs" | "Glutes"  "Shoulders" | "Arms" | "Core" | "FullBody";
+type MuscleGroup = "Back" | "Chest" | "Legs" | "Glutes" | "Shoulders" | "Arms" | "Core" | "FullBody";
 type Category = "pull" | "push" | "legs" | "armor" | "power" | "core" | "isolation";
 
 interface Exercise {
@@ -1522,8 +1521,9 @@ function ReacherApp() {
 }
 
 // --- INITIALIZATION ---
-const rootElement = document.getElementById("root");
-if (rootElement) {
-  const root = createRoot(rootElement);
-  root.render(<ReacherApp />);
-}
+// const rootElement = document.getElementById("root");
+// if (rootElement) {
+ // const root = createRoot(rootElement);
+ // root.render(<ReacherApp />);
+// }
+export default ReacherApp;
