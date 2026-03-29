@@ -357,8 +357,9 @@ function FieldBlock({ label, children }: { label: string; children: React.ReactN
 
 function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <div className={`w-12 h-12 rounded-2xl bg-white/10 ring-1 ring-white/10 p-1.5 shadow-[0_0_24px_rgba(255,255,255,0.08)] ${className}`}>
-      <img src="/icon-192.png" alt="Betesh Training logo" className="w-full h-full object-contain rounded-xl" />
+    // הוסר: bg-white/10, ring-1, shadow. הוגדל מ-w-12 ל-w-28
+    <div className={`w-28 h-28 p-1 transition-transform hover:scale-105 ${className}`}>
+      <img src="/icon-192.png" alt="Betesh Training logo" className="w-full h-full object-contain" />
     </div>
   );
 }
@@ -478,7 +479,11 @@ function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; lo
             </Card>
             <Card className="p-5 bg-white/5 border-white/10">
               <div className="text-sm font-bold text-slate-200 mb-3">שאלה מוכנה</div>
-              <textarea value={question} onChange={(e) => setQuestion(e.target.value)} className="w-full min-h-[150px] bg-black/30 border border-white/10 rounded-2xl p-4 outline-none resize-none" />
+              <textarea 
+                value={question} 
+                onChange={(e) => setQuestion(e.target.value)} 
+                className="w-full min-h-[150px] bg-black/30 border border-white/10 rounded-2xl p-4 outline-none resize-none text-white placeholder-slate-500 focus:border-teal-500 transition-colors" 
+              />
               <div className="grid sm:grid-cols-2 gap-3 mt-4">
                 <Btn variant="premium" onClick={askCoach}><Bot size={16} /> שאל מתוך התרגיל</Btn>
                 <Btn variant="outline" onClick={() => setQuestion(`תן לי וריאציה קלה יותר ל-${exercise.name} ודגשים לטעויות נפוצות`)}>
@@ -609,14 +614,15 @@ function ReacherApp() {
     if (!audioCtx.current) audioCtx.current = new AudioContext();
     if (audioCtx.current.state === "suspended") audioCtx.current.resume();
 
-    const profiles = {
-      nav: { type: "triangle" as OscillatorType, attack: 0.008, decay: 0.18, gain: 0.03, step: 0.045 },
-      add: { type: "square" as OscillatorType, attack: 0.004, decay: 0.14, gain: 0.022, step: 0.05 },
-      save: { type: "sawtooth" as OscillatorType, attack: 0.004, decay: 0.16, gain: 0.018, step: 0.05 },
-      rest: { type: "sine" as OscillatorType, attack: 0.01, decay: 0.22, gain: 0.02, step: 0.06 },
-      finish: { type: "square" as OscillatorType, attack: 0.003, decay: 0.24, gain: 0.028, step: 0.055 },
-    } as const;
-
+    
+const profiles = {
+  nav: { type: "sine" as OscillatorType, attack: 0.01, decay: 0.1, gain: 0.04, step: 0.05 },
+  add: { type: "triangle" as OscillatorType, attack: 0.02, decay: 0.2, gain: 0.05, step: 0.08 },
+  save: { type: "sawtooth" as OscillatorType, attack: 0.005, decay: 0.15, gain: 0.02, step: 0.04 }, // צליל מתכתי קצר
+  rest: { type: "sine" as OscillatorType, attack: 0.05, decay: 0.4, gain: 0.03, step: 0.1 }, // צליל עמוק ומרגיע
+  finish: { type: "square" as OscillatorType, attack: 0.01, decay: 0.5, gain: 0.04, step: 0.06 }, // צליל ניצחון עוצמתי
+} as const;
+    
     const profile = profiles[mode];
 
     freqs.forEach((freq, i) => {
