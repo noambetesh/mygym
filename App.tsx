@@ -496,10 +496,28 @@ function ScreenFlash({ show }: { show: boolean }) {
   );
 }
 
-function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) => void; activeMuscle: MuscleGroup | "All" }) {
+function BodyMap({
+  onSelect,
+  activeMuscle,
+}: {
+  onSelect: (muscle: MuscleGroup) => void;
+  activeMuscle: MuscleGroup | "All";
+}) {
   const bodyImage = "/anatomy-map.png";
 
-  const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup }) => {
+  const Dot = ({
+    x,
+    y,
+    label,
+    muscle,
+    side = "front",
+  }: {
+    x: number;
+    y: number;
+    label: string;
+    muscle: MuscleGroup;
+    side?: "front" | "back";
+  }) => {
     const active = activeMuscle === muscle;
 
     return (
@@ -509,7 +527,9 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
         style={{ left: `${x}%`, top: `${y}%` }}
       >
         <span
-          className={`absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${
+          className={`absolute ${
+            side === "front" ? "-right-16" : "-left-16"
+          } top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${
             active
               ? "bg-teal-500 text-white opacity-100 scale-110"
               : "bg-black/80 text-teal-300 opacity-0 group-hover:opacity-100 border border-white/10"
@@ -533,10 +553,12 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
     <Card className="p-4 relative overflow-hidden bg-slate-950/80 border-white/10">
       <div className="flex items-center gap-3 mb-4 px-2">
         <User className="text-teal-400" size={20} />
-        <h3 className="text-xl font-black italic text-white uppercase tracking-tight">Anatomy Map</h3>
+        <h3 className="text-xl font-black italic text-white uppercase tracking-tight">
+          Anatomy Map
+        </h3>
       </div>
 
-      <div className="relative h-[450px] rounded-[2rem] bg-black border border-white/5 overflow-hidden">
+      <div className="relative h-[560px] rounded-[2rem] bg-black border border-white/5 overflow-hidden">
         <img
           src={bodyImage}
           alt="Anatomy map"
@@ -545,22 +567,19 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/10 pointer-events-none" />
 
-        <Dot x={30} y={22} label="כתפיים" muscle="Shoulders" />
-        <Dot x={70} y={22} label="כתפיים" muscle="Shoulders" />
+        {/* FRONT */}
+        <Dot x={17} y={22} label="כתפיים" muscle="Shoulders" side="front" />
+        <Dot x={24} y={24} label="חזה" muscle="Chest" side="front" />
+        <Dot x={12} y={38} label="ידיים" muscle="Arms" side="front" />
+        <Dot x={28} y={39} label="ליבה" muscle="Core" side="front" />
+        <Dot x={24} y={55} label="רגליים" muscle="Legs" side="front" />
 
-        <Dot x={30} y={31} label="חזה" muscle="Chest" />
-
-        <Dot x={18} y={34} label="ידיים" muscle="Arms" />
-        <Dot x={82} y={34} label="ידיים" muscle="Arms" />
-
-        <Dot x={30} y={45} label="ליבה" muscle="Core" />
-
-        <Dot x={70} y={34} label="גב" muscle="Back" />
-
-        <Dot x={70} y={50} label="ישבן" muscle="Glutes" />
-
-        <Dot x={30} y={67} label="רגליים" muscle="Legs" />
-        <Dot x={70} y={67} label="רגליים" muscle="Legs" />
+        {/* BACK */}
+        <Dot x={56} y={22} label="כתפיים" muscle="Shoulders" side="back" />
+        <Dot x={67} y={24} label="גב" muscle="Back" side="back" />
+        <Dot x={77} y={38} label="ידיים" muscle="Arms" side="back" />
+        <Dot x={63} y={39} label="ישבן" muscle="Glutes" side="back" />
+        <Dot x={63} y={55} label="רגליים" muscle="Legs" side="back" />
       </div>
     </Card>
   );
@@ -857,7 +876,48 @@ function bottomTabClasses(item: MainTab, current: MainTab) {
   if (item === "nutrition") return "bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-[0_0_30px_rgba(20,184,166,0.38)] scale-110";
   return "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.42)] scale-110";
 }
+function getNextWorkoutDay(selectedDay: DayKey) {
+  const dayIndex = DAY_SPLITS.findIndex((d) => d.id === selectedDay);
+  const nextIndex = dayIndex === DAY_SPLITS.length - 1 ? 0 : dayIndex + 1;
+  return DAY_SPLITS[nextIndex];
+}
 
+function getCompletedExercisesCount(sessionList: Exercise[], logs: SetRecord[]) {
+  const sessionIds = new Set(sessionList.map((ex) => ex.id));
+  const completedIds = new Set(
+    logs.filter((log) => sessionIds.has(log.exerciseId)).map((log) => log.exerciseId)
+  );
+  return completedIds.size;
+}
+
+function getRemainingMuscleGroups(sessionList: Exercise[], logs: SetRecord[]) {
+  const completedIds = new Set(logs.map((log) => log.exerciseId));
+
+  const summary = sessionList.reduce<Record<string, { total: number; done: number }>>((acc, ex) => {
+    if (!acc[ex.muscleGroup]) {
+      acc[ex.muscleGroup] = { total: 0, done: 0 };
+    }
+    acc[ex.muscleGroup].total += 1;
+    if (completedIds.has(ex.id)) {
+      acc[ex.muscleGroup].done += 1;
+    }
+    return acc;
+  }, {});
+
+  return Object.entries(summary).map(([muscle, data]) => ({
+    muscle: muscle as MuscleGroup,
+    total: data.total,
+    done: data.done,
+    left: Math.max(0, data.total - data.done),
+  }));
+}
+
+function getWorkoutProgressText(sessionList: Exercise[], logs: SetRecord[]) {
+  const done = getCompletedExercisesCount(sessionList, logs);
+  const total = sessionList.length;
+  if (!total) return "עוד לא נבנה אימון";
+  return `${done}/${total} תרגילים הושלמו`;
+}
 function ReacherApp() {
   const [tab, setTab] = useState<MainTab>("dashboard");
   const [selectedDay, setSelectedDay] = useState<DayKey>("sun");
@@ -994,6 +1054,11 @@ const profiles = {
     return () => window.clearInterval(t);
   }, [isRunning, timer]);
 
+  const nextWorkout = useMemo(() => getNextWorkoutDay(selectedDay), [selectedDay]);
+const completedExercises = useMemo(() => getCompletedExercisesCount(sessionList, logs), [sessionList, logs]);
+const remainingByMuscle = useMemo(() => getRemainingMuscleGroups(sessionList, logs), [sessionList, logs]);
+const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, logs), [sessionList, logs]);
+  
   const filteredVault = useMemo(() => {
     return EXERCISES.filter((ex) => {
       const sectorOK = selectedSector === "All" || ex.sector === selectedSector;
@@ -1151,6 +1216,43 @@ const profiles = {
           <Card className="p-4 bg-black/30 border-white/10 min-w-[180px]"><div className="text-xs text-slate-500 mb-1">Nutrition score</div><div className="text-4xl font-black italic text-teal-400">{nutritionScore}</div></Card>
         </div>
       </Card>
+      <div className="grid md:grid-cols-3 gap-4">
+  <Card className="p-5">
+    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">
+      next workout
+    </div>
+    <div className="text-2xl font-black italic text-teal-400">{nextWorkout.title}</div>
+    <div className="text-sm text-slate-400 mt-2">{nextWorkout.subtitle}</div>
+  </Card>
+
+  <Card className="p-5">
+    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">
+      workout progress
+    </div>
+    <div className="text-2xl font-black italic text-amber-400">{workoutProgressText}</div>
+    <div className="text-sm text-slate-400 mt-2">
+      {sessionList.length ? `נשארו ${Math.max(0, sessionList.length - completedExercises)} תרגילים` : "הוסף תרגילים כדי להתחיל"}
+    </div>
+  </Card>
+
+  <Card className="p-5">
+    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">
+      muscle remaining
+    </div>
+    <div className="space-y-2">
+      {remainingByMuscle.length ? (
+        remainingByMuscle.map((item) => (
+          <div key={item.muscle} className="flex items-center justify-between text-sm">
+            <span className="text-slate-300">{muscleHebrew[item.muscle]}</span>
+            <span className="text-teal-300 font-bold">{item.done}/{item.total}</span>
+          </div>
+        ))
+      ) : (
+        <div className="text-sm text-slate-400">אין עדיין חלוקת שרירים באימון</div>
+      )}
+    </div>
+  </Card>
+</div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Exercises</div><div className="text-3xl md:text-4xl font-black italic">{sessionList.length}</div></Card>
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Volume</div><div className="text-3xl md:text-4xl font-black italic text-teal-400">{sessionVolume}</div></Card>
@@ -1259,6 +1361,34 @@ const profiles = {
 
   const renderVault = () => (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+      <Card className="p-5">
+  <div className="flex items-center justify-between mb-4">
+    <div>
+      <div className="text-[10px] uppercase tracking-[0.25em] text-teal-400 mb-1">
+        quick anatomy filter
+      </div>
+      <div className="text-2xl font-black italic text-white">בחר שריר מהר</div>
+    </div>
+    <Btn
+      variant="outline"
+      className="h-10"
+      onClick={() => {
+        setSelectedMuscle("All");
+        setSelectedSector("All");
+      }}
+    >
+      איפוס
+    </Btn>
+  </div>
+
+  <BodyMap
+    activeMuscle={selectedMuscle}
+    onSelect={(muscle) => {
+      setSelectedMuscle(muscle);
+      setSelectedSector("All");
+    }}
+  />
+</Card>
       <div className="grid md:grid-cols-[1fr_auto] gap-4">
         <div className="relative">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
