@@ -1470,62 +1470,197 @@ const profiles = {
     </motion.div>
   );
 
-  return (
-    <>
-      <ScreenFlash show={flash} />
-      <AnimatePresence>{toast && (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="fixed top-6 left-1/2 -translate-x-1/2 z-[900] bg-slate-900/95 border border-teal-500/30 rounded-[1.2rem] px-5 py-3 text-white">
-          <div className="flex items-center gap-2"><CheckCircle2 size={16} className="text-teal-400" /><span className="font-bold">{toast}</span></div>
+ return (
+  <>
+    <ScreenFlash show={flash} />
+
+    <AnimatePresence>
+      {toast && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-[900] bg-slate-900/95 border border-teal-500/30 rounded-[1.2rem] px-5 py-3 text-white"
+        >
+          <div className="flex items-center gap-2">
+            <CheckCircle2 size={16} className="text-teal-400" />
+            <span className="font-bold">{toast}</span>
+          </div>
         </motion.div>
-      )}</AnimatePresence>
-      {askAIExercise && <AskAIModal exercise={askAIExercise} logs={logs} onClose={() => setAskAIExercise(null)} onAdd={() => { addExerciseToSession(askAIExercise); setAskAIExercise(null); }} />}
-      <QuickAddNutritionModal open={quickAddMenuOpen} onClose={() => setQuickAddMenuOpen(false)} onAddEntry={addNutritionEntry} onAddWater={addWater} onAddMeasurement={addMeasurement} onAddPhoto={addPhoto} />
-      <AnimatePresence>{showNamePrompt && <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="fixed inset-0 z-[950] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"><motion.div initial={{ scale: 0.9, y: 20 }} animate={{ scale: 1, y: 0 }} className="w-full max-w-md bg-slate-900 border border-white/10 rounded-[2rem] p-6"><div className="text-2xl font-black italic mb-2">ברוך הבא</div><div className="text-slate-400 mb-4">איך לקרוא לך באפליקציה?</div><input value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="השם שלך"   className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none text-white placeholder:text-slate-400" mb-4" /><Btn variant="premium" className="w-full" onClick={() => { if (!userName.trim()) return; setShowNamePrompt(false); }}>שמור</Btn></motion.div></motion.div>}</AnimatePresence>
-      <div className="min-h-screen bg-[#020617] text-slate-100 overflow-x-hidden" dir="rtl">
-        <div className="fixed inset-0 pointer-events-none z-0">
-          <div className="absolute top-[-20%] left-[-10%] w-full h-full bg-teal-500/5 blur-[150px] rounded-full animate-pulse" />
-          <div className="absolute bottom-[-20%] right-[-10%] w-full h-full bg-indigo-500/5 blur-[150px] rounded-full" />
-        </div>
+      )}
+    </AnimatePresence>
 
-        <header className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pt-8 md:pt-12 pb-6 md:pb-8 flex flex-col lg:flex-row justify-between items-start gap-6">
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <LogoMark />
-              <h1 className="text-[2.2rem] sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none break-words">Betesh<span className="text-teal-500">Training</span></h1>
-            </div>
-            <div className="text-slate-400 font-bold text-xs sm:text-sm max-w-full">Training, nutrition, cardio, recovery, progression.</div>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Btn variant={tabButtonVariant(tab, "dashboard")} onClick={() => navigateTab("dashboard")}><Home size={16} /> בית</Btn>
-            <Btn variant={tabButtonVariant(tab, "vault")} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר תרגילים</Btn>
-            <Btn variant={tabButtonVariant(tab, "stats")} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
-            <Btn variant={tabButtonVariant(tab, "nutrition")} onClick={() => navigateTab("nutrition")}><HeartPulse size={16} /> תזונה</Btn>
-            <Btn variant={tabButtonVariant(tab, "cardio")} onClick={() => navigateTab("cardio")}><Flame size={16} /> אירובי</Btn>
-            <Btn variant="youtube" onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")}><Youtube size={16} /> YouTube</Btn>
-            <Btn variant="spotify" onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}><SpotifyIcon className="w-4 h-4" /> ספוטיפיי</Btn>
-          </div>
-        </header>
+    {askAIExercise && (
+      <AskAIModal
+        exercise={askAIExercise}
+        logs={logs}
+        onClose={() => setAskAIExercise(null)}
+        onAdd={() => {
+          addExerciseToSession(askAIExercise);
+          setAskAIExercise(null);
+        }}
+      />
+    )}
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pb-56 md:pb-40">
-          {tab === "dashboard" && renderDashboard()}
-          {tab === "vault" && renderVault()}
-          {tab === "stats" && renderStats()}
-          {tab === "nutrition" && renderNutrition()}
-          {tab === "cardio" && renderCardio()}
-        </div>
+    <QuickAddNutritionModal
+      open={quickAddMenuOpen}
+      onClose={() => setQuickAddMenuOpen(false)}
+      onAddEntry={addNutritionEntry}
+      onAddWater={addWater}
+      onAddMeasurement={addMeasurement}
+      onAddPhoto={addPhoto}
+    />
 
-        <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md md:max-w-lg px-4 md:px-8">
-          <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 md:p-5 rounded-[2rem] md:rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]">
-            {[{ id: "dashboard", icon: Home, active: "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)]" }, { id: "vault", icon: LayoutGrid, active: "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)]" }, { id: "stats", icon: BarChart3, active: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.45)]" }, { id: "nutrition", icon: HeartPulse, active: "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.45)]" }, { id: "cardio", icon: Flame, active: "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.45)]" }].map((item) => (
-              <button key={item.id} onClick={() => navigateTab(item.id as MainTab)} className={`p-3 md:p-5 rounded-[1.2rem] transition-all duration-500 relative ${tab === item.id ? `${item.active} scale-110` : "text-slate-600 hover:text-white"}`}>
-                <item.icon size={24} />
-              </button>
-            ))}
+    <AnimatePresence>
+      {showNamePrompt && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-[950] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            className="w-full max-w-md bg-slate-900 border border-white/10 rounded-[2rem] p-6"
+          >
+            <div className="text-2xl font-black italic mb-2">ברוך הבא</div>
+            <div className="text-slate-400 mb-4">איך לקרוא לך באפליקציה?</div>
+
+            <input
+              value={userName}
+              onChange={(e) => setUserName(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && userName.trim()) {
+                  localStorage.setItem("betesh_user_name", userName.trim());
+                  setShowNamePrompt(false);
+                }
+              }}
+              placeholder="השם שלך"
+              className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none text-white placeholder:text-slate-400 caret-white mb-4 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+            />
+
+            <Btn
+              variant="premium"
+              className={`w-full ${!userName.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
+              disabled={!userName.trim()}
+              onClick={() => {
+                if (!userName.trim()) return;
+                localStorage.setItem("betesh_user_name", userName.trim());
+                setShowNamePrompt(false);
+              }}
+            >
+              שמור
+            </Btn>
           </motion.div>
-        </div>
-      </div>
-    </>
-  );
-}
+        </motion.div>
+      )}
+    </AnimatePresence>
 
+    <div className="min-h-screen bg-[#020617] text-slate-100 overflow-x-hidden" dir="rtl">
+      <div className="fixed inset-0 pointer-events-none z-0">
+        <div className="absolute top-[-20%] left-[-10%] w-full h-full bg-teal-500/5 blur-[150px] rounded-full animate-pulse" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-full h-full bg-indigo-500/5 blur-[150px] rounded-full" />
+      </div>
+
+      <header className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pt-8 md:pt-12 pb-6 md:pb-8 flex flex-col lg:flex-row justify-between items-start gap-6">
+        <div className="space-y-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <LogoMark />
+            <h1 className="text-[2.2rem] sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none break-words">
+              Betesh<span className="text-teal-500">Training</span>
+            </h1>
+          </div>
+          <div className="text-slate-400 font-bold text-xs sm:text-sm max-w-full">
+            Training, nutrition, cardio, recovery, progression.
+          </div>
+        </div>
+
+        <div className="flex flex-wrap gap-3">
+          <Btn variant={tabButtonVariant(tab, "dashboard")} onClick={() => navigateTab("dashboard")}>
+            <Home size={16} /> בית
+          </Btn>
+          <Btn variant={tabButtonVariant(tab, "vault")} onClick={() => navigateTab("vault")}>
+            <LayoutGrid size={16} /> מאגר תרגילים
+          </Btn>
+          <Btn variant={tabButtonVariant(tab, "stats")} onClick={() => navigateTab("stats")}>
+            <BarChart3 size={16} /> ביצועים
+          </Btn>
+          <Btn variant={tabButtonVariant(tab, "nutrition")} onClick={() => navigateTab("nutrition")}>
+            <HeartPulse size={16} /> תזונה
+          </Btn>
+          <Btn variant={tabButtonVariant(tab, "cardio")} onClick={() => navigateTab("cardio")}>
+            <Flame size={16} /> אירובי
+          </Btn>
+          <Btn
+            variant="youtube"
+            onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")}
+          >
+            <Youtube size={16} /> YouTube
+          </Btn>
+          <Btn
+            variant="spotify"
+            onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}
+          >
+            <SpotifyIcon className="w-4 h-4" /> ספוטיפיי
+          </Btn>
+        </div>
+      </header>
+
+      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pb-56 md:pb-40">
+        {tab === "dashboard" && renderDashboard()}
+        {tab === "vault" && renderVault()}
+        {tab === "stats" && renderStats()}
+        {tab === "nutrition" && renderNutrition()}
+        {tab === "cardio" && renderCardio()}
+      </div>
+
+      <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md md:max-w-lg px-4 md:px-8">
+        <motion.div
+          initial={{ y: 100 }}
+          animate={{ y: 0 }}
+          className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 md:p-5 rounded-[2rem] md:rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]"
+        >
+          {[
+            {
+              id: "dashboard",
+              icon: Home,
+              active: "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)]",
+            },
+            {
+              id: "vault",
+              icon: LayoutGrid,
+              active: "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)]",
+            },
+            {
+              id: "stats",
+              icon: BarChart3,
+              active: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.45)]",
+            },
+            {
+              id: "nutrition",
+              icon: HeartPulse,
+              active: "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.45)]",
+            },
+            {
+              id: "cardio",
+              icon: Flame,
+              active: "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.45)]",
+            },
+          ].map((item) => (
+            <button
+              key={item.id}
+              onClick={() => navigateTab(item.id as MainTab)}
+              className={`p-3 md:p-5 rounded-[1.2rem] transition-all duration-500 relative ${
+                tab === item.id ? `${item.active} scale-110` : "text-slate-600 hover:text-white"
+              }`}
+            >
+              <item.icon size={24} />
+            </button>
+          ))}
+        </motion.div>
+      </div>
+    </div>
+  </>
+);
 export default ReacherApp;
