@@ -19,13 +19,13 @@ import {
   RefreshCcw,
   Search,
   Sparkles,
+  Target,
   Trash2,
   User,
   Weight,
   X,
   Youtube,
 } from "lucide-react";
-
 const REACHER_HERO = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600";
 const DEFAULT_EXERCISE_IMAGE = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200";
 
@@ -389,7 +389,46 @@ function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; lo
     </div>
   );
 }
+function getNutritionTrainingPlan(profile: NutritionProfile, bmi: number) {
+  const bmiNote =
+    !bmi
+      ? "הכנס נתונים כדי לקבל הערכה."
+      : bmi < 18.5
+        ? "BMI נמוך יחסית, כדאי להתמקד בבנייה הדרגתית."
+        : bmi < 25
+          ? "BMI בטווח תקין, אפשר להתאים לפי מטרה."
+          : bmi < 30
+            ? "BMI מעט גבוה, עדיף לשלב כוח עם אירובי מסודר."
+            : "BMI גבוה יחסית, כדאי לעבוד בהדרגה ולשמור על עקביות.";
 
+  const weeklyStrength =
+    profile.goal === "gain"
+      ? "4-5 אימוני כוח בשבוע"
+      : profile.goal === "cut"
+        ? "3-4 אימוני כוח בשבוע"
+        : "3-5 אימוני כוח בשבוע";
+
+  const cardio =
+    profile.goal === "gain"
+      ? "1-2 יחידות אירובי קל של 15-20 דקות כדי לשמור כושר בלי לפגוע בהתאוששות."
+      : profile.goal === "cut"
+        ? "2-4 יחידות אירובי של 20-35 דקות, בקצב שאפשר להתמיד בו."
+        : "2-3 יחידות אירובי בינוני של 20-30 דקות לשמירה על כושר ובריאות.";
+
+  const focus =
+    profile.goal === "gain"
+      ? "דגש על עומס מתקדם, התאוששות טובה, וחלבון קבוע לאורך היום."
+      : profile.goal === "cut"
+        ? "דגש על שמירת מסת שריר, חלבון גבוה, וניהול עומס חכם."
+        : "דגש על איזון בין כוח, התאוששות, ושמירה על שגרה יציבה.";
+
+  return {
+    bmiNote,
+    weeklyStrength,
+    cardio,
+    focus,
+  };
+}
 function ReacherApp() {
   const [tab, setTab] = useState<MainTab>("dashboard");
   const [selectedDay, setSelectedDay] = useState<DayKey>("sun");
