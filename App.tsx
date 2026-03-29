@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 const REACHER_HERO = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600";
 const DEFAULT_EXERCISE_IMAGE = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200";
-const ANATOMY_IMAGE = "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 1200'%3E%3Crect width='900' height='1200' fill='%230b1020'/%3E%3Cg opacity='0.95'%3E%3Cellipse cx='300' cy='130' rx='62' ry='78' fill='%23f2c8a5'/%3E%3Crect x='260' y='205' width='80' height='72' rx='28' fill='%23f2c8a5'/%3E%3Cpath d='M210 300 C228 250 372 250 390 300 L425 525 C432 586 396 642 345 668 L325 1110 L275 1110 L255 668 C204 642 168 586 175 525 Z' fill='%23e8b088'/%3E%3Cpath d='M238 305 C260 270 340 270 362 305 L388 430 C395 476 368 512 330 525 L312 1090 L288 1090 L270 525 C232 512 205 476 212 430 Z' fill='none' stroke='%23fff' stroke-opacity='0.28' stroke-width='6'/%3E%3Cpath d='M176 338 L112 560 L158 574 L236 382' fill='%23e8b088'/%3E%3Cpath d='M424 338 L488 560 L442 574 L364 382' fill='%23e8b088'/%3E%3Cpath d='M124 552 L108 760 L150 760 L172 570' fill='%23e8b088'/%3E%3Cpath d='M476 552 L492 760 L450 760 L428 570' fill='%23e8b088'/%3E%3Cpath d='M248 1110 L275 660 L300 660 L325 1110' fill='%23d79970'/%3E%3Cpath d='M275 1110 L250 1180 L286 1180 L300 1126' fill='%23e8b088'/%3E%3Cpath d='M325 1110 L350 1180 L314 1180 L300 1126' fill='%23e8b088'/%3E%3Cpath d='M675 130 a62 78 0 1 1 -124 0 a62 78 0 1 1 124 0' fill='%23f2c8a5'/%3E%3Crect x='560' y='205' width='80' height='72' rx='28' fill='%23f2c8a5'/%3E%3Cpath d='M610 300 C628 250 772 250 790 300 L825 525 C832 586 796 642 745 668 L725 1110 L675 1110 L655 668 C604 642 568 586 575 525 Z' fill='%23e8b088'/%3E%3Cpath d='M638 305 C660 270 740 270 762 305 L788 430 C795 476 768 512 730 525 L712 1090 L688 1090 L670 525 C632 512 605 476 612 430 Z' fill='none' stroke='%23fff' stroke-opacity='0.28' stroke-width='6'/%3E%3Cpath d='M576 338 L512 560 L558 574 L636 382' fill='%23e8b088'/%3E%3Cpath d='M824 338 L888 560 L842 574 L764 382' fill='%23e8b088'/%3E%3Cpath d='M524 552 L508 760 L550 760 L572 570' fill='%23e8b088'/%3E%3Cpath d='M876 552 L892 760 L850 760 L828 570' fill='%23e8b088'/%3E%3Cpath d='M648 1110 L675 660 L700 660 L725 1110' fill='%23d79970'/%3E%3Cpath d='M675 1110 L650 1180 L686 1180 L700 1126' fill='%23e8b088'/%3E%3Cpath d='M725 1110 L750 1180 L714 1180 L700 1126' fill='%23e8b088'/%3E%3C/g%3E%3Cg fill='none' stroke='%2322c55e' stroke-opacity='0.55' stroke-width='10'%3E%3Cpath d='M236 300 C248 276 352 276 364 300'/%3E%3Cpath d='M210 330 C250 410 350 410 390 330'/%3E%3Cpath d='M250 688 C270 648 330 648 350 688'/%3E%3Cpath d='M575 330 C615 410 715 410 755 330'/%3E%3Cpath d='M636 300 C648 276 752 276 764 300'/%3E%3Cpath d='M650 688 C670 648 730 648 750 688'/%3E%3C/g%3E%3Ctext x='300' y='70' fill='%23d7e3ff' font-size='34' font-family='Arial' text-anchor='middle'%3EFront%3C/text%3E%3Ctext x='700' y='70' fill='%23d7e3ff' font-size='34' font-family='Arial' text-anchor='middle'%3EBack%3C/text%3E%3C/svg%3E";
+const ANATOMY_IMAGE = "data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20900'%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id='bg'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%0A%20%20%20%20%20%20%3Cstop%20offset='0%25'%20stop-color='#0b1227'/%3E%0A%20%20%20%20%20%20%3Cstop%20offset='100%25'%20stop-color='#091021'/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id='skin'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%0A%20%20%20%20%20%20%3Cstop%20offset='0%25'%20stop-color='#ead2bf'/%3E%0A%20%20%20%20%20%20%3Cstop%20offset='100%25'%20stop-color='#c9ac95'/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id='muscle'%20x1='0'%20y1='0'%20x2='1'%20y2='1'%3E%0A%20%20%20%20%20%20%3Cstop%20offset='0%25'%20stop-color='#33e3a4'/%3E%0A%20%20%20%20%20%20%3Cstop%20offset='100%25'%20stop-color='#0fbf78'/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3Cfilter%20id='glow'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%0A%20%20%20%20%20%20%3CfeGaussianBlur%20stdDeviation='8'%20result='b'/%3E%0A%20%20%20%20%20%20%3CfeMerge%3E%3CfeMergeNode%20in='b'/%3E%3CfeMergeNode%20in='SourceGraphic'/%3E%3C/feMerge%3E%0A%20%20%20%20%3C/filter%3E%0A%20%20%20%20%3Cg%20id='front'%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-185'%20r='46'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Crect%20x='-23'%20y='-142'%20width='46'%20height='36'%20rx='16'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-102%20C-40%20-118%2040%20-118%2068%20-102%20C82%20-74%2088%20-40%2084%20-8%20C80%2028%2064%2058%2036%2076%20L24%20288%20L-24%20288%20L-36%2076%20C-64%2058%20-80%2028%20-84%20-8%20C-88%20-40%20-82%20-74%20-68%20-102Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-92%20C-82%20-44%20-102%206%20-120%2072%20L-92%2088%20L-72%2020%20L-62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M68%20-92%20C82%20-44%20102%206%20120%2072%20L92%2088%20L72%2020%20L62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-58%2024%20L-76%20172%20L-48%20172%20L-32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M58%2024%20L76%20172%20L48%20172%20L32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-26%20288%20L-40%20502%20L-10%20502%20L6%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M26%20288%20L10%20502%20L40%20502%20L56%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-34%20502%20L-52%20552%20L-20%20552%20L-8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M34%20502%20L20%20552%20L52%20552%20L8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-64%20-80%20C-36%20-94%2036%20-94%2064%20-80'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.55'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-52%20-6%20C-48%2026%20-28%2044%20-5%2050%20L-5%20132'%20fill='none'%20stroke='#7fb0a1'%20stroke-width='4'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M52%20-6%20C48%2026%2028%2044%205%2050%20L5%20132'%20fill='none'%20stroke='#7fb0a1'%20stroke-width='4'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-24%20140%20C-4%20122%204%20122%2024%20140'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-64'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='48'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='96'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='160'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%3C/g%3E%0A%20%20%20%20%3Cg%20id='back'%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-185'%20r='46'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Crect%20x='-23'%20y='-142'%20width='46'%20height='36'%20rx='16'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-102%20C-40%20-118%2040%20-118%2068%20-102%20C82%20-74%2088%20-40%2084%20-8%20C80%2028%2064%2058%2036%2076%20L24%20288%20L-24%20288%20L-36%2076%20C-64%2058%20-80%2028%20-84%20-8%20C-88%20-40%20-82%20-74%20-68%20-102Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-92%20C-82%20-44%20-102%206%20-120%2072%20L-92%2088%20L-72%2020%20L-62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M68%20-92%20C82%20-44%20102%206%20120%2072%20L92%2088%20L72%2020%20L62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-58%2024%20L-76%20172%20L-48%20172%20L-32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M58%2024%20L76%20172%20L48%20172%20L32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-26%20288%20L-40%20502%20L-10%20502%20L6%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M26%20288%20L10%20502%20L40%20502%20L56%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-34%20502%20L-52%20552%20L-20%20552%20L-8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M34%20502%20L20%20552%20L52%20552%20L8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-66%20-82%20C-34%20-96%2034%20-96%2066%20-82'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.55'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-64%20-20%20C-58%2038%20-20%2066%200%2084%20C20%2066%2058%2038%2064%20-20'%20fill='none'%20stroke='#7fb0a1'%20stroke-width='4'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-24%20140%20C-4%20122%204%20122%2024%20140'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-64'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='52'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='154'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%3C/g%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width='1200'%20height='900'%20fill='url(#bg)'/%3E%0A%20%20%3Crect%20x='150'%20y='70'%20width='900'%20height='730'%20rx='32'%20fill='#0b1327'%20opacity='0.88'/%3E%0A%20%20%3Cg%20transform='translate(430%20390)'%3E%3Cuse%20href='#front'/%3E%3C/g%3E%0A%20%20%3Cg%20transform='translate(770%20390)'%3E%3Cuse%20href='#back'/%3E%3C/g%3E%0A%3C/svg%3E";
 
 type MuscleGroup = "Back" | "Chest" | "Legs" | "Glutes" | "Shoulders" | "Arms" | "Core" | "FullBody";
 type Category = "pull" | "push" | "legs" | "armor" | "power" | "core" | "isolation";
@@ -357,8 +357,8 @@ function FieldBlock({ label, children }: { label: string; children: React.ReactN
 
 function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 via-emerald-400 to-cyan-500 flex items-center justify-center shadow-[0_0_30px_rgba(20,184,166,0.35)] ${className}`}>
-      <Dumbbell size={22} className="text-slate-950" />
+    <div className={`w-12 h-12 rounded-2xl bg-white/10 ring-1 ring-white/10 p-1.5 shadow-[0_0_24px_rgba(255,255,255,0.08)] ${className}`}>
+      <img src="/icon-192.png" alt="Betesh Training logo" className="w-full h-full object-contain rounded-xl" />
     </div>
   );
 }
@@ -386,7 +386,7 @@ const Card = ({ children, className = "", onClick }: { children: React.ReactNode
 const Btn = ({ children, className = "", variant = "default", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string; variant?: "default" | "outline" | "ghost" | "premium" | "youtube" | "home" | "vault" | "stats" | "spotify" | "cardio" }) => {
   const styles = {
     default: "bg-teal-500 text-slate-950 hover:bg-teal-400",
-    outline: "border border-white/10 bg-white/5 hover:bg-white/10 text-white",
+    outline: "border border-white/15 bg-white/8 hover:bg-white/12 text-white",
     ghost: "bg-transparent text-white/70 hover:text-white",
     premium: "bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-xl",
     youtube: "bg-red-600 text-white hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.28)]",
@@ -396,7 +396,7 @@ const Btn = ({ children, className = "", variant = "default", ...props }: React.
     spotify: "bg-[#1DB954] text-slate-950 hover:bg-[#22d861] shadow-[0_0_20px_rgba(29,185,84,0.32)]",
     cardio: "bg-orange-500 text-white hover:bg-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.28)]",
   } as const;
-  return <button className={`inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl font-black transition-all active:scale-95 ${styles[variant]} ${className}`} {...props}>{children}</button>;
+  return <button className={`inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl font-black transition-all active:scale-95 ring-1 ring-transparent ${styles[variant]} ${className}`} {...props}>{children}</button>;
 };
 
 function ScreenFlash({ show }: { show: boolean }) {
@@ -441,7 +441,7 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
         <Dot x={56} y={73} label="רגליים" muscle="Legs" />
         <Dot x={50} y={86} label="כל הגוף" muscle="FullBody" />
       </div>
-      <p className="text-slate-400 mt-4 text-sm">לחץ על שריר כדי לסנן מיד את המאגר. עכשיו הרקע הוא איור אנטומי ולא תמונת חדר כושר.</p>
+      <p className="text-slate-400 mt-4 text-sm">לחץ על שריר כדי לסנן את המאגר.</p>
     </Card>
   );
 }
@@ -544,6 +544,25 @@ function getNutritionTrainingPlan(profile: NutritionProfile, bmi: number) {
     focus,
   };
 }
+
+function tabButtonVariant(current: MainTab, item: MainTab) {
+  if (item === "dashboard") return current === item ? "home" : "outline";
+  if (item === "vault") return current === item ? "vault" : "outline";
+  if (item === "stats") return current === item ? "stats" : "outline";
+  if (item === "nutrition") return current === item ? "premium" : "outline";
+  return current === item ? "cardio" : "outline";
+}
+
+function bottomTabClasses(item: MainTab, current: MainTab) {
+  const active = current === item;
+  if (!active) return "text-slate-500 hover:text-white bg-transparent";
+  if (item === "dashboard") return "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)] scale-110";
+  if (item === "vault") return "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)] scale-110";
+  if (item === "stats") return "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_34px_rgba(34,211,238,0.38)] scale-110";
+  if (item === "nutrition") return "bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-[0_0_30px_rgba(20,184,166,0.38)] scale-110";
+  return "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.42)] scale-110";
+}
+
 function ReacherApp() {
   const [tab, setTab] = useState<MainTab>("dashboard");
   const [selectedDay, setSelectedDay] = useState<DayKey>("sun");
@@ -585,35 +604,55 @@ function ReacherApp() {
 
   const audioCtx = useRef<AudioContext | null>(null);
 
-  const playSoftTones = useCallback((freqs: number[]) => {
+  const playSoftTones = useCallback((freqs: number[], mode: "nav" | "add" | "save" | "rest" | "finish" = "nav") => {
     if (typeof window === "undefined") return;
     if (!audioCtx.current) audioCtx.current = new AudioContext();
     if (audioCtx.current.state === "suspended") audioCtx.current.resume();
+
+    const profiles = {
+      nav: { type: "triangle" as OscillatorType, attack: 0.008, decay: 0.18, gain: 0.03, step: 0.045 },
+      add: { type: "square" as OscillatorType, attack: 0.004, decay: 0.14, gain: 0.022, step: 0.05 },
+      save: { type: "sawtooth" as OscillatorType, attack: 0.004, decay: 0.16, gain: 0.018, step: 0.05 },
+      rest: { type: "sine" as OscillatorType, attack: 0.01, decay: 0.22, gain: 0.02, step: 0.06 },
+      finish: { type: "square" as OscillatorType, attack: 0.003, decay: 0.24, gain: 0.028, step: 0.055 },
+    } as const;
+
+    const profile = profiles[mode];
+
     freqs.forEach((freq, i) => {
       const osc = audioCtx.current!.createOscillator();
       const gain = audioCtx.current!.createGain();
-      osc.connect(gain);
+      const filter = audioCtx.current!.createBiquadFilter();
+
+      osc.connect(filter);
+      filter.connect(gain);
       gain.connect(audioCtx.current!.destination);
-      osc.type = "sine";
-      const start = audioCtx.current!.currentTime + i * 0.04;
+
+      osc.type = profile.type;
+      filter.type = "lowpass";
+      filter.frequency.setValueAtTime(mode === "finish" ? 1800 : 1400, audioCtx.current!.currentTime);
+
+      const start = audioCtx.current!.currentTime + i * profile.step;
       osc.frequency.setValueAtTime(freq, start);
+      osc.frequency.exponentialRampToValueAtTime(Math.max(80, freq * 0.94), start + profile.decay);
       gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.linearRampToValueAtTime(0.012, start + 0.02);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + 0.14);
+      gain.gain.linearRampToValueAtTime(profile.gain, start + profile.attack);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + profile.decay);
+
       osc.start(start);
-      osc.stop(start + 0.18);
+      osc.stop(start + profile.decay + 0.03);
     });
   }, []);
 
-  const playNavigateSound = useCallback(() => playSoftTones([520, 660, 820]), [playSoftTones]);
-  const playAddSound = useCallback(() => playSoftTones([760, 920]), [playSoftTones]);
-  const playSaveSound = useCallback(() => playSoftTones([640, 820, 980]), [playSoftTones]);
-  const playRestSound = useCallback(() => playSoftTones([620, 760]), [playSoftTones]);
-  const playFinishSound = useCallback(() => playSoftTones([640, 840, 1040]), [playSoftTones]);
+  const playNavigateSound = useCallback(() => playSoftTones([220, 330, 440], "nav"), [playSoftTones]);
+  const playAddSound = useCallback(() => playSoftTones([180, 240, 320], "add"), [playSoftTones]);
+  const playSaveSound = useCallback(() => playSoftTones([260, 390, 520], "save"), [playSoftTones]);
+  const playRestSound = useCallback(() => playSoftTones([150, 190], "rest"), [playSoftTones]);
+  const playFinishSound = useCallback(() => playSoftTones([180, 240, 320, 420], "finish"), [playSoftTones]);
 
   const navigateTab = (next: MainTab) => {
     setFlash(true);
-    if (next === "nutrition") playSoftTones([480, 600, 720]);
+    if (next === "nutrition") playSoftTones([210, 280, 360], "nav");
     else playNavigateSound();
     window.setTimeout(() => setTab(next), 120);
     window.setTimeout(() => setFlash(false), 320);
@@ -1093,11 +1132,11 @@ function ReacherApp() {
             <div className="text-slate-400 font-bold text-xs sm:text-sm max-w-full">Training, nutrition, cardio, recovery, progression.</div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Btn variant={tab === "dashboard" ? "home" : "outline"} onClick={() => navigateTab("dashboard")}><Home size={16} /> בית</Btn>
-            <Btn variant={tab === "vault" ? "vault" : "outline"} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר תרגילים</Btn>
-            <Btn variant={tab === "stats" ? "stats" : "outline"} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
-            <Btn variant={tab === "nutrition" ? "premium" : "outline"} onClick={() => navigateTab("nutrition")}><HeartPulse size={16} /> תזונה</Btn>
-            <Btn variant={tab === "cardio" ? "cardio" : "outline"} onClick={() => navigateTab("cardio")}><Flame size={16} /> אירובי</Btn>
+            <Btn variant={tabButtonVariant(tab, "dashboard")} onClick={() => navigateTab("dashboard")}><Home size={16} /> בית</Btn>
+            <Btn variant={tabButtonVariant(tab, "vault")} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר תרגילים</Btn>
+            <Btn variant={tabButtonVariant(tab, "stats")} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
+            <Btn variant={tabButtonVariant(tab, "nutrition")} onClick={() => navigateTab("nutrition")}><HeartPulse size={16} /> תזונה</Btn>
+            <Btn variant={tabButtonVariant(tab, "cardio")} onClick={() => navigateTab("cardio")}><Flame size={16} /> אירובי</Btn>
             <Btn variant="youtube" onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")}><Youtube size={16} /> YouTube</Btn>
             <Btn variant="spotify" onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}><SpotifyIcon className="w-4 h-4" /> ספוטיפיי</Btn>
           </div>
