@@ -12,7 +12,6 @@ import {
   HeartPulse,
   Home,
   LayoutGrid,
-  Music,
   Pause,
   Play,
   Plus,
@@ -28,12 +27,13 @@ import {
 } from "lucide-react";
 const REACHER_HERO = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600";
 const DEFAULT_EXERCISE_IMAGE = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200";
+const ANATOMY_IMAGE = "data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 900 1200'%3E%3Crect width='900' height='1200' fill='%230b1020'/%3E%3Cg opacity='0.95'%3E%3Cellipse cx='300' cy='130' rx='62' ry='78' fill='%23f2c8a5'/%3E%3Crect x='260' y='205' width='80' height='72' rx='28' fill='%23f2c8a5'/%3E%3Cpath d='M210 300 C228 250 372 250 390 300 L425 525 C432 586 396 642 345 668 L325 1110 L275 1110 L255 668 C204 642 168 586 175 525 Z' fill='%23e8b088'/%3E%3Cpath d='M238 305 C260 270 340 270 362 305 L388 430 C395 476 368 512 330 525 L312 1090 L288 1090 L270 525 C232 512 205 476 212 430 Z' fill='none' stroke='%23fff' stroke-opacity='0.28' stroke-width='6'/%3E%3Cpath d='M176 338 L112 560 L158 574 L236 382' fill='%23e8b088'/%3E%3Cpath d='M424 338 L488 560 L442 574 L364 382' fill='%23e8b088'/%3E%3Cpath d='M124 552 L108 760 L150 760 L172 570' fill='%23e8b088'/%3E%3Cpath d='M476 552 L492 760 L450 760 L428 570' fill='%23e8b088'/%3E%3Cpath d='M248 1110 L275 660 L300 660 L325 1110' fill='%23d79970'/%3E%3Cpath d='M275 1110 L250 1180 L286 1180 L300 1126' fill='%23e8b088'/%3E%3Cpath d='M325 1110 L350 1180 L314 1180 L300 1126' fill='%23e8b088'/%3E%3Cpath d='M675 130 a62 78 0 1 1 -124 0 a62 78 0 1 1 124 0' fill='%23f2c8a5'/%3E%3Crect x='560' y='205' width='80' height='72' rx='28' fill='%23f2c8a5'/%3E%3Cpath d='M610 300 C628 250 772 250 790 300 L825 525 C832 586 796 642 745 668 L725 1110 L675 1110 L655 668 C604 642 568 586 575 525 Z' fill='%23e8b088'/%3E%3Cpath d='M638 305 C660 270 740 270 762 305 L788 430 C795 476 768 512 730 525 L712 1090 L688 1090 L670 525 C632 512 605 476 612 430 Z' fill='none' stroke='%23fff' stroke-opacity='0.28' stroke-width='6'/%3E%3Cpath d='M576 338 L512 560 L558 574 L636 382' fill='%23e8b088'/%3E%3Cpath d='M824 338 L888 560 L842 574 L764 382' fill='%23e8b088'/%3E%3Cpath d='M524 552 L508 760 L550 760 L572 570' fill='%23e8b088'/%3E%3Cpath d='M876 552 L892 760 L850 760 L828 570' fill='%23e8b088'/%3E%3Cpath d='M648 1110 L675 660 L700 660 L725 1110' fill='%23d79970'/%3E%3Cpath d='M675 1110 L650 1180 L686 1180 L700 1126' fill='%23e8b088'/%3E%3Cpath d='M725 1110 L750 1180 L714 1180 L700 1126' fill='%23e8b088'/%3E%3C/g%3E%3Cg fill='none' stroke='%2322c55e' stroke-opacity='0.55' stroke-width='10'%3E%3Cpath d='M236 300 C248 276 352 276 364 300'/%3E%3Cpath d='M210 330 C250 410 350 410 390 330'/%3E%3Cpath d='M250 688 C270 648 330 648 350 688'/%3E%3Cpath d='M575 330 C615 410 715 410 755 330'/%3E%3Cpath d='M636 300 C648 276 752 276 764 300'/%3E%3Cpath d='M650 688 C670 648 730 648 750 688'/%3E%3C/g%3E%3Ctext x='300' y='70' fill='%23d7e3ff' font-size='34' font-family='Arial' text-anchor='middle'%3EFront%3C/text%3E%3Ctext x='700' y='70' fill='%23d7e3ff' font-size='34' font-family='Arial' text-anchor='middle'%3EBack%3C/text%3E%3C/svg%3E";
 
 type MuscleGroup = "Back" | "Chest" | "Legs" | "Glutes" | "Shoulders" | "Arms" | "Core" | "FullBody";
 type Category = "pull" | "push" | "legs" | "armor" | "power" | "core" | "isolation";
 type EquipmentSector = "Gym" | "Home" | "TRX";
 type DayKey = "sun" | "mon" | "tue" | "wed" | "thu" | "fri";
-type MainTab = "dashboard" | "vault" | "stats" | "nutrition";
+type MainTab = "dashboard" | "vault" | "stats" | "nutrition" | "cardio";
 
 interface Exercise {
   id: string;
@@ -71,6 +71,16 @@ interface NutritionProfile {
   height: number;
   goal: "maintain" | "gain" | "cut";
   activity: "light" | "moderate" | "high";
+}
+
+
+interface CardioProfilePlan {
+  zone2Minutes: number;
+  hiitMinutes: number;
+  walkingSteps: number;
+  recommendedSessions: string;
+  weeklyFocus: string;
+  paceTip: string;
 }
 
 const muscleHebrew: Record<MuscleGroup, string> = {
@@ -213,7 +223,6 @@ const APEX_MEALS = {
   cut: ["סקיר + פרי", "חזה עוף + תפוח אדמה + סלט", "טונה + קרקרים + ירקות"],
 };
 
-const GEMINI_URL = "https://gemini.google.com/";
 
 function getExerciseImage(exercise: Exercise) {
   return exercise.imageUrl || muscleGroupImages[exercise.muscleGroup] || DEFAULT_EXERCISE_IMAGE;
@@ -285,6 +294,83 @@ function calcCalories(profile: NutritionProfile) {
   return maintenance;
 }
 
+
+function getCardioPlan(profile: NutritionProfile, bmi: number): CardioProfilePlan {
+  const baseZone2 = profile.goal === "cut" ? 120 : profile.goal === "gain" ? 60 : 90;
+  const zone2Minutes = profile.activity === "high" ? baseZone2 - 15 : profile.activity === "light" ? baseZone2 + 15 : baseZone2;
+  const hiitMinutes = profile.goal === "gain" ? 12 : profile.goal === "cut" ? 24 : 18;
+  const walkingSteps = profile.goal === "cut" ? 10000 : profile.goal === "maintain" ? 8500 : 7500;
+  const recommendedSessions =
+    profile.goal === "gain"
+      ? "2-3 יחידות אירובי קצרות"
+      : profile.goal === "cut"
+        ? "3-5 יחידות אירובי משולבות"
+        : "3-4 יחידות אירובי חכמות";
+  const weeklyFocus =
+    profile.goal === "gain"
+      ? "שמור את האירובי כתומך התאוששות ולא כמשהו שמרוקן אותך."
+      : profile.goal === "cut"
+        ? "שלב הליכה יומית עם Zone 2 קבוע, ורק מעט HIIT."
+        : "בנה בסיס לב-ריאה טוב עם עבודה עקבית ולא קיצונית.";
+  const paceTip =
+    bmi && bmi >= 27
+      ? "עדיף להתחיל בהליכה מהירה, אופניים או אליפטיקל כדי לשמור על מפרקים."
+      : "אפשר לשלב ריצה קלה, אופניים, חתירה או הליכה בשיפוע לפי העדפה.";
+  return { zone2Minutes, hiitMinutes, walkingSteps, recommendedSessions, weeklyFocus, paceTip };
+}
+
+function generateExerciseCoachReply(exercise: Exercise, logs: SetRecord[], question: string) {
+  const last = getExerciseLogs(exercise.id, logs)[0];
+  const patterns = getExerciseAiNotes(exercise, logs);
+  const lower = question.toLowerCase();
+  const goalTip = lower.includes("mass") || lower.includes("מסה")
+    ? "למסה, שמור טווח חזרות נקי, התקרב לכשל רק בסט האחרון, ותעד עומס כל שבוע."
+    : lower.includes("cut") || lower.includes("חיטוב")
+      ? "בחיטוב, שמור על הטכניקה ועל המשקל כמה שאפשר, גם אם החזרות יורדות מעט."
+      : "המטרה היא לשפר ביצוע יציב, שליטה, ועומס מתקדם בלי לפגוע בטכניקה.";
+  const mistakeTip =
+    exercise.muscleGroup === "Back" ? "הטעות הנפוצה כאן היא משיכה עם הידיים במקום הובלת המרפק." :
+    exercise.muscleGroup === "Chest" ? "הטעות הנפוצה כאן היא כתפיים שעולות קדימה ואיבוד שליטה בירידה." :
+    exercise.muscleGroup === "Legs" ? "הטעות הנפוצה כאן היא איבוד יציבות בברך וירידה מהירה מדי." :
+    exercise.muscleGroup === "Shoulders" ? "הטעות הנפוצה כאן היא עומס גדול מדי וטווח תנועה חלקי." :
+    "הטעות הנפוצה כאן היא תנופה במקום שליטה.";
+  const progression = last
+    ? `לפי התיעוד האחרון שלך, עשית ${last.weight} ק״ג ל-${last.reps} חזרות. כדאי לשאוף או לעוד חזרה אחת, או לעלייה קטנה במשקל רק אם הטכניקה נשארת טובה.`
+    : "עדיין אין היסטוריה לתרגיל הזה, אז כדאי להתחיל ב-2-3 סטים נקיים, לבדוק שליטה, ואז להתקדם.";
+  return [
+    `שאלה על ${exercise.name}: ${question || "איך לבצע טוב יותר?"}`,
+    patterns[0],
+    mistakeTip,
+    goalTip,
+    progression,
+  ].join(" ");
+}
+
+function FieldBlock({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <label className="block space-y-2">
+      <div className="text-sm font-bold text-slate-300">{label}</div>
+      {children}
+    </label>
+  );
+}
+
+function LogoMark({ className = "" }: { className?: string }) {
+  return (
+    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br from-teal-400 via-emerald-400 to-cyan-500 flex items-center justify-center shadow-[0_0_30px_rgba(20,184,166,0.35)] ${className}`}>
+      <Dumbbell size={22} className="text-slate-950" />
+    </div>
+  );
+}
+
+function SpotifyIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" className={className} fill="currentColor" aria-hidden="true">
+      <path d="M12 1.5A10.5 10.5 0 1 0 22.5 12 10.51 10.51 0 0 0 12 1.5Zm4.8 15.14a.92.92 0 0 1-1.26.3 10.2 10.2 0 0 0-5.54-1.43 14.9 14.9 0 0 0-3.53.46.92.92 0 1 1-.43-1.8 16.8 16.8 0 0 1 3.96-.5 12 12 0 0 1 6.43 1.7.92.92 0 0 1 .37 1.27Zm1.8-3.34a1.14 1.14 0 0 1-1.56.37 12.95 12.95 0 0 0-6.92-1.78 19.58 19.58 0 0 0-4.47.57 1.14 1.14 0 1 1-.52-2.22 21.55 21.55 0 0 1 4.99-.63 15.14 15.14 0 0 1 8.12 2.12 1.14 1.14 0 0 1 .36 1.57Zm.15-3.48a1.37 1.37 0 0 1-1.88.44A15.87 15.87 0 0 0 8.8 8.2a24.02 24.02 0 0 0-4.56.59 1.37 1.37 0 0 1-.59-2.67 26.14 26.14 0 0 1 5.12-.66 18.13 18.13 0 0 1 9.56 2.5 1.37 1.37 0 0 1 .42 1.86Z"/>
+    </svg>
+  );
+}
+
 function SafeImage({ src, alt, className, fallbackSrc = DEFAULT_EXERCISE_IMAGE }: { src: string; alt: string; className?: string; fallbackSrc?: string }) {
   const [imgSrc, setImgSrc] = useState(src || fallbackSrc);
   useEffect(() => setImgSrc(src || fallbackSrc), [src, fallbackSrc]);
@@ -297,14 +383,19 @@ const Card = ({ children, className = "", onClick }: { children: React.ReactNode
   </motion.div>
 );
 
-const Btn = ({ children, className = "", variant = "default", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string; variant?: "default" | "outline" | "ghost" | "premium" | "youtube" }) => {
+const Btn = ({ children, className = "", variant = "default", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string; variant?: "default" | "outline" | "ghost" | "premium" | "youtube" | "home" | "vault" | "stats" | "spotify" | "cardio" }) => {
   const styles = {
     default: "bg-teal-500 text-slate-950 hover:bg-teal-400",
     outline: "border border-white/10 bg-white/5 hover:bg-white/10 text-white",
     ghost: "bg-transparent text-white/70 hover:text-white",
     premium: "bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-xl",
     youtube: "bg-red-600 text-white hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.28)]",
-  };
+    home: "bg-emerald-500 text-slate-950 hover:bg-emerald-400 shadow-[0_0_20px_rgba(34,197,94,0.28)]",
+    vault: "bg-pink-500 text-white hover:bg-pink-400 shadow-[0_0_20px_rgba(236,72,153,0.28)]",
+    stats: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_26px_rgba(6,182,212,0.25)]",
+    spotify: "bg-[#1DB954] text-slate-950 hover:bg-[#22d861] shadow-[0_0_20px_rgba(29,185,84,0.32)]",
+    cardio: "bg-orange-500 text-white hover:bg-orange-400 shadow-[0_0_20px_rgba(249,115,22,0.28)]",
+  } as const;
   return <button className={`inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl font-black transition-all active:scale-95 ${styles[variant]} ${className}`} {...props}>{children}</button>;
 };
 
@@ -322,7 +413,7 @@ function ScreenFlash({ show }: { show: boolean }) {
 }
 
 function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) => void; activeMuscle: MuscleGroup | "All" }) {
-  const bodyImage = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200";
+  const bodyImage = ANATOMY_IMAGE;
   const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup }) => {
     const active = activeMuscle === muscle;
     return (
@@ -334,9 +425,9 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
   };
   return (
     <Card className="p-6">
-      <div className="flex items-center gap-3 mb-4"><User className="text-emerald-400" /><h3 className="text-2xl font-black italic">מפת שרירים</h3></div>
+      <div className="flex items-center gap-3 mb-4"><User className="text-emerald-400" /><h3 className="text-2xl font-black italic">מפת שרירים אינטראקטיבית</h3></div>
       <div className="relative h-[420px] rounded-[1.8rem] bg-gradient-to-b from-slate-950 to-slate-900 overflow-hidden">
-        <SafeImage src={bodyImage} alt="body map" className="absolute inset-0 w-full h-full object-cover opacity-35" fallbackSrc={DEFAULT_EXERCISE_IMAGE} />
+        <SafeImage src={bodyImage} alt="body map" className="absolute inset-0 w-full h-full object-contain opacity-80 p-4" fallbackSrc={DEFAULT_EXERCISE_IMAGE} />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-slate-900/35" />
         <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.12),transparent_55%)]" />
         <Dot x={50} y={22} label="כתפיים" muscle="Shoulders" />
@@ -350,39 +441,63 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
         <Dot x={56} y={73} label="רגליים" muscle="Legs" />
         <Dot x={50} y={86} label="כל הגוף" muscle="FullBody" />
       </div>
-      <p className="text-slate-400 mt-4 text-sm">לחץ על שריר כדי לסנן מיד את המאגר. השריר הנבחר מסומן בירוק.</p>
+      <p className="text-slate-400 mt-4 text-sm">לחץ על שריר כדי לסנן מיד את המאגר. עכשיו הרקע הוא איור אנטומי ולא תמונת חדר כושר.</p>
     </Card>
   );
 }
 
 function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; logs: SetRecord[]; onClose: () => void; onAdd: () => void }) {
   const notes = useMemo(() => getExerciseAiNotes(exercise, logs), [exercise, logs]);
-  const openGemini = () => {
-    const prompt = encodeURIComponent(`I want advice for this exercise: ${exercise.name}. Goals: technique, common mistakes, progression, and alternatives. Answer briefly.`);
-    window.open(`${GEMINI_URL}?prompt=${prompt}`, "_blank", "noopener,noreferrer");
+  const [question, setQuestion] = useState(`איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`);
+  const [reply, setReply] = useState(() => generateExerciseCoachReply(exercise, logs, `איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`));
+
+  const askCoach = () => {
+    setReply(generateExerciseCoachReply(exercise, logs, question));
   };
+
   return (
     <div className="fixed inset-0 z-[700] bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4" dir="rtl">
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-3xl bg-slate-900 border border-white/10 rounded-[2rem] overflow-hidden">
-        <div className="relative h-48">
+      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-4xl bg-slate-900 border border-white/10 rounded-[2rem] overflow-hidden">
+        <div className="relative h-52">
           <SafeImage src={getExerciseImage(exercise)} alt={exercise.name} className="w-full h-full object-cover opacity-30" fallbackSrc={muscleGroupImages[exercise.muscleGroup]} />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
           <div className="absolute inset-0 p-6 flex items-end justify-between">
             <div>
               <div className="text-xs tracking-[0.3em] uppercase text-teal-400 mb-2">{exercise.sector} · {exercise.difficulty}</div>
               <h3 className="text-3xl font-black italic">{exercise.name}</h3>
+              <div className="text-sm text-slate-300 mt-2">עוזר AI פנימי לתרגיל, עם הקשר אוטומטי מהמאגר ומהביצועים שלך.</div>
             </div>
             <Btn variant="ghost" onClick={onClose}><X /></Btn>
           </div>
         </div>
-        <div className="p-6 space-y-6">
-          <Card className="p-5 bg-teal-500/5 border-teal-500/20">
-            <div className="space-y-3">{notes.map((n, i) => <div key={i} className="text-slate-200">- {n}</div>)}</div>
-          </Card>
-          <div className="grid sm:grid-cols-3 gap-3">
-            <Btn variant="premium" onClick={onAdd}><Plus size={16} /> הוסף לסשן</Btn>
-            <Btn variant="youtube" onClick={() => window.open(exercise.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={16} /> הדרכה</Btn>
-            <Btn variant="outline" onClick={openGemini}><Bot size={16} /> Gemini</Btn>
+        <div className="p-6 grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
+          <div className="space-y-4">
+            <Card className="p-5 bg-teal-500/5 border-teal-500/20">
+              <div className="text-sm font-bold text-teal-300 mb-3">הקשר מהיר לתרגיל</div>
+              <div className="space-y-3">{notes.map((n, i) => <div key={i} className="text-slate-200">- {n}</div>)}</div>
+            </Card>
+            <Card className="p-5 bg-white/5 border-white/10">
+              <div className="text-sm font-bold text-slate-200 mb-3">שאלה מוכנה</div>
+              <textarea value={question} onChange={(e) => setQuestion(e.target.value)} className="w-full min-h-[150px] bg-black/30 border border-white/10 rounded-2xl p-4 outline-none resize-none" />
+              <div className="grid sm:grid-cols-2 gap-3 mt-4">
+                <Btn variant="premium" onClick={askCoach}><Bot size={16} /> שאל מתוך התרגיל</Btn>
+                <Btn variant="outline" onClick={() => setQuestion(`תן לי וריאציה קלה יותר ל-${exercise.name} ודגשים לטעויות נפוצות`)}>
+                  <Sparkles size={16} /> מלא שאלה חכמה
+                </Btn>
+              </div>
+            </Card>
+          </div>
+
+          <div className="space-y-4">
+            <Card className="p-5 min-h-[280px] bg-slate-950/70 border-white/10">
+              <div className="text-sm font-bold text-cyan-300 mb-3">תשובת המאמן</div>
+              <div className="text-slate-100 leading-8 whitespace-pre-wrap">{reply}</div>
+            </Card>
+            <div className="grid sm:grid-cols-3 gap-3">
+              <Btn variant="premium" onClick={onAdd}><Plus size={16} /> הוסף לסשן</Btn>
+              <Btn variant="youtube" onClick={() => window.open(exercise.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={16} /> הדרכה</Btn>
+              <Btn variant="outline" onClick={() => navigator.clipboard?.writeText(question)}><Sparkles size={16} /> העתק שאלה</Btn>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -543,9 +658,12 @@ function ReacherApp() {
     return logs.filter((log) => ids.has(log.exerciseId)).reduce((sum, item) => sum + item.weight * item.reps, 0);
   }, [logs, sessionList]);
   const recoveryScore = useMemo(() => getRecoveryScore(history), [history]);
+  const weeklyStreak = Math.min(6, Math.max(0, history.length));
+  const estimatedSessionMinutes = sessionList.reduce((sum, ex) => sum + ex.sets * (ex.work + ex.rest), 0) / 60;
   const bmi = calcBMI(nutritionProfile.weight, nutritionProfile.height);
   const recommendedCalories = calcCalories(nutritionProfile);
   const trainingPlan = getNutritionTrainingPlan(nutritionProfile, bmi);
+  const cardioPlan = getCardioPlan(nutritionProfile, bmi);
 
   const addExerciseToSession = (exercise: Exercise) => {
     setSessionList((prev) => [...prev, exercise]);
@@ -636,6 +754,7 @@ function ReacherApp() {
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Volume</div><div className="text-3xl md:text-4xl font-black italic text-teal-400">{sessionVolume}</div></Card>
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Calories</div><div className="text-3xl md:text-4xl font-black italic text-amber-400">{estimateCalories(sessionVolume)}</div></Card>
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Recovery</div><div className="text-3xl md:text-4xl font-black italic text-indigo-400">{recoveryScore}</div></Card>
+        <Card className="p-5 md:p-8 col-span-2 md:col-span-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Extra features</div><div className="text-lg font-black italic">סטREAK {weeklyStreak} · זמן סשן משוער {estimatedSessionMinutes ? estimatedSessionMinutes.toFixed(0) : 0} דק׳</div></div><div className="text-sm text-slate-400">יש עכשיו גם AI פנימי לתרגיל, סקשן אירובי נפרד, ומפת שרירים אנטומית.</div></div></Card>
       </div>
 
       <div className="grid xl:grid-cols-[1.05fr_0.95fr] gap-6">
@@ -780,7 +899,7 @@ function ReacherApp() {
             </div>
             <div className="p-5 space-y-4">
               <div>
-                <div className="font-black italic text-2xl">{ex.name}</div>
+                <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-xs font-black text-teal-300">{filteredVault.findIndex((item) => item.id === ex.id) + 1}</div><div className="font-black italic text-2xl">{ex.name}</div></div>
                 <div className="text-sm text-slate-400 mt-1">{muscleHebrew[ex.muscleGroup]} · {categoryHebrew[ex.category]}</div>
               </div>
               <div className="text-slate-300 text-sm leading-relaxed">{ex.he}</div>
@@ -818,6 +937,19 @@ function ReacherApp() {
           )) : <div className="text-slate-400">עדיין אין היסטוריית אימונים.</div>}
         </div>
       </Card>
+    
+      <Card className="p-8">
+        <div className="flex justify-between items-center mb-4"><h3 className="text-2xl font-black italic">שיאים אחרונים</h3><Target className="text-amber-400" /></div>
+        <div className="space-y-3">
+          {EXERCISES.slice(0, 4).map((ex) => {
+            const best = getExerciseLogs(ex.id, logs).sort((a, b) => (b.weight * b.reps) - (a.weight * a.reps))[0];
+            if (!best) return null;
+            return <div key={ex.id} className="bg-black/30 rounded-2xl p-4 border border-white/5 flex justify-between gap-3"><div><div className="font-black italic">{ex.name}</div><div className="text-xs text-slate-400">{muscleHebrew[ex.muscleGroup]}</div></div><div className="text-right"><div className="text-lg font-black italic text-teal-400">{best.weight}kg</div><div className="text-xs text-slate-400">{best.reps} חזרות</div></div></div>;
+          }).filter(Boolean)}
+          {!logs.length && <div className="text-slate-400">אחרי שתשמור סטים, יופיעו כאן שיאים אחרונים.</div>}
+        </div>
+      </Card>
+
     </motion.div>
   );
 
@@ -826,15 +958,25 @@ function ReacherApp() {
       <Card className="p-6">
         <div className="flex items-center gap-3 mb-4"><Flame className="text-teal-400" /><h2 className="text-3xl md:text-4xl font-black italic">מרכז תזונה חכם</h2></div>
         <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
-          <input type="number" value={nutritionProfile.age} onChange={(e) => setNutritionProfile({ ...nutritionProfile, age: +e.target.value })} placeholder="גיל" className="h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
-          <input type="number" value={nutritionProfile.weight} onChange={(e) => setNutritionProfile({ ...nutritionProfile, weight: +e.target.value })} placeholder="משקל" className="h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
-          <input type="number" value={nutritionProfile.height} onChange={(e) => setNutritionProfile({ ...nutritionProfile, height: +e.target.value })} placeholder="גובה" className="h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
-          <select value={nutritionProfile.goal} onChange={(e) => setNutritionProfile({ ...nutritionProfile, goal: e.target.value as any })} className="h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none">
-            <option value="maintain">שמירה</option><option value="gain">מסה</option><option value="cut">חיטוב</option>
-          </select>
-          <select value={nutritionProfile.activity} onChange={(e) => setNutritionProfile({ ...nutritionProfile, activity: e.target.value as any })} className="h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none">
-            <option value="light">קל</option><option value="moderate">בינוני</option><option value="high">גבוה</option>
-          </select>
+          <FieldBlock label="גיל">
+            <input type="number" value={nutritionProfile.age} onChange={(e) => setNutritionProfile({ ...nutritionProfile, age: +e.target.value })} placeholder="הכנס גיל" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
+          </FieldBlock>
+          <FieldBlock label="משקל">
+            <input type="number" value={nutritionProfile.weight} onChange={(e) => setNutritionProfile({ ...nutritionProfile, weight: +e.target.value })} placeholder="הכנס משקל" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
+          </FieldBlock>
+          <FieldBlock label="גובה">
+            <input type="number" value={nutritionProfile.height} onChange={(e) => setNutritionProfile({ ...nutritionProfile, height: +e.target.value })} placeholder="הכנס גובה" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
+          </FieldBlock>
+          <FieldBlock label="מטרה">
+            <select value={nutritionProfile.goal} onChange={(e) => setNutritionProfile({ ...nutritionProfile, goal: e.target.value as any })} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none">
+              <option value="maintain">שמירה</option><option value="gain">מסה</option><option value="cut">חיטוב</option>
+            </select>
+          </FieldBlock>
+          <FieldBlock label="רמת פעילות">
+            <select value={nutritionProfile.activity} onChange={(e) => setNutritionProfile({ ...nutritionProfile, activity: e.target.value as any })} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none">
+              <option value="light">קל</option><option value="moderate">בינוני</option><option value="high">גבוה</option>
+            </select>
+          </FieldBlock>
         </div>
       </Card>
 
@@ -874,6 +1016,59 @@ function ReacherApp() {
     </motion.div>
   );
 
+
+  const renderCardio = () => (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
+      <Card className="p-6">
+        <div className="flex items-center gap-3 mb-4"><HeartPulse className="text-orange-400" /><h2 className="text-3xl md:text-4xl font-black italic">מרכז אירובי חכם</h2></div>
+        <div className="text-slate-300 leading-7">סקשן נפרד לאירובי עם חישובים לפי גיל, משקל, גובה, מטרה ורמת פעילות. המטרה כאן היא לא רק לשרוף קלוריות, אלא לבנות סיבולת, התאוששות ובריאות לב-ריאה.</div>
+      </Card>
+
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">Zone 2 שבועי</div><div className="text-3xl font-black italic text-orange-400">{cardioPlan.zone2Minutes} דק׳</div><div className="text-xs text-slate-400 mt-2">קצב שבו אפשר לדבר אבל לא לשיר.</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">HIIT שבועי</div><div className="text-3xl font-black italic text-rose-400">{cardioPlan.hiitMinutes} דק׳</div><div className="text-xs text-slate-400 mt-2">רק כתוספת, לא כבסיס היחיד.</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">צעדים מומלצים</div><div className="text-3xl font-black italic text-cyan-400">{cardioPlan.walkingSteps}</div><div className="text-xs text-slate-400 mt-2">עוזר גם בהתאוששות וגם בהוצאה אנרגטית.</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">כמות יחידות</div><div className="text-2xl font-black italic text-emerald-400">{cardioPlan.recommendedSessions}</div><div className="text-xs text-slate-400 mt-2">מותאם למטרה הנוכחית שלך.</div></Card>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4"><Target className="text-orange-400" /><h3 className="text-2xl font-black italic">פוקוס שבועי</h3></div>
+          <div className="text-slate-300 leading-relaxed">{cardioPlan.weeklyFocus}</div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4"><Flame className="text-rose-400" /><h3 className="text-2xl font-black italic">המלצת ביצוע</h3></div>
+          <div className="text-slate-300 leading-relaxed">{cardioPlan.paceTip}</div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4"><Sparkles className="text-cyan-400" /><h3 className="text-2xl font-black italic">רעיונות לאירובי</h3></div>
+          <div className="space-y-3">
+            {["הליכה בשיפוע 20-40 דקות", "אופניים בקצב קבוע", "חתירה לסבבים קצרים", "אינטרוולים של 30/60", "הליכה ארוכה ביום התאוששות"].map((tip) => (
+              <div key={tip} className="bg-black/30 border border-white/5 rounded-2xl px-4 py-3 text-slate-200">{tip}</div>
+            ))}
+          </div>
+        </Card>
+      </div>
+
+      <Card className="p-6">
+        <div className="flex items-center gap-3 mb-4"><CalendarDays className="text-emerald-400" /><h3 className="text-2xl font-black italic">חלוקה מומלצת לשבוע</h3></div>
+        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
+          {[
+            { title: "יום התאוששות", text: "20-30 דקות הליכה מהירה או אופניים קלים." },
+            { title: "Zone 2", text: "35-45 דקות בקצב אחיד ונשלט." },
+            { title: "HIIT", text: "8-12 סבבים קצרים, לא אחרי יום רגליים קשה." },
+            { title: "NEAT", text: "עוד צעדים במהלך היום, מדרגות, והליכות קצרות." },
+          ].map((item) => (
+            <Card key={item.title} className="p-4 bg-black/20 border-white/5">
+              <div className="font-black italic text-lg">{item.title}</div>
+              <div className="text-slate-400 mt-2 text-sm leading-6">{item.text}</div>
+            </Card>
+          ))}
+        </div>
+      </Card>
+    </motion.div>
+  );
+
   return (
     <>
       <ScreenFlash show={flash} />
@@ -892,17 +1087,19 @@ function ReacherApp() {
         <header className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pt-8 md:pt-12 pb-6 md:pb-8 flex flex-col lg:flex-row justify-between items-start gap-6">
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
+              <LogoMark />
               <h1 className="text-[2.2rem] sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none break-words">Betesh<span className="text-teal-500">Training</span></h1>
             </div>
-            <div className="text-slate-400 font-bold text-xs sm:text-sm max-w-full">Training, nutrition, recovery, progression.</div>
+            <div className="text-slate-400 font-bold text-xs sm:text-sm max-w-full">Training, nutrition, cardio, recovery, progression.</div>
           </div>
           <div className="flex flex-wrap gap-3">
-            <Btn variant={tab === "dashboard" ? "premium" : "outline"} onClick={() => navigateTab("dashboard")}><Home size={16} /> בית</Btn>
-            <Btn variant={tab === "vault" ? "premium" : "outline"} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר תרגילים</Btn>
-            <Btn variant={tab === "stats" ? "premium" : "outline"} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
+            <Btn variant={tab === "dashboard" ? "home" : "outline"} onClick={() => navigateTab("dashboard")}><Home size={16} /> בית</Btn>
+            <Btn variant={tab === "vault" ? "vault" : "outline"} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר תרגילים</Btn>
+            <Btn variant={tab === "stats" ? "stats" : "outline"} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
             <Btn variant={tab === "nutrition" ? "premium" : "outline"} onClick={() => navigateTab("nutrition")}><HeartPulse size={16} /> תזונה</Btn>
+            <Btn variant={tab === "cardio" ? "cardio" : "outline"} onClick={() => navigateTab("cardio")}><Flame size={16} /> אירובי</Btn>
             <Btn variant="youtube" onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")}><Youtube size={16} /> YouTube</Btn>
-            <Btn variant="outline" onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}><Music size={16} /> Music</Btn>
+            <Btn variant="spotify" onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}><SpotifyIcon className="w-4 h-4" /> ספוטיפיי</Btn>
           </div>
         </header>
 
@@ -911,12 +1108,13 @@ function ReacherApp() {
           {tab === "vault" && renderVault()}
           {tab === "stats" && renderStats()}
           {tab === "nutrition" && renderNutrition()}
+          {tab === "cardio" && renderCardio()}
         </div>
 
         <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md md:max-w-lg px-4 md:px-8">
           <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 md:p-5 rounded-[2rem] md:rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]">
-            {[{ id: "dashboard", icon: Home }, { id: "vault", icon: LayoutGrid }, { id: "stats", icon: BarChart3 }, { id: "nutrition", icon: Flame }].map((item) => (
-              <button key={item.id} onClick={() => navigateTab(item.id as MainTab)} className={`p-3 md:p-5 rounded-[1.2rem] transition-all duration-500 relative ${tab === item.id ? "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.5)] scale-110" : "text-slate-600 hover:text-white"}`}>
+            {[{ id: "dashboard", icon: Home, active: "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)]" }, { id: "vault", icon: LayoutGrid, active: "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)]" }, { id: "stats", icon: BarChart3, active: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.45)]" }, { id: "nutrition", icon: HeartPulse, active: "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.45)]" }, { id: "cardio", icon: Flame, active: "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.45)]" }].map((item) => (
+              <button key={item.id} onClick={() => navigateTab(item.id as MainTab)} className={`p-3 md:p-5 rounded-[1.2rem] transition-all duration-500 relative ${tab === item.id ? `${item.active} scale-110` : "text-slate-600 hover:text-white"}`}>
                 <item.icon size={24} />
               </button>
             ))}
