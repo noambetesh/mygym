@@ -297,12 +297,13 @@ const Card = ({ children, className = "", onClick }: { children: React.ReactNode
   </motion.div>
 );
 
-const Btn = ({ children, className = "", variant = "default", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string; variant?: "default" | "outline" | "ghost" | "premium" }) => {
+const Btn = ({ children, className = "", variant = "default", ...props }: React.ButtonHTMLAttributes<HTMLButtonElement> & { className?: string; variant?: "default" | "outline" | "ghost" | "premium" | "youtube" }) => {
   const styles = {
     default: "bg-teal-500 text-slate-950 hover:bg-teal-400",
     outline: "border border-white/10 bg-white/5 hover:bg-white/10 text-white",
     ghost: "bg-transparent text-white/70 hover:text-white",
     premium: "bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-xl",
+    youtube: "bg-red-600 text-white hover:bg-red-500 shadow-[0_0_20px_rgba(220,38,38,0.28)]",
   };
   return <button className={`inline-flex items-center justify-center gap-2 h-12 px-5 rounded-2xl font-black transition-all active:scale-95 ${styles[variant]} ${className}`} {...props}>{children}</button>;
 };
@@ -320,39 +321,36 @@ function ScreenFlash({ show }: { show: boolean }) {
   );
 }
 
-function BodyMap({ onSelect }: { onSelect: (muscle: MuscleGroup) => void }) {
-  const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup }) => (
-    <button onClick={() => onSelect(muscle)} className="absolute -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${x}%`, top: `${y}%` }}>
-      <span className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] px-2 py-1 rounded-full bg-emerald-500/20 text-emerald-300 opacity-0 group-hover:opacity-100 transition-opacity">{label}</span>
-      <span className="block w-4 h-4 rounded-full bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.7)] border border-emerald-200/60" />
-    </button>
-  );
+function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) => void; activeMuscle: MuscleGroup | "All" }) {
+  const bodyImage = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200";
+  const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup }) => {
+    const active = activeMuscle === muscle;
+    return (
+      <button onClick={() => onSelect(muscle)} className="absolute -translate-x-1/2 -translate-y-1/2 group" style={{ left: `${x}%`, top: `${y}%` }}>
+        <span className={`absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] px-2 py-1 rounded-full transition-opacity ${active ? "bg-emerald-500/30 text-emerald-200 opacity-100" : "bg-emerald-500/20 text-emerald-300 opacity-0 group-hover:opacity-100"}`}>{label}</span>
+        <span className={`block w-4 h-4 rounded-full border transition-all ${active ? "bg-emerald-300 shadow-[0_0_22px_rgba(74,222,128,0.95)] border-emerald-100 scale-125" : "bg-emerald-400 shadow-[0_0_18px_rgba(74,222,128,0.7)] border-emerald-200/60"}`} />
+      </button>
+    );
+  };
   return (
     <Card className="p-6">
       <div className="flex items-center gap-3 mb-4"><User className="text-emerald-400" /><h3 className="text-2xl font-black italic">מפת שרירים</h3></div>
       <div className="relative h-[420px] rounded-[1.8rem] bg-gradient-to-b from-slate-950 to-slate-900 overflow-hidden">
-        <svg viewBox="0 0 220 420" className="absolute inset-0 w-full h-full opacity-25">
-          <circle cx="110" cy="44" r="22" fill="white" />
-          <rect x="82" y="68" width="56" height="88" rx="26" fill="white" />
-          <rect x="60" y="76" width="20" height="90" rx="10" fill="white" />
-          <rect x="140" y="76" width="20" height="90" rx="10" fill="white" />
-          <rect x="86" y="154" width="20" height="100" rx="10" fill="white" />
-          <rect x="114" y="154" width="20" height="100" rx="10" fill="white" />
-          <rect x="84" y="250" width="20" height="120" rx="10" fill="white" />
-          <rect x="116" y="250" width="20" height="120" rx="10" fill="white" />
-        </svg>
-        <Dot x={50} y={24} label="כתפיים" muscle="Shoulders" />
-        <Dot x={50} y={33} label="חזה" muscle="Chest" />
-        <Dot x={38} y={35} label="ידיים" muscle="Arms" />
-        <Dot x={62} y={35} label="ידיים" muscle="Arms" />
+        <SafeImage src={bodyImage} alt="body map" className="absolute inset-0 w-full h-full object-cover opacity-35" fallbackSrc={DEFAULT_EXERCISE_IMAGE} />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/35 to-slate-900/35" />
+        <div className="absolute inset-x-0 top-0 h-full bg-[radial-gradient(circle_at_center,rgba(34,197,94,0.12),transparent_55%)]" />
+        <Dot x={50} y={22} label="כתפיים" muscle="Shoulders" />
+        <Dot x={50} y={31} label="חזה" muscle="Chest" />
+        <Dot x={35} y={36} label="ידיים" muscle="Arms" />
+        <Dot x={65} y={36} label="ידיים" muscle="Arms" />
         <Dot x={50} y={42} label="ליבה" muscle="Core" />
-        <Dot x={50} y={50} label="גב" muscle="Back" />
+        <Dot x={50} y={49} label="גב" muscle="Back" />
         <Dot x={50} y={58} label="ישבן" muscle="Glutes" />
-        <Dot x={46} y={70} label="רגליים" muscle="Legs" />
-        <Dot x={54} y={70} label="רגליים" muscle="Legs" />
+        <Dot x={44} y={73} label="רגליים" muscle="Legs" />
+        <Dot x={56} y={73} label="רגליים" muscle="Legs" />
         <Dot x={50} y={86} label="כל הגוף" muscle="FullBody" />
       </div>
-      <p className="text-slate-400 mt-4 text-sm">לחץ על שריר כדי לסנן מיד את המאגר ולקפוץ אליו.</p>
+      <p className="text-slate-400 mt-4 text-sm">לחץ על שריר כדי לסנן מיד את המאגר. השריר הנבחר מסומן בירוק.</p>
     </Card>
   );
 }
@@ -383,7 +381,7 @@ function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; lo
           </Card>
           <div className="grid sm:grid-cols-3 gap-3">
             <Btn variant="premium" onClick={onAdd}><Plus size={16} /> הוסף לסשן</Btn>
-            <Btn variant="outline" onClick={() => window.open(exercise.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={16} /> וידאו</Btn>
+            <Btn variant="outline" onClick={() => window.open(exercise.videoUrl, "_blank", "noopener,noreferrer")} variant="youtube"><Youtube size={16} /> הדרכה</Btn>
             <Btn variant="outline" onClick={openGemini}><Bot size={16} /> Gemini</Btn>
           </div>
         </div>
@@ -453,9 +451,16 @@ function ReacherApp() {
     });
   }, []);
 
+  const playNavigateSound = useCallback(() => playSoftTones([520, 660, 820]), [playSoftTones]);
+  const playAddSound = useCallback(() => playSoftTones([760, 920]), [playSoftTones]);
+  const playSaveSound = useCallback(() => playSoftTones([640, 820, 980]), [playSoftTones]);
+  const playRestSound = useCallback(() => playSoftTones([620, 760]), [playSoftTones]);
+  const playFinishSound = useCallback(() => playSoftTones([640, 840, 1040]), [playSoftTones]);
+
   const navigateTab = (next: MainTab) => {
     setFlash(true);
-    playSoftTones(next === "nutrition" ? [480, 600, 720] : [520, 660, 820]);
+    if (next === "nutrition") playSoftTones([480, 600, 720]);
+    else playNavigateSound();
     window.setTimeout(() => setTab(next), 120);
     window.setTimeout(() => setFlash(false), 320);
   };
@@ -501,11 +506,12 @@ function ReacherApp() {
   const recoveryScore = useMemo(() => getRecoveryScore(history), [history]);
   const bmi = calcBMI(nutritionProfile.weight, nutritionProfile.height);
   const recommendedCalories = calcCalories(nutritionProfile);
+  const trainingPlan = getNutritionTrainingPlan(nutritionProfile, bmi);
 
   const addExerciseToSession = (exercise: Exercise) => {
     setSessionList((prev) => [...prev, exercise]);
     setToast(`${exercise.name} נוסף לסשן`);
-    playSoftTones([760, 920]);
+    playAddSound();
   };
 
   const addExerciseToCustomDay = (day: DayKey, exerciseId: string) => {
@@ -531,7 +537,7 @@ function ReacherApp() {
     setPhase("work");
     setTimer(sessionList[0].work);
     setIsRunning(true);
-    playSoftTones([500, 620, 740]);
+    playNavigateSound();
   };
 
   const handlePhaseTransition = () => {
@@ -541,14 +547,14 @@ function ReacherApp() {
       setPhase("rest");
       setTimer(ex.rest);
       setTip(getExerciseAiNotes(ex, logs)[0] || AI_TIPS[0]);
-      playSoftTones([620, 760]);
+      playRestSound();
       return;
     }
     if (currentSet < ex.sets) {
       setCurrentSet((s) => s + 1);
       setPhase("work");
       setTimer(ex.work);
-      playSoftTones([880]);
+      playSaveSound();
       return;
     }
     if (currentIndex + 1 < sessionList.length) {
@@ -556,7 +562,7 @@ function ReacherApp() {
       setCurrentSet(1);
       setPhase("work");
       setTimer(sessionList[currentIndex + 1].work);
-      playSoftTones([880, 980]);
+      playSaveSound();
       return;
     }
     const totalVolume = logs.reduce((sum, item) => sum + item.weight * item.reps, 0);
@@ -565,7 +571,7 @@ function ReacherApp() {
     setIsRunning(false);
     setSessionList([]);
     setToast("האימון הושלם");
-    playSoftTones([640, 840, 1040]);
+    playFinishSound();
   };
 
   useEffect(() => {
@@ -581,7 +587,7 @@ function ReacherApp() {
     setWeight("");
     setReps("");
     setToast("הסט נשמר");
-    playSoftTones([820, 980]);
+    playSaveSound();
   };
 
   const renderDashboard = () => (
@@ -599,7 +605,7 @@ function ReacherApp() {
             <div>
               <div className="text-[10px] uppercase tracking-[0.4em] text-teal-400 mb-2">weekly plan</div>
               <h2 className="text-3xl md:text-4xl font-black italic">בית</h2>
-              <p className="text-slate-400 mt-2">ברירת המחדל היא התוכנית שלך. אפשר לעבור לתכנון אישי לכל השבוע.</p>
+              <p className="text-slate-400 mt-2">ברירת המחדל היא התוכנית שלך. אפשר לעבור לתכנון אישי ולבנות תוכנית שבועית משלך.</p>
             </div>
             <div className="flex gap-2">
               <Btn variant={plannerMode === "default" ? "premium" : "outline"} onClick={() => setPlannerMode("default")}>ברירת מחדל</Btn>
@@ -645,7 +651,7 @@ function ReacherApp() {
         </Card>
 
         <div className="space-y-6">
-          <BodyMap onSelect={(muscle) => { setSelectedMuscle(muscle); setSelectedSector("All"); navigateTab("vault"); }} />
+          <BodyMap activeMuscle={selectedMuscle} onSelect={(muscle) => { setSelectedMuscle(muscle); setSelectedSector("All"); navigateTab("vault"); }} />
 
           <Card className="p-6">
             <div className="flex items-center justify-between mb-4">
@@ -663,7 +669,7 @@ function ReacherApp() {
                     <button onClick={() => setSessionList((prev) => prev.filter((_, idx) => idx !== i))} className="p-2 rounded-xl hover:bg-rose-500/10"><Trash2 size={18} className="text-rose-400" /></button>
                   </div>
                 )) : <div className="text-slate-400">הוסף תרגילים מהדשבורד או מהמאגר כדי להתחיל סשן.</div>}
-                <Btn variant="premium" className="w-full h-14" onClick={startSession}>התחל אימון</Btn>
+                <Btn variant="premium" className="w-full h-14" onClick={startSession}>התחל אוסף אימון</Btn>
               </div>
             ) : (
               <div className="space-y-5">
@@ -742,10 +748,10 @@ function ReacherApp() {
               <div className="text-xs text-teal-300">{ex.sets} סטים · {ex.reps}</div>
               <Card className="p-4 bg-white/5 border-white/5"><div className="text-sm text-slate-200">{getExerciseAiNotes(ex, logs)[0]}</div></Card>
               <div className="grid grid-cols-2 gap-2">
-                <Btn variant="premium" onClick={() => addExerciseToSession(ex)}><Plus size={15} /> סשן</Btn>
+                <Btn variant="premium" onClick={() => addExerciseToSession(ex)}><Plus size={15} /> אוסף תרגיל לאימון</Btn>
                 <Btn variant="outline" onClick={() => setAskAIExercise(ex)}><Sparkles size={15} /> askAI</Btn>
-                <Btn variant="outline" onClick={() => window.open(ex.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={15} /> וידאו</Btn>
-                <Btn variant="outline" onClick={() => addExerciseToCustomDay(selectedDay, ex.id)}><CalendarDays size={15} /> לשבוע</Btn>
+                <Btn variant="outline" onClick={() => window.open(ex.videoUrl, "_blank", "noopener,noreferrer")} variant="youtube"><Youtube size={15} /> הדרכה</Btn>
+                <Btn variant="outline" onClick={() => addExerciseToCustomDay(selectedDay, ex.id)}><CalendarDays size={15} /> הוסף לתכנון שבועי</Btn>
               </div>
             </div>
           </Card>
@@ -794,10 +800,26 @@ function ReacherApp() {
       </Card>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">BMI</div><div className="text-3xl font-black italic text-teal-400">{bmi || "-"}</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">קלוריות יעד</div><div className="text-3xl font-black italic text-amber-400">{recommendedCalories || "-"}</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">חלבון יעד</div><div className="text-3xl font-black italic text-indigo-400">{nutritionProfile.weight ? Math.round(nutritionProfile.weight * 2) : "-"}g</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">מים</div><div className="text-3xl font-black italic text-cyan-400">{nutritionProfile.weight ? (nutritionProfile.weight * 0.035).toFixed(1) : "-"}L</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">BMI</div><div className="text-3xl font-black italic text-teal-400">{bmi || "-"}</div><div className="text-xs text-slate-400 mt-2">{trainingPlan.bmiNote}</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">קלוריות יעד</div><div className="text-3xl font-black italic text-amber-400">{recommendedCalories || "-"}</div><div className="text-xs text-slate-400 mt-2">יעד יומי משוער לפי גיל, משקל, גובה ומטרה.</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">חלבון יעד</div><div className="text-3xl font-black italic text-indigo-400">{nutritionProfile.weight ? Math.round(nutritionProfile.weight * 2) : "-"}g</div><div className="text-xs text-slate-400 mt-2">כדאי לפזר על פני 3-5 ארוחות ביום.</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">מים</div><div className="text-3xl font-black italic text-cyan-400">{nutritionProfile.weight ? (nutritionProfile.weight * 0.035).toFixed(1) : "-"}L</div><div className="text-xs text-slate-400 mt-2">לפחות, ובאימונים חמים אפילו יותר.</div></Card>
+      </div>
+
+      <div className="grid lg:grid-cols-3 gap-6">
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4"><Dumbbell className="text-teal-400" /><h3 className="text-2xl font-black italic">כמה אימונים בשבוע</h3></div>
+          <div className="text-slate-100 text-xl font-black italic mb-3">{trainingPlan.weeklyStrength}</div>
+          <div className="text-slate-300 leading-relaxed">{trainingPlan.focus}</div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4"><HeartPulse className="text-rose-400" /><h3 className="text-2xl font-black italic">אירובי</h3></div>
+          <div className="text-slate-300 leading-relaxed">{trainingPlan.cardio}</div>
+        </Card>
+        <Card className="p-6">
+          <div className="flex items-center gap-3 mb-4"><Target className="text-amber-400" /><h3 className="text-2xl font-black italic">דגש עיקרי</h3></div>
+          <div className="text-slate-300 leading-relaxed">{trainingPlan.focus}</div>
+        </Card>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
@@ -832,7 +854,6 @@ function ReacherApp() {
           <div className="space-y-3">
             <div className="flex flex-wrap items-center gap-3">
               <h1 className="text-[2.2rem] sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none break-words">Betesh<span className="text-teal-500">Training</span></h1>
-              <Btn variant="premium" onClick={() => setAskAIExercise(currentPlanExercises[0] || EXERCISES[0])}><Sparkles size={16} /> askAI</Btn>
             </div>
             <div className="text-slate-400 font-bold text-xs sm:text-sm max-w-full">Training, nutrition, recovery, progression.</div>
           </div>
@@ -841,7 +862,7 @@ function ReacherApp() {
             <Btn variant={tab === "vault" ? "premium" : "outline"} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר תרגילים</Btn>
             <Btn variant={tab === "stats" ? "premium" : "outline"} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
             <Btn variant={tab === "nutrition" ? "premium" : "outline"} onClick={() => navigateTab("nutrition")}><HeartPulse size={16} /> תזונה</Btn>
-            <Btn variant="outline" onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")}><Youtube size={16} /> YouTube</Btn>
+            <Btn variant="outline" onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")} variant="youtube"><Youtube size={16} /> YouTube</Btn>
             <Btn variant="outline" onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}><Music size={16} /> Music</Btn>
           </div>
         </header>
