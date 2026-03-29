@@ -497,8 +497,8 @@ function ScreenFlash({ show }: { show: boolean }) {
 }
 
 function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) => void; activeMuscle: MuscleGroup | "All" }) {
-  // תמונה אנטומית מקצועית שמציגה קדימה ואחורה
-  const bodyImage = "https://images.unsplash.com/photo-1581009146145-b5ef03a7403f?q=80&w=1200"; 
+  // כתובת התמונה המקצועית שנוצרה
+  const anatomyImage = "https://images.unsplash.com/photo-1581009146145-b5ef03a7403f?q=80&w=1200"; 
   
   const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup }) => {
     const active = activeMuscle === muscle;
@@ -518,13 +518,13 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
       </div>
       <div className="relative h-[450px] rounded-[2rem] bg-black border border-white/5 overflow-hidden">
         <img 
-          src={bodyImage} 
+          src={anatomyImage} 
           alt="Anatomy background" 
-          className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale contrast-125 shadow-inner" 
+          className="absolute inset-0 w-full h-full object-cover opacity-60 grayscale contrast-125 shadow-inner" 
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
         
-        {/* מיקומי נקודות אופטימליים */}
+        {/* מיקומי נקודות מותאמים לתמונה החדשה */}
         <Dot x={50} y={15} label="כתפיים" muscle="Shoulders" />
         <Dot x={50} y={26} label="חזה" muscle="Chest" />
         <Dot x={28} y={35} label="ידיים" muscle="Arms" />
@@ -537,7 +537,6 @@ function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) =
     </Card>
   );
 }
-
 function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; logs: SetRecord[]; onClose: () => void; onAdd: () => void }) {
   const notes = useMemo(() => getExerciseAiNotes(exercise, logs), [exercise, logs]);
   const [question, setQuestion] = useState(`איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`);
