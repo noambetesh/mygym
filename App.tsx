@@ -381,7 +381,7 @@ function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; lo
           </Card>
           <div className="grid sm:grid-cols-3 gap-3">
             <Btn variant="premium" onClick={onAdd}><Plus size={16} /> הוסף לסשן</Btn>
-            <Btn variant="outline" onClick={() => window.open(exercise.videoUrl, "_blank", "noopener,noreferrer")} variant="youtube"><Youtube size={16} /> הדרכה</Btn>
+            <Btn variant="youtube" onClick={() => window.open(exercise.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={16} /> הדרכה</Btn>
             <Btn variant="outline" onClick={openGemini}><Bot size={16} /> Gemini</Btn>
           </div>
         </div>
@@ -750,7 +750,7 @@ function ReacherApp() {
               <div className="grid grid-cols-2 gap-2">
                 <Btn variant="premium" onClick={() => addExerciseToSession(ex)}><Plus size={15} /> אוסף תרגיל לאימון</Btn>
                 <Btn variant="outline" onClick={() => setAskAIExercise(ex)}><Sparkles size={15} /> askAI</Btn>
-                <Btn variant="outline" onClick={() => window.open(ex.videoUrl, "_blank", "noopener,noreferrer")} variant="youtube"><Youtube size={15} /> הדרכה</Btn>
+                <Btn variant="youtube" onClick={() => window.open(ex.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={15} /> הדרכה</Btn>
                 <Btn variant="outline" onClick={() => addExerciseToCustomDay(selectedDay, ex.id)}><CalendarDays size={15} /> הוסף לתכנון שבועי</Btn>
               </div>
             </div>
@@ -862,7 +862,7 @@ function ReacherApp() {
             <Btn variant={tab === "vault" ? "premium" : "outline"} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר תרגילים</Btn>
             <Btn variant={tab === "stats" ? "premium" : "outline"} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
             <Btn variant={tab === "nutrition" ? "premium" : "outline"} onClick={() => navigateTab("nutrition")}><HeartPulse size={16} /> תזונה</Btn>
-            <Btn variant="outline" onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")} variant="youtube"><Youtube size={16} /> YouTube</Btn>
+            <Btn variant="youtube" onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")}><Youtube size={16} /> YouTube</Btn>
             <Btn variant="outline" onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}><Music size={16} /> Music</Btn>
           </div>
         </header>
