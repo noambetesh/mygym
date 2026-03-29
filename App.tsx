@@ -496,77 +496,77 @@ function ScreenFlash({ show }: { show: boolean }) {
   );
 }
 
-const BodyMap = () => {
+function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) => void; activeMuscle: MuscleGroup | "All" }) {
   const bodyImage = "/anatomy-map.png";
 
-  return (
-    <div className="relative w-full h-[420px] rounded-[2rem] overflow-hidden bg-black">
-      
-      {/* Background image */}
-      <img
-        src={bodyImage}
-        alt="Anatomy map"
-        className="absolute inset-0 w-full h-full object-contain opacity-90"
-      />
+  const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup }) => {
+    const active = activeMuscle === muscle;
 
-      {/* Overlay for better contrast */}
-      <div className="absolute inset-0 bg-black/30" />
+    return (
+      <button
+        onClick={() => onSelect(muscle)}
+        className="absolute -translate-x-1/2 -translate-y-1/2 group z-20"
+        style={{ left: `${x}%`, top: `${y}%` }}
+      >
+        <span
+          className={`absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${
+            active
+              ? "bg-teal-500 text-white opacity-100 scale-110"
+              : "bg-black/80 text-teal-300 opacity-0 group-hover:opacity-100 border border-white/10"
+          }`}
+        >
+          {label}
+        </span>
 
-      {/* Example points (תשאיר את שלך כמו שהם, רק דוגמה) */}
-      <div className="absolute top-[20%] left-1/2 -translate-x-1/2 w-4 h-4 bg-teal-400 rounded-full shadow-[0_0_15px_rgba(20,184,166,0.8)]" />
-      <div className="absolute top-[35%] left-[30%] w-4 h-4 bg-teal-400 rounded-full" />
-      <div className="absolute top-[35%] right-[30%] w-4 h-4 bg-teal-400 rounded-full" />
-      <div className="absolute top-[55%] left-1/2 -translate-x-1/2 w-4 h-4 bg-teal-400 rounded-full" />
-
-    </div>
-  );
-};
+        <span
+          className={`block w-5 h-5 rounded-full border-2 transition-all ${
+            active
+              ? "bg-teal-400 border-white shadow-[0_0_20px_#2dd4bf] scale-125"
+              : "bg-teal-900/70 border-teal-400/70"
+          }`}
+        />
+      </button>
+    );
+  };
 
   return (
     <Card className="p-4 relative overflow-hidden bg-slate-950/80 border-white/10">
-      <div className="flex items-center justify-between mb-4 px-2">
-        <h3 className="text-xl font-black italic text-white uppercase tracking-tight">
-          ANATOMY MAP
-        </h3>
+      <div className="flex items-center gap-3 mb-4 px-2">
         <User className="text-teal-400" size={20} />
+        <h3 className="text-xl font-black italic text-white uppercase tracking-tight">Anatomy Map</h3>
       </div>
 
-      <div className="relative h-[560px] rounded-[2rem] bg-[#020617] border border-white/5 overflow-hidden">
+      <div className="relative h-[450px] rounded-[2rem] bg-black border border-white/5 overflow-hidden">
         <img
-          src={anatomyMapImg}
+          src={bodyImage}
           alt="Anatomy map"
           className="absolute inset-0 w-full h-full object-contain opacity-95"
         />
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/10 pointer-events-none" />
 
-        {/* Shoulders */}
         <Dot x={30} y={22} label="כתפיים" muscle="Shoulders" />
         <Dot x={70} y={22} label="כתפיים" muscle="Shoulders" />
 
-        {/* Chest */}
         <Dot x={30} y={31} label="חזה" muscle="Chest" />
 
-        {/* Arms */}
         <Dot x={18} y={34} label="ידיים" muscle="Arms" />
         <Dot x={82} y={34} label="ידיים" muscle="Arms" />
 
-        {/* Core */}
         <Dot x={30} y={45} label="ליבה" muscle="Core" />
 
-        {/* Back */}
         <Dot x={70} y={34} label="גב" muscle="Back" />
 
-        {/* Glutes */}
         <Dot x={70} y={50} label="ישבן" muscle="Glutes" />
 
-        {/* Legs */}
         <Dot x={30} y={67} label="רגליים" muscle="Legs" />
         <Dot x={70} y={67} label="רגליים" muscle="Legs" />
       </div>
     </Card>
   );
 }
+
+
 function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; logs: SetRecord[]; onClose: () => void; onAdd: () => void }) {
   const notes = useMemo(() => getExerciseAiNotes(exercise, logs), [exercise, logs]);
   const [question, setQuestion] = useState(`איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`);
