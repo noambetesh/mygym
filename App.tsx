@@ -390,17 +390,23 @@ function FieldBlock({ label, children }: { label: string; children: React.ReactN
 
 function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <div className={`w-full flex justify-center mb-4 ${className}`}>
-      <div className="w-48 h-48 sm:w-64 sm:h-64 relative">
+    // מיכל ראשי לכל הרוחב עם שוליים מינימליים
+    <div className={`w-full mb-6 px-4 ${className}`}>
+      {/* מיכל יחסי ששומר על פרופורציות של כמעט ריבוע כדי לתת "נפח" בחלק העליון */}
+      <div className="w-full aspect-square max-h-[35vh] flex items-center justify-center relative mx-auto">
         <img 
           src="/icon-192.png" 
           alt="Betesh Training logo" 
-          className="w-full h-full object-contain drop-shadow-[0_0_30px_rgba(45,212,191,0.3)]" 
+          // object-contain מבטיח שהתמונה תגדל הכי הרבה שאפשר בלי להיחתך
+          className="w-full h-full object-contain drop-shadow-[0_0_50px_rgba(45,212,191,0.4)] transition-transform duration-500 hover:scale-105" 
         />
+        {/* שכבת אור אחורית עדינה להשלמת המראה */}
+        <div className="absolute inset-0 bg-teal-500/5 blur-[100px] rounded-full pointer-events-none" />
       </div>
     </div>
   );
 }
+
 
 function SpotifyIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
