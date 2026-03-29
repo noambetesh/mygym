@@ -1524,22 +1524,25 @@ const profiles = {
             animate={{ scale: 1, y: 0 }}
             className="w-full max-w-md bg-slate-900 border border-white/10 rounded-[2rem] p-6"
           >
-            <div className="text-2xl font-black italic mb-2">ברוך הבא</div>
-            <div className="text-slate-400 mb-4">איך לקרוא לך באפליקציה?</div>
-
-            <input
-              value={userName}
-              onChange={(e) => setUserName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && userName.trim()) {
-                  localStorage.setItem("betesh_user_name", userName.trim());
-                  setShowNamePrompt(false);
-                }
-              }}
-              placeholder="השם שלך"
-              className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none text-white placeholder:text-slate-400 caret-white mb-4 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
-            />
-
+<div className="text-2xl font-bold text-white mb-2">ברוך הבא</div>
+<div className="text-sm font-medium text-slate-400 mb-6">איך לקרוא לך באפליקציה?</div>
+          <input
+  value={userName}
+  onChange={(e) => setUserName(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === "Enter" && userName.trim()) {
+      localStorage.setItem("reacher_user_name_v1", userName.trim());
+      setShowNamePrompt(false);
+    }
+  }}
+  placeholder="השם שלך"
+  className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none 
+             text-teal-400                
+             placeholder:text-slate-500      
+             text-right                   
+             caret-teal-400               
+             mb-4 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
+/>
             <Btn
               variant="premium"
               className={`w-full ${!userName.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
