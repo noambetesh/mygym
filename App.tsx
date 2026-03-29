@@ -390,12 +390,14 @@ function FieldBlock({ label, children }: { label: string; children: React.ReactN
 
 function LogoMark({ className = "" }: { className?: string }) {
   return (
-    <div className={`w-40 h-40 sm:w-56 sm:h-56 flex items-center justify-center ${className}`}>
-      <img 
-        src="/icon-192.png" 
-        alt="Betesh Training logo" 
-        className="w-full h-full object-contain transform hover:scale-105 transition-transform duration-500" 
-      />
+    <div className={`w-full flex justify-center mb-4 ${className}`}>
+      <div className="w-48 h-48 sm:w-64 sm:h-64 relative">
+        <img 
+          src="/icon-192.png" 
+          alt="Betesh Training logo" 
+          className="w-full h-full object-contain drop-shadow-[0_0_30px_rgba(45,212,191,0.3)]" 
+        />
+      </div>
     </div>
   );
 }
@@ -450,35 +452,42 @@ function ScreenFlash({ show }: { show: boolean }) {
 }
 
 function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) => void; activeMuscle: MuscleGroup | "All" }) {
-  // החלפתי לכתובת של תמונה אנטומית איכותית שדומה למה ששלחת
+  // תמונה אנטומית מקצועית שמציגה קדימה ואחורה
   const bodyImage = "https://images.unsplash.com/photo-1581009146145-b5ef03a7403f?q=80&w=1200"; 
   
   const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup }) => {
     const active = activeMuscle === muscle;
     return (
       <button onClick={() => onSelect(muscle)} className="absolute -translate-x-1/2 -translate-y-1/2 group z-20" style={{ left: `${x}%`, top: `${y}%` }}>
-        <span className={`absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap text-[11px] font-bold px-2 py-1 rounded-full transition-all ${active ? "bg-teal-500 text-white opacity-100 scale-110" : "bg-black/60 text-teal-300 opacity-0 group-hover:opacity-100"}`}>{label}</span>
-        <span className={`block w-5 h-5 rounded-full border-2 transition-all ${active ? "bg-teal-400 border-white shadow-[0_0_20px_#2dd4bf]" : "bg-teal-900/40 border-teal-500/50 shadow-sm"}`} />
+        <span className={`absolute -top-9 left-1/2 -translate-x-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${active ? "bg-teal-500 text-white opacity-100 scale-110" : "bg-black/80 text-teal-300 opacity-0 group-hover:opacity-100 border border-white/10"}`}>{label}</span>
+        <span className={`block w-5 h-5 rounded-full border-2 transition-all ${active ? "bg-teal-400 border-white shadow-[0_0_20px_#2dd4bf] scale-125" : "bg-teal-900/60 border-teal-500/50"}`} />
       </button>
     );
   };
 
   return (
-    <Card className="p-6 relative overflow-hidden">
-      <div className="flex items-center gap-3 mb-4"><User className="text-teal-400" /><h3 className="text-2xl font-black italic text-white">מפת שרירים אנטומית</h3></div>
-      <div className="relative h-[500px] rounded-[2rem] bg-slate-950 border border-white/5 overflow-hidden">
-        <img src={bodyImage} alt="Anatomy" className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale contrast-125" />
-        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/20" />
+    <Card className="p-4 relative overflow-hidden bg-slate-950/80 border-white/10">
+      <div className="flex items-center gap-3 mb-4 px-2">
+        <User className="text-teal-400" size={20} />
+        <h3 className="text-xl font-black italic text-white uppercase tracking-tight">Anatomy Map</h3>
+      </div>
+      <div className="relative h-[450px] rounded-[2rem] bg-black border border-white/5 overflow-hidden">
+        <img 
+          src={bodyImage} 
+          alt="Anatomy background" 
+          className="absolute inset-0 w-full h-full object-cover opacity-40 grayscale contrast-125 shadow-inner" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/40" />
         
-        {/* מיקומי נקודות מעודכנים על גבי תמונה כללית */}
+        {/* מיקומי נקודות אופטימליים */}
         <Dot x={50} y={15} label="כתפיים" muscle="Shoulders" />
-        <Dot x={50} y={25} label="חזה" muscle="Chest" />
-        <Dot x={30} y={35} label="ידיים" muscle="Arms" />
-        <Dot x={70} y={35} label="ידיים" muscle="Arms" />
-        <Dot x={50} y={45} label="ליבה" muscle="Core" />
-        <Dot x={50} y={55} label="גב" muscle="Back" />
-        <Dot x={50} y={65} label="ישבן" muscle="Glutes" />
-        <Dot x={50} y={80} label="רגליים" muscle="Legs" />
+        <Dot x={50} y={26} label="חזה" muscle="Chest" />
+        <Dot x={28} y={35} label="ידיים" muscle="Arms" />
+        <Dot x={72} y={35} label="ידיים" muscle="Arms" />
+        <Dot x={50} y={42} label="ליבה" muscle="Core" />
+        <Dot x={50} y={54} label="גב" muscle="Back" />
+        <Dot x={50} y={64} label="ישבן" muscle="Glutes" />
+        <Dot x={50} y={82} label="רגליים" muscle="Legs" />
       </div>
     </Card>
   );
@@ -489,63 +498,55 @@ function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; lo
   const [question, setQuestion] = useState(`איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`);
   const [reply, setReply] = useState(() => generateExerciseCoachReply(exercise, logs, `איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`));
 
-  const askCoach = () => {
-    setReply(generateExerciseCoachReply(exercise, logs, question));
-  };
+  const askCoach = () => setReply(generateExerciseCoachReply(exercise, logs, question));
 
   return (
-    <div className="fixed inset-0 z-[700] bg-black/90 backdrop-blur-2xl flex items-center justify-center p-4" dir="rtl">
-      <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-4xl bg-slate-900 border border-white/10 rounded-[2rem] overflow-hidden">
-        <div className="relative h-52">
-          <SafeImage src={getExerciseImage(exercise)} alt={exercise.name} className="w-full h-full object-cover opacity-30" fallbackSrc={muscleGroupImages[exercise.muscleGroup]} />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent" />
-          <div className="absolute inset-0 p-6 flex items-end justify-between">
-            <div>
-              <div className="text-xs tracking-[0.3em] uppercase text-teal-400 mb-2">{exercise.sector} · {exercise.difficulty}</div>
-              <h3 className="text-3xl font-black italic">{exercise.name}</h3>
-              <div className="text-sm text-slate-300 mt-2">עוזר AI פנימי לתרגיל, עם הקשר אוטומטי מהמאגר ומהביצועים שלך.</div>
-            </div>
-            <Btn variant="ghost" onClick={onClose}><X /></Btn>
+    <div className="fixed inset-0 z-[800] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto" dir="rtl">
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.9 }} 
+        animate={{ opacity: 1, scale: 1 }} 
+        className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden my-auto"
+      >
+        {/* Header עם כפתור סגירה */}
+        <div className="flex items-center justify-between p-6 border-b border-white/5 bg-white/5">
+          <div className="flex items-center gap-3">
+            <Bot className="text-teal-400" />
+            <h3 className="text-xl font-black italic text-white">{exercise.name} - AI Coach</h3>
           </div>
+          <button onClick={onClose} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 text-white hover:bg-rose-500/20 transition-colors">
+            <X size={20} />
+          </button>
         </div>
-        <div className="p-6 grid lg:grid-cols-[0.9fr_1.1fr] gap-6">
-          <div className="space-y-4">
-            <Card className="p-5 bg-teal-500/5 border-teal-500/20">
-              <div className="text-sm font-bold text-teal-300 mb-3">הקשר מהיר לתרגיל</div>
-              <div className="space-y-3">{notes.map((n, i) => <div key={i} className="text-slate-200">- {n}</div>)}</div>
-            </Card>
-            <Card className="p-5 bg-white/5 border-white/10">
-              <div className="text-sm font-bold text-slate-200 mb-3">שאלה מוכנה</div>
+
+        <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
+          <Card className="p-4 bg-teal-500/5 border-teal-500/20 text-sm leading-relaxed text-slate-200">
+            {notes.map((n, i) => <div key={i} className="mb-1">• {n}</div>)}
+          </Card>
+
+          <div className="space-y-2">
+            <div className="text-xs font-bold text-slate-400 px-1">שאלה מוכנה</div>
             <textarea 
-  value={question} 
-  onChange={(e) => setQuestion(e.target.value)} 
-  className="w-full min-h-[150px] bg-black/40 border border-white/10 rounded-2xl p-4 outline-none resize-none text-white font-medium placeholder-slate-500" 
-/>
-              <div className="grid sm:grid-cols-2 gap-3 mt-4">
-                <Btn variant="premium" onClick={askCoach}><Bot size={16} /> שאל מתוך התרגיל</Btn>
-                <Btn variant="outline" onClick={() => setQuestion(`תן לי וריאציה קלה יותר ל-${exercise.name} ודגשים לטעויות נפוצות`)}>
-                  <Sparkles size={16} /> מלא שאלה חכמה
-                </Btn>
-              </div>
-            </Card>
+              value={question} 
+              onChange={(e) => setQuestion(e.target.value)} 
+              className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-4 outline-none resize-none text-white focus:border-teal-500 transition-all shadow-inner" 
+            />
           </div>
 
-          <div className="space-y-4">
-            <Card className="p-5 min-h-[280px] bg-slate-950/70 border-white/10">
-              <div className="text-sm font-bold text-cyan-300 mb-3">תשובת המאמן</div>
-              <div className="text-slate-100 leading-8 whitespace-pre-wrap">{reply}</div>
-            </Card>
-            <div className="grid sm:grid-cols-3 gap-3">
-              <Btn variant="premium" onClick={onAdd}><Plus size={16} /> הוסף לסשן</Btn>
-              <Btn variant="youtube" onClick={() => window.open(exercise.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={16} /> הדרכה</Btn>
-              <Btn variant="outline" onClick={() => navigator.clipboard?.writeText(question)}><Sparkles size={16} /> העתק שאלה</Btn>
-            </div>
+          <Card className="p-5 bg-black/60 border-white/5">
+            <div className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-widest">תשובת המאמן</div>
+            <div className="text-slate-100 leading-8 text-md font-medium">{reply}</div>
+          </Card>
+
+          <div className="grid grid-cols-2 gap-3 pt-2 pb-4">
+            <Btn variant="premium" className="h-14" onClick={askCoach}><Bot size={18} /> שאל שוב</Btn>
+            <Btn variant="outline" className="h-14" onClick={onAdd}><Plus size={18} /> הוסף לסשן</Btn>
           </div>
         </div>
       </motion.div>
     </div>
   );
 }
+
 function getNutritionTrainingPlan(profile: NutritionProfile, bmi: number) {
   const bmiNote =
     !bmi
