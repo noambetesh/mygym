@@ -1,5 +1,4 @@
-
-import React, { useCallback, useEffect, useMemo, useRef, useState, Footprints, UtensilsCrossed } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3,
@@ -32,6 +31,7 @@ import {
   X,
   Youtube,
 } from "lucide-react";
+
 const REACHER_HERO = "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1600";
 const DEFAULT_EXERCISE_IMAGE = "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=1200";
 const ANATOMY_IMAGE = "data:image/svg+xml;utf8,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%201200%20900'%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3ClinearGradient%20id='bg'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%0A%20%20%20%20%20%20%3Cstop%20offset='0%25'%20stop-color='#0b1227'/%3E%0A%20%20%20%20%20%20%3Cstop%20offset='100%25'%20stop-color='#091021'/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id='skin'%20x1='0'%20y1='0'%20x2='0'%20y2='1'%3E%0A%20%20%20%20%20%20%3Cstop%20offset='0%25'%20stop-color='#ead2bf'/%3E%0A%20%20%20%20%20%20%3Cstop%20offset='100%25'%20stop-color='#c9ac95'/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id='muscle'%20x1='0'%20y1='0'%20x2='1'%20y2='1'%3E%0A%20%20%20%20%20%20%3Cstop%20offset='0%25'%20stop-color='#33e3a4'/%3E%0A%20%20%20%20%20%20%3Cstop%20offset='100%25'%20stop-color='#0fbf78'/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3Cfilter%20id='glow'%20x='-30%25'%20y='-30%25'%20width='160%25'%20height='160%25'%3E%0A%20%20%20%20%20%20%3CfeGaussianBlur%20stdDeviation='8'%20result='b'/%3E%0A%20%20%20%20%20%20%3CfeMerge%3E%3CfeMergeNode%20in='b'/%3E%3CfeMergeNode%20in='SourceGraphic'/%3E%3C/feMerge%3E%0A%20%20%20%20%3C/filter%3E%0A%20%20%20%20%3Cg%20id='front'%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-185'%20r='46'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Crect%20x='-23'%20y='-142'%20width='46'%20height='36'%20rx='16'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-102%20C-40%20-118%2040%20-118%2068%20-102%20C82%20-74%2088%20-40%2084%20-8%20C80%2028%2064%2058%2036%2076%20L24%20288%20L-24%20288%20L-36%2076%20C-64%2058%20-80%2028%20-84%20-8%20C-88%20-40%20-82%20-74%20-68%20-102Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-92%20C-82%20-44%20-102%206%20-120%2072%20L-92%2088%20L-72%2020%20L-62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M68%20-92%20C82%20-44%20102%206%20120%2072%20L92%2088%20L72%2020%20L62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-58%2024%20L-76%20172%20L-48%20172%20L-32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M58%2024%20L76%20172%20L48%20172%20L32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-26%20288%20L-40%20502%20L-10%20502%20L6%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M26%20288%20L10%20502%20L40%20502%20L56%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-34%20502%20L-52%20552%20L-20%20552%20L-8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M34%20502%20L20%20552%20L52%20552%20L8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-64%20-80%20C-36%20-94%2036%20-94%2064%20-80'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.55'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-52%20-6%20C-48%2026%20-28%2044%20-5%2050%20L-5%20132'%20fill='none'%20stroke='#7fb0a1'%20stroke-width='4'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M52%20-6%20C48%2026%2028%2044%205%2050%20L5%20132'%20fill='none'%20stroke='#7fb0a1'%20stroke-width='4'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-24%20140%20C-4%20122%204%20122%2024%20140'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-64'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='48'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='96'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='160'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%3C/g%3E%0A%20%20%20%20%3Cg%20id='back'%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-185'%20r='46'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Crect%20x='-23'%20y='-142'%20width='46'%20height='36'%20rx='16'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-102%20C-40%20-118%2040%20-118%2068%20-102%20C82%20-74%2088%20-40%2084%20-8%20C80%2028%2064%2058%2036%2076%20L24%20288%20L-24%20288%20L-36%2076%20C-64%2058%20-80%2028%20-84%20-8%20C-88%20-40%20-82%20-74%20-68%20-102Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-68%20-92%20C-82%20-44%20-102%206%20-120%2072%20L-92%2088%20L-72%2020%20L-62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M68%20-92%20C82%20-44%20102%206%20120%2072%20L92%2088%20L72%2020%20L62%20-28%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-58%2024%20L-76%20172%20L-48%20172%20L-32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M58%2024%20L76%20172%20L48%20172%20L32%2042%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-26%20288%20L-40%20502%20L-10%20502%20L6%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M26%20288%20L10%20502%20L40%20502%20L56%20288%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-34%20502%20L-52%20552%20L-20%20552%20L-8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M34%20502%20L20%20552%20L52%20552%20L8%20508%20Z'%20fill='url(#skin)'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-66%20-82%20C-34%20-96%2034%20-96%2066%20-82'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.55'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-64%20-20%20C-58%2038%20-20%2066%200%2084%20C20%2066%2058%2038%2064%20-20'%20fill='none'%20stroke='#7fb0a1'%20stroke-width='4'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Cpath%20d='M-24%20140%20C-4%20122%204%20122%2024%20140'%20fill='none'%20stroke='url(#muscle)'%20stroke-width='6'%20opacity='0.45'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='-64'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='66'%20cy='4'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='52'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='0'%20cy='154'%20r='12'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='-12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%20%20%3Ccircle%20cx='12'%20cy='356'%20r='13'%20fill='url(#muscle)'%20filter='url(#glow)'/%3E%0A%20%20%20%20%3C/g%3E%0A%20%20%3C/defs%3E%0A%20%20%3Crect%20width='1200'%20height='900'%20fill='url(#bg)'/%3E%0A%20%20%3Crect%20x='150'%20y='70'%20width='900'%20height='730'%20rx='32'%20fill='#0b1327'%20opacity='0.88'/%3E%0A%20%20%3Cg%20transform='translate(430%20390)'%3E%3Cuse%20href='#front'/%3E%3C/g%3E%0A%20%20%3Cg%20transform='translate(770%20390)'%3E%3Cuse%20href='#back'/%3E%3C/g%3E%0A%3C/svg%3E";
@@ -182,8 +182,8 @@ const EXERCISES: Exercise[] = [
   { id: "gym_b15", name: "Deadlift", sets: 3, reps: "5", he: "דדליפט קלאסי. בניית כוח ומסה בכל הגוף.", work: 45, rest: 180, category: "power", muscleGroup: "Back", videoUrl: "https://www.youtube.com/results?search_query=Deadlift+form+tutorial", imageUrl: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?q=80&w=800", difficulty: "Elite", sector: "Gym" },
 
   // ================= GYM - CHEST (15) =================
-  { id: "gym_c1", name: "Low-Incline DB Press", sets: 4, reps: "8-10", he: "לחיצת משקולות בשיפוע קל. מפתח חזה עליון.", work: 45, rest: 100, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=Low+Incline+DB+Press", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Advanced", sector: "Gym" },
-  { id: "gym_c2", name: "Weighted Dips", sets: 4, reps: "8-12", he: "מקבילים עם משקל. התרגיל הכי טוב לחזה תחתון.", work: 40, rest: 100, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=Weighted+Dips+chest", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef03a7403f?q=80&w=800", difficulty: "Elite", sector: "Gym" },
+  { id: "gym_c1", name: "Low-Incline DB Press", sets: 4, reps: "8-10", he: "לחיצת חזה במשקולות בשיפוע חיובי.", work: 45, rest: 90, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=Low+Incline+DB+Press", imageUrl: "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=800", difficulty: "Advanced", sector: "Gym" },
+  { id: "gym_c2", name: "Weighted Dips", sets: 4, reps: "8-12", he: "מקבילים עם משקל. דגש על חזה תחתון.", work: 40, rest: 100, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=Weighted+Dips+chest", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef03a7403f?q=80&w=800", difficulty: "Elite", sector: "Gym" },
   { id: "gym_c3", name: "Converging Press", sets: 3, reps: "10-12", he: "לחיצת חזה במכונה עם סחיטה במרכז.", work: 40, rest: 90, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=Converging+Chest+Press", imageUrl: "https://images.unsplash.com/photo-1591741535018-d042766c62eb?q=80&w=800", difficulty: "Standard", sector: "Gym" },
   { id: "gym_c4", name: "Floor Press", sets: 3, reps: "8", he: "לחיצה מהרצפה. שיפור כוח הנעילה ומניעת פציעות.", work: 40, rest: 90, category: "push", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=Floor+Press+dumbbell", imageUrl: "https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?q=80&w=800", difficulty: "Advanced", sector: "Gym" },
   { id: "gym_c5", name: "Cable Flyes", sets: 3, reps: "15", he: "פרפר בכבלים מלמעלה. חיטוב ובידוד החזה.", work: 35, rest: 60, category: "isolation", muscleGroup: "Chest", videoUrl: "https://www.youtube.com/results?search_query=Cable+Flyes+tutorial", imageUrl: "https://images.unsplash.com/photo-1581009146145-b5ef050c2e1e?q=80&w=800", difficulty: "Standard", sector: "Gym" },
@@ -295,7 +295,6 @@ const APEX_MEALS = {
   cut: ["סקיר + פרי", "חזה עוף + תפוח אדמה + סלט", "טונה + קרקרים + ירקות"],
 };
 
-
 function getExerciseImage(exercise: Exercise) {
   return exercise.imageUrl || muscleGroupImages[exercise.muscleGroup] || DEFAULT_EXERCISE_IMAGE;
 }
@@ -366,7 +365,6 @@ function calcCalories(profile: NutritionProfile) {
   return maintenance;
 }
 
-
 function getCardioPlan(profile: NutritionProfile, bmi: number): CardioProfilePlan {
   const baseZone2 = profile.goal === "cut" ? 120 : profile.goal === "gain" ? 60 : 90;
   const zone2Minutes = profile.activity === "high" ? baseZone2 - 15 : profile.activity === "light" ? baseZone2 + 15 : baseZone2;
@@ -429,23 +427,18 @@ function FieldBlock({ label, children }: { label: string; children: React.ReactN
 
 function LogoMark({ className = "" }: { className?: string }) {
   return (
-    // מיכל ראשי לכל הרוחב עם שוליים מינימליים
     <div className={`w-full mb-6 px-4 ${className}`}>
-      {/* מיכל יחסי ששומר על פרופורציות של כמעט ריבוע כדי לתת "נפח" בחלק העליון */}
       <div className="w-full aspect-square max-h-[35vh] flex items-center justify-center relative mx-auto">
         <img 
           src="/icon-192.png" 
           alt="Betesh Training logo" 
-          // object-contain מבטיח שהתמונה תגדל הכי הרבה שאפשר בלי להיחתך
           className="w-full h-full object-contain drop-shadow-[0_0_50px_rgba(45,212,191,0.4)] transition-transform duration-500 hover:scale-105" 
         />
-        {/* שכבת אור אחורית עדינה להשלמת המראה */}
         <div className="absolute inset-0 bg-teal-500/5 blur-[100px] rounded-full pointer-events-none" />
       </div>
     </div>
   );
 }
-
 
 function SpotifyIcon({ className = "w-4 h-4" }: { className?: string }) {
   return (
@@ -496,85 +489,34 @@ function ScreenFlash({ show }: { show: boolean }) {
   );
 }
 
-function BodyMap({
-  onSelect,
-  activeMuscle,
-}: {
-  onSelect: (muscle: MuscleGroup) => void;
-  activeMuscle: MuscleGroup | "All";
-}) {
+function BodyMap({ onSelect, activeMuscle }: { onSelect: (muscle: MuscleGroup) => void; activeMuscle: MuscleGroup | "All"; }) {
   const bodyImage = "/anatomy-map.png";
-
-  const Dot = ({
-    x,
-    y,
-    label,
-    muscle,
-  }: {
-    x: number;
-    y: number;
-    label: string;
-    muscle: MuscleGroup;
-  }) => {
+  const Dot = ({ x, y, label, muscle }: { x: number; y: number; label: string; muscle: MuscleGroup; }) => {
     const active = activeMuscle === muscle;
-
     return (
-      <button
-        onClick={() => onSelect(muscle)}
-        className="absolute -translate-x-1/2 -translate-y-1/2 group z-20"
-        style={{ left: `${x}%`, top: `${y}%` }}
-      >
-        <span
-          className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${
-            x < 50
-              ? "-left-16"
-              : "-right-16"
-          } ${
-            active
-              ? "bg-teal-500 text-white opacity-100 scale-110"
-              : "bg-black/80 text-teal-300 opacity-0 group-hover:opacity-100 border border-white/10"
-          }`}
-        >
+      <button onClick={() => onSelect(muscle)} className="absolute -translate-x-1/2 -translate-y-1/2 group z-20" style={{ left: `${x}%`, top: `${y}%` }}>
+        <span className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${x < 50 ? "-left-16" : "-right-16"} ${active ? "bg-teal-500 text-white opacity-100 scale-110" : "bg-black/80 text-teal-300 opacity-0 group-hover:opacity-100 border border-white/10"}`}>
           {label}
         </span>
-
-        <span
-          className={`block w-5 h-5 rounded-full border-2 transition-all ${
-            active
-              ? "bg-teal-400 border-white shadow-[0_0_20px_#2dd4bf] scale-125"
-              : "bg-teal-900/70 border-teal-400/70"
-          }`}
-        />
+        <span className={`block w-5 h-5 rounded-full border-2 transition-all ${active ? "bg-teal-400 border-white shadow-[0_0_20px_#2dd4bf] scale-125" : "bg-teal-900/70 border-teal-400/70"}`} />
       </button>
     );
   };
-
   return (
     <Card className="p-4 relative overflow-hidden bg-slate-950/80 border-white/10">
       <div className="flex items-center justify-between mb-4 px-2">
-        <h3 className="text-xl font-black italic text-white uppercase tracking-tight">
-          Anatomy Map
-        </h3>
+        <h3 className="text-xl font-black italic text-white uppercase tracking-tight">Anatomy Map</h3>
         <User className="text-teal-400" size={20} />
       </div>
-
       <div className="relative h-[560px] rounded-[2rem] bg-black border border-white/5 overflow-hidden">
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="relative w-[78%] h-[92%] max-w-[900px]">
-            <img
-              src={bodyImage}
-              alt="Anatomy map"
-              className="absolute inset-0 w-full h-full object-contain opacity-95"
-            />
-
-            {/* Front */}
+            <img src={bodyImage} alt="Anatomy map" className="absolute inset-0 w-full h-full object-contain opacity-95" />
             <Dot x={27} y={21} label="כתפיים" muscle="Shoulders" />
             <Dot x={33} y={24} label="חזה" muscle="Chest" />
             <Dot x={23} y={39} label="ידיים" muscle="Arms" />
             <Dot x={35} y={38} label="ליבה" muscle="Core" />
             <Dot x={33} y={55} label="רגליים" muscle="Legs" />
-
-            {/* Back */}
             <Dot x={63} y={21} label="כתפיים" muscle="Shoulders" />
             <Dot x={68} y={24} label="גב" muscle="Back" />
             <Dot x={77} y={39} label="ידיים" muscle="Arms" />
@@ -582,7 +524,6 @@ function BodyMap({
             <Dot x={66} y={55} label="רגליים" muscle="Legs" />
           </div>
         </div>
-
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/10 pointer-events-none" />
       </div>
     </Card>
@@ -593,17 +534,10 @@ function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; lo
   const notes = useMemo(() => getExerciseAiNotes(exercise, logs), [exercise, logs]);
   const [question, setQuestion] = useState(`איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`);
   const [reply, setReply] = useState(() => generateExerciseCoachReply(exercise, logs, `איך לשפר את ${exercise.name} עם דגש על טכניקה והתקדמות?`));
-
   const askCoach = () => setReply(generateExerciseCoachReply(exercise, logs, question));
-
   return (
     <div className="fixed inset-0 z-[800] bg-black/90 backdrop-blur-md flex items-center justify-center p-4 overflow-y-auto" dir="rtl">
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.9 }} 
-        animate={{ opacity: 1, scale: 1 }} 
-        className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden my-auto"
-      >
-        {/* Header עם כפתור סגירה */}
+      <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[2.5rem] shadow-2xl overflow-hidden my-auto">
         <div className="flex items-center justify-between p-6 border-b border-white/5 bg-white/5">
           <div className="flex items-center gap-3">
             <Bot className="text-teal-400" />
@@ -613,26 +547,18 @@ function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; lo
             <X size={20} />
           </button>
         </div>
-
         <div className="p-6 space-y-6 max-h-[70vh] overflow-y-auto custom-scrollbar">
           <Card className="p-4 bg-teal-500/5 border-teal-500/20 text-sm leading-relaxed text-slate-200">
             {notes.map((n, i) => <div key={i} className="mb-1">• {n}</div>)}
           </Card>
-
           <div className="space-y-2">
             <div className="text-xs font-bold text-slate-400 px-1">שאלה מוכנה</div>
-            <textarea 
-              value={question} 
-              onChange={(e) => setQuestion(e.target.value)} 
-              className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-4 outline-none resize-none text-white focus:border-teal-500 transition-all shadow-inner" 
-            />
+            <textarea value={question} onChange={(e) => setQuestion(e.target.value)} className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-4 outline-none resize-none text-white focus:border-teal-500 transition-all shadow-inner" />
           </div>
-
           <Card className="p-5 bg-black/60 border-white/5">
             <div className="text-xs font-bold text-cyan-400 mb-3 uppercase tracking-widest">תשובת המאמן</div>
             <div className="text-slate-100 leading-8 text-md font-medium">{reply}</div>
           </Card>
-
           <div className="grid grid-cols-2 gap-3 pt-2 pb-4">
             <Btn variant="premium" className="h-14" onClick={askCoach}><Bot size={18} /> שאל שוב</Btn>
             <Btn variant="outline" className="h-14" onClick={onAdd}><Plus size={18} /> הוסף לסשן</Btn>
@@ -649,32 +575,25 @@ function getNutritionProgressScore(entries: NutritionEntry[], waterMl: number, s
   const protein = entries.reduce((sum, item) => sum + item.protein, 0);
   const proteinTarget = profile.weight ? profile.weight * 2 : 130;
   let score = 0;
-
   if (entries.length >= 2) score += 25;
   else if (entries.length === 1) score += 12;
-
   if (waterMl >= 2000) score += 20;
   else if (waterMl >= 1200) score += 10;
-
   if (steps >= 8000) score += 15;
   else if (steps >= 5000) score += 8;
-
   if (protein >= proteinTarget * 0.9) score += 20;
   else if (protein >= proteinTarget * 0.65) score += 10;
-
   if (targetCalories > 0) {
     const delta = Math.abs(calories - targetCalories);
     if (delta <= 180) score += 20;
     else if (delta <= 350) score += 10;
   }
-
   return Math.min(100, score);
 }
 
 function getWelcomeMessage(score: number, profile: NutritionProfile, history: SessionData[], userName: string) {
   const namePart = userName ? ` ${userName}` : "";
   const goalLabel = profile.goal === "gain" ? "מסה" : profile.goal === "cut" ? "חיטוב" : "שמירה";
-
   if (score >= 85) return `ברוך הבא${namePart}, ההתקדמות שלך ב-${goalLabel} נראית מצוין.`;
   if (score >= 65) return `ברוך הבא${namePart}, אתה שומר על קצב יפה. עוד יום טוב ואתה מחזק את ההתקדמות.`;
   if (score >= 40) return `ברוך הבא${namePart}, יש בסיס טוב להיום. בוא נסגור ארוחות, מים ותנועה.`;
@@ -691,21 +610,7 @@ function getNextMealLabel(entries: NutritionEntry[]) {
   return "ארוחה קלה";
 }
 
-function QuickAddNutritionModal({
-  open,
-  onClose,
-  onAddEntry,
-  onAddWater,
-  onAddMeasurement,
-  onAddPhoto,
-}: {
-  open: boolean;
-  onClose: () => void;
-  onAddEntry: (entry: Omit<NutritionEntry, "id" | "createdAt">) => void;
-  onAddWater: (ml: number) => void;
-  onAddMeasurement: (measurement: Omit<BodyMeasurement, "id" | "createdAt">) => void;
-  onAddPhoto: (photo: Omit<BodyPhoto, "id" | "createdAt">) => void;
-}) {
+function QuickAddNutritionModal({ open, onClose, onAddEntry, onAddWater, onAddMeasurement, onAddPhoto }: { open: boolean; onClose: () => void; onAddEntry: (entry: Omit<NutritionEntry, "id" | "createdAt">) => void; onAddWater: (ml: number) => void; onAddMeasurement: (measurement: Omit<BodyMeasurement, "id" | "createdAt">) => void; onAddPhoto: (photo: Omit<BodyPhoto, "id" | "createdAt">) => void; }) {
   const [mode, setMode] = useState<"menu" | "text" | "image" | "drink" | "measurement" | "photo">("menu");
   const [title, setTitle] = useState("");
   const [mealLabel, setMealLabel] = useState("ארוחה");
@@ -722,52 +627,22 @@ function QuickAddNutritionModal({
   const [thigh, setThigh] = useState("");
   const [photoUrl, setPhotoUrl] = useState("");
   const [photoNote, setPhotoNote] = useState("");
-
   if (!open) return null;
-
   const resetAndClose = () => {
-    setMode("menu");
-    setTitle("");
-    setMealLabel("ארוחה");
-    setCalories("");
-    setProtein("");
-    setCarbs("");
-    setFat("");
-    setImageUrl("");
-    setWaterMl("500");
-    setWeight("");
-    setWaist("");
-    setChest("");
-    setArm("");
-    setThigh("");
-    setPhotoUrl("");
-    setPhotoNote("");
+    setMode("menu"); setTitle(""); setMealLabel("ארוחה"); setCalories(""); setProtein(""); setCarbs(""); setFat(""); setImageUrl(""); setWaterMl("500"); setWeight(""); setWaist(""); setChest(""); setArm(""); setThigh(""); setPhotoUrl(""); setPhotoNote("");
     onClose();
   };
-
   const addMeal = (type: NutritionEntryType) => {
     if (!title.trim()) return;
-    onAddEntry({
-      type,
-      title,
-      mealLabel,
-      calories: Number(calories || 0),
-      protein: Number(protein || 0),
-      carbs: Number(carbs || 0),
-      fat: Number(fat || 0),
-      imageUrl: imageUrl || undefined,
-      waterMl: type === "drink" ? Number(waterMl || 0) : undefined,
-    });
+    onAddEntry({ type, title, mealLabel, calories: Number(calories || 0), protein: Number(protein || 0), carbs: Number(carbs || 0), fat: Number(fat || 0), imageUrl: imageUrl || undefined, waterMl: type === "drink" ? Number(waterMl || 0) : undefined });
     resetAndClose();
   };
-
   const MenuButton = ({ icon, title, subtitle, onClick }: { icon: React.ReactNode; title: string; subtitle: string; onClick: () => void }) => (
     <button onClick={onClick} className="w-full text-right rounded-[1.6rem] bg-black/30 border border-white/10 p-4 hover:border-teal-400/50 transition-all">
       <div className="flex items-center gap-3 mb-2"><div className="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-teal-300">{icon}</div><div className="font-black text-white">{title}</div></div>
       <div className="text-sm text-slate-400">{subtitle}</div>
     </button>
   );
-
   return (
     <div className="fixed inset-0 z-[850] bg-black/80 backdrop-blur-md flex items-center justify-center p-4" dir="rtl">
       <motion.div initial={{ opacity: 0, scale: 0.94 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-xl rounded-[2rem] bg-slate-900 border border-white/10 shadow-2xl overflow-hidden">
@@ -780,7 +655,6 @@ function QuickAddNutritionModal({
             <MenuButton icon={<Ruler size={20} />} title="הוסף מדידה" subtitle="משקל, מותן, חזה, יד וירך" onClick={() => setMode("measurement")} />
             <MenuButton icon={<Camera size={20} />} title="הוסף תמונות גוף" subtitle="שמור תמונת מעקב עם הערה" onClick={() => setMode("photo")} />
           </div>}
-
           {(mode === "text" || mode === "image") && <div className="space-y-4">
             <FieldBlock label="שם הארוחה"><input value={title} onChange={(e) => setTitle(e.target.value)} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" placeholder="למשל: אורז, עוף וירקות" /></FieldBlock>
             <FieldBlock label="סוג ארוחה"><input value={mealLabel} onChange={(e) => setMealLabel(e.target.value)} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" placeholder="למשל: ארוחת צהריים" /></FieldBlock>
@@ -793,12 +667,10 @@ function QuickAddNutritionModal({
             {mode === "image" && <FieldBlock label="קישור לתמונה"><input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" placeholder="https://..." /></FieldBlock>}
             <div className="grid grid-cols-2 gap-3"><Btn variant="outline" onClick={() => setMode("menu")}>חזרה</Btn><Btn variant="premium" onClick={() => addMeal(mode === "image" ? "image" : "text")}>שמור</Btn></div>
           </div>}
-
           {mode === "drink" && <div className="space-y-4">
             <FieldBlock label="כמות במ״ל"><input value={waterMl} onChange={(e) => setWaterMl(e.target.value)} type="number" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" /></FieldBlock>
             <div className="grid grid-cols-2 gap-3"><Btn variant="outline" onClick={() => setMode("menu")}>חזרה</Btn><Btn variant="premium" onClick={() => { onAddWater(Number(waterMl || 0)); onAddEntry({ type: "drink", title: "שתייה", mealLabel: "מים", calories: 0, protein: 0, carbs: 0, fat: 0, waterMl: Number(waterMl || 0) }); resetAndClose(); }}>הוסף שתייה</Btn></div>
           </div>}
-
           {mode === "measurement" && <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <FieldBlock label="משקל"><input value={weight} onChange={(e) => setWeight(e.target.value)} type="number" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" /></FieldBlock>
@@ -809,7 +681,6 @@ function QuickAddNutritionModal({
             </div>
             <div className="grid grid-cols-2 gap-3"><Btn variant="outline" onClick={() => setMode("menu")}>חזרה</Btn><Btn variant="premium" onClick={() => { onAddMeasurement({ weight: weight ? Number(weight) : undefined, waist: waist ? Number(waist) : undefined, chest: chest ? Number(chest) : undefined, arm: arm ? Number(arm) : undefined, thigh: thigh ? Number(thigh) : undefined }); resetAndClose(); }}>שמור מדידה</Btn></div>
           </div>}
-
           {mode === "photo" && <div className="space-y-4">
             <FieldBlock label="קישור לתמונה"><input value={photoUrl} onChange={(e) => setPhotoUrl(e.target.value)} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" placeholder="https://..." /></FieldBlock>
             <FieldBlock label="הערה"><input value={photoNote} onChange={(e) => setPhotoNote(e.target.value)} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" placeholder="למשל: בוקר, אחרי שבוע טוב" /></FieldBlock>
@@ -822,44 +693,11 @@ function QuickAddNutritionModal({
 }
 
 function getNutritionTrainingPlan(profile: NutritionProfile, bmi: number) {
-  const bmiNote =
-    !bmi
-      ? "הכנס נתונים כדי לקבל הערכה."
-      : bmi < 18.5
-        ? "BMI נמוך יחסית, כדאי להתמקד בבנייה הדרגתית."
-        : bmi < 25
-          ? "BMI בטווח תקין, אפשר להתאים לפי מטרה."
-          : bmi < 30
-            ? "BMI מעט גבוה, עדיף לשלב כוח עם אירובי מסודר."
-            : "BMI גבוה יחסית, כדאי לעבוד בהדרגה ולשמור על עקביות.";
-
-  const weeklyStrength =
-    profile.goal === "gain"
-      ? "4-5 אימוני כוח בשבוע"
-      : profile.goal === "cut"
-        ? "3-4 אימוני כוח בשבוע"
-        : "3-5 אימוני כוח בשבוע";
-
-  const cardio =
-    profile.goal === "gain"
-      ? "1-2 יחידות אירובי קל של 15-20 דקות כדי לשמור כושר בלי לפגוע בהתאוששות."
-      : profile.goal === "cut"
-        ? "2-4 יחידות אירובי של 20-35 דקות, בקצב שאפשר להתמיד בו."
-        : "2-3 יחידות אירובי בינוני של 20-30 דקות לשמירה על כושר ובריאות.";
-
-  const focus =
-    profile.goal === "gain"
-      ? "דגש על עומס מתקדם, התאוששות טובה, וחלבון קבוע לאורך היום."
-      : profile.goal === "cut"
-        ? "דגש על שמירת מסת שריר, חלבון גבוה, וניהול עומס חכם."
-        : "דגש על איזון בין כוח, התאוששות, ושמירה על שגרה יציבה.";
-
-  return {
-    bmiNote,
-    weeklyStrength,
-    cardio,
-    focus,
-  };
+  const bmiNote = !bmi ? "הכנס נתונים כדי לקבל הערכה." : bmi < 18.5 ? "BMI נמוך יחסית, כדאי להתמקד בבנייה הדרגתית." : bmi < 25 ? "BMI בטווח תקין, אפשר להתאים לפי מטרה." : bmi < 30 ? "BMI מעט גבוה, עדיף לשלב כוח עם אירובי מסודר." : "BMI גבוה יחסית, כדאי לעבוד בהדרגה ולשמור על עקביות.";
+  const weeklyStrength = profile.goal === "gain" ? "4-5 אימוני כוח בשבוע" : profile.goal === "cut" ? "3-4 אימוני כוח בשבוע" : "3-5 אימוני כוח בשבוע";
+  const cardio = profile.goal === "gain" ? "1-2 יחידות אירובי קל של 15-20 דקות כדי לשמור כושר בלי לפגוע בהתאוששות." : profile.goal === "cut" ? "2-4 יחידות אירובי של 20-35 דקות, בקצב שאפשר להתמיד בו." : "2-3 יחידות אירובי בינוני של 20-30 דקות לשמירה על כושר ובריאות.";
+  const focus = profile.goal === "gain" ? "דגש על עומס מתקדם, התאוששות טובה, וחלבון קבוע לאורך היום." : profile.goal === "cut" ? "דגש על שמירת מסת שריר, חלבון גבוה, וניהול עומס חכם." : "דגש על איזון בין כוח, התאוששות, ושמירה על שגרה יציבה.";
+  return { bmiNote, weeklyStrength, cardio, focus };
 }
 
 function tabButtonVariant(current: MainTab, item: MainTab) {
@@ -870,15 +708,6 @@ function tabButtonVariant(current: MainTab, item: MainTab) {
   return current === item ? "cardio" : "outline";
 }
 
-function bottomTabClasses(item: MainTab, current: MainTab) {
-  const active = current === item;
-  if (!active) return "text-slate-500 hover:text-white bg-transparent";
-  if (item === "dashboard") return "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)] scale-110";
-  if (item === "vault") return "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)] scale-110";
-  if (item === "stats") return "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_34px_rgba(34,211,238,0.38)] scale-110";
-  if (item === "nutrition") return "bg-gradient-to-r from-teal-500 to-indigo-600 text-white shadow-[0_0_30px_rgba(20,184,166,0.38)] scale-110";
-  return "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.42)] scale-110";
-}
 function getNextWorkoutDay(selectedDay: DayKey) {
   const dayIndex = DAY_SPLITS.findIndex((d) => d.id === selectedDay);
   const nextIndex = dayIndex === DAY_SPLITS.length - 1 ? 0 : dayIndex + 1;
@@ -887,31 +716,20 @@ function getNextWorkoutDay(selectedDay: DayKey) {
 
 function getCompletedExercisesCount(sessionList: Exercise[], logs: SetRecord[]) {
   const sessionIds = new Set(sessionList.map((ex) => ex.id));
-  const completedIds = new Set(
-    logs.filter((log) => sessionIds.has(log.exerciseId)).map((log) => log.exerciseId)
-  );
+  const completedIds = new Set(logs.filter((log) => sessionIds.has(log.exerciseId)).map((log) => log.exerciseId));
   return completedIds.size;
 }
 
 function getRemainingMuscleGroups(sessionList: Exercise[], logs: SetRecord[]) {
   const completedIds = new Set(logs.map((log) => log.exerciseId));
-
   const summary = sessionList.reduce<Record<string, { total: number; done: number }>>((acc, ex) => {
-    if (!acc[ex.muscleGroup]) {
-      acc[ex.muscleGroup] = { total: 0, done: 0 };
-    }
+    if (!acc[ex.muscleGroup]) { acc[ex.muscleGroup] = { total: 0, done: 0 }; }
     acc[ex.muscleGroup].total += 1;
-    if (completedIds.has(ex.id)) {
-      acc[ex.muscleGroup].done += 1;
-    }
+    if (completedIds.has(ex.id)) { acc[ex.muscleGroup].done += 1; }
     return acc;
   }, {});
-
   return Object.entries(summary).map(([muscle, data]) => ({
-    muscle: muscle as MuscleGroup,
-    total: data.total,
-    done: data.done,
-    left: Math.max(0, data.total - data.done),
+    muscle: muscle as MuscleGroup, total: data.total, done: data.done, left: Math.max(0, data.total - data.done),
   }));
 }
 
@@ -922,89 +740,37 @@ function getWorkoutProgressText(sessionList: Exercise[], logs: SetRecord[]) {
   return `${done}/${total} תרגילים הושלמו`;
 }
 
-function ProgressDonut({
-  value,
-  total,
-  label,
-  sublabel,
-  size = 120,
-  stroke = 12,
-}: {
-  value: number;
-  total: number;
-  label: string;
-  sublabel?: string;
-  size?: number;
-  stroke?: number;
-}) {
+function ProgressDonut({ value, total, label, sublabel, size = 120, stroke = 12 }: { value: number; total: number; label: string; sublabel?: string; size?: number; stroke?: number; }) {
   const safeTotal = Math.max(total, 1);
   const pct = Math.max(0, Math.min(100, Math.round((value / safeTotal) * 100)));
   const inner = size - stroke * 2;
-
   return (
     <div className="flex flex-col items-center justify-center">
-      <div
-        className="relative rounded-full flex items-center justify-center"
-        style={{
-          width: size,
-          height: size,
-          background: `conic-gradient(rgb(45 212 191) ${pct * 3.6}deg, rgba(255,255,255,0.08) 0deg)`,
-        }}
-      >
-        <div
-          className="rounded-full bg-slate-950/95 flex flex-col items-center justify-center text-center"
-          style={{
-            width: inner,
-            height: inner,
-          }}
-        >
+      <div className="relative rounded-full flex items-center justify-center" style={{ width: size, height: size, background: `conic-gradient(rgb(45 212 191) ${pct * 3.6}deg, rgba(255,255,255,0.08) 0deg)` }}>
+        <div className="rounded-full bg-slate-950/95 flex flex-col items-center justify-center text-center" style={{ width: inner, height: inner }}>
           <div className="text-2xl font-black italic text-white">{pct}%</div>
           <div className="text-[11px] text-slate-400">{label}</div>
         </div>
       </div>
-
       {sublabel && <div className="mt-2 text-xs text-slate-400">{sublabel}</div>}
     </div>
   );
 }
 
-function ExerciseSpotlightCard({
-  exercise,
-  onAdd,
-  onAskAI,
-}: {
-  exercise: Exercise;
-  onAdd: () => void;
-  onAskAI: () => void;
-}) {
+function ExerciseSpotlightCard({ exercise, onAdd, onAskAI }: { exercise: Exercise; onAdd: () => void; onAskAI: () => void; }) {
   return (
     <Card className="overflow-hidden">
       <div className="relative h-52">
-        <SafeImage
-          src={getExerciseImage(exercise)}
-          alt={exercise.name}
-          className="w-full h-full object-cover opacity-60"
-          fallbackSrc={muscleGroupImages[exercise.muscleGroup]}
-        />
+        <SafeImage src={getExerciseImage(exercise)} alt={exercise.name} className="w-full h-full object-cover opacity-60" fallbackSrc={muscleGroupImages[exercise.muscleGroup]} />
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
-
         <div className="absolute bottom-0 left-0 right-0 p-5">
-          <div className="text-xs uppercase tracking-[0.25em] text-teal-300 mb-2">
-            spotlight
-          </div>
+          <div className="text-xs uppercase tracking-[0.25em] text-teal-300 mb-2">spotlight</div>
           <div className="text-2xl font-black italic text-white">{exercise.name}</div>
-          <div className="text-sm text-slate-300 mt-1">
-            {muscleHebrew[exercise.muscleGroup]} · {categoryHebrew[exercise.category]}
-          </div>
+          <div className="text-sm text-slate-300 mt-1">{muscleHebrew[exercise.muscleGroup]} · {categoryHebrew[exercise.category]}</div>
           <div className="text-sm text-slate-400 mt-2 line-clamp-2">{exercise.he}</div>
-
           <div className="flex gap-2 mt-4 flex-wrap">
-            <Btn variant="premium" className="h-10 px-4" onClick={onAdd}>
-              <Plus size={14} /> הוסף לאימון
-            </Btn>
-            <Btn variant="outline" className="h-10 px-4" onClick={onAskAI}>
-              <Sparkles size={14} /> askAI
-            </Btn>
+            <Btn variant="premium" className="h-10 px-4" onClick={onAdd}><Plus size={14} /> הוסף לאימון</Btn>
+            <Btn variant="outline" className="h-10 px-4" onClick={onAskAI}><Sparkles size={14} /> askAI</Btn>
           </div>
         </div>
       </div>
@@ -1012,108 +778,32 @@ function ExerciseSpotlightCard({
   );
 }
 
-function WorkoutListModal({
-  open,
-  sessionList,
-  onClose,
-  onRemove,
-}: {
-  open: boolean;
-  sessionList: Exercise[];
-  onClose: () => void;
-  onRemove: (index: number) => void;
-}) {
+function WorkoutListModal({ open, sessionList, onClose, onRemove }: { open: boolean; sessionList: Exercise[]; onClose: () => void; onRemove: (index: number) => void; }) {
   if (!open) return null;
-
   return (
     <div className="fixed inset-0 z-[880] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
-      <motion.div
-        initial={{ opacity: 0, scale: 0.92 }}
-        animate={{ opacity: 1, scale: 1 }}
-        className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[2rem] p-6 max-h-[80vh] overflow-y-auto"
-      >
+      <motion.div initial={{ opacity: 0, scale: 0.92 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[2rem] p-6 max-h-[80vh] overflow-y-auto">
         <div className="flex items-center justify-between mb-5">
           <div>
-            <div className="text-xs uppercase tracking-[0.25em] text-teal-400 mb-1">
-              workout list
-            </div>
+            <div className="text-xs uppercase tracking-[0.25em] text-teal-400 mb-1">workout list</div>
             <div className="text-2xl font-black italic text-white">האימון שלי</div>
           </div>
-
-          <button
-            onClick={onClose}
-            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-rose-500/20"
-          >
-            <X size={18} />
-          </button>
+          <button onClick={onClose} className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-rose-500/20"><X size={18} /></button>
         </div>
-
         <div className="space-y-3">
-          {sessionList.length ? (
-            sessionList.map((ex, index) => (
-              <div
-                key={`${ex.id}-${index}`}
-                className="bg-black/30 border border-white/5 rounded-2xl p-4 flex items-center justify-between gap-3"
-              >
-                <div>
-                  <div className="font-black italic text-white">{ex.name}</div>
-                  <div className="text-xs text-slate-400">
-                    {muscleHebrew[ex.muscleGroup]} · {ex.sets} סטים · {ex.reps}
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => onRemove(index)}
-                  className="p-2 rounded-xl hover:bg-rose-500/10"
-                >
-                  <Trash2 size={16} className="text-rose-400" />
-                </button>
+          {sessionList.length ? sessionList.map((ex, index) => (
+            <div key={`${ex.id}-${index}`} className="bg-black/30 border border-white/5 rounded-2xl p-4 flex items-center justify-between gap-3">
+              <div>
+                <div className="font-black italic text-white">{ex.name}</div>
+                <div className="text-xs text-slate-400">{muscleHebrew[ex.muscleGroup]} · {ex.sets} סטים · {ex.reps}</div>
               </div>
-            ))
-          ) : (
-            <div className="text-slate-400">עוד לא סימנת תרגילים לאימון.</div>
-          )}
+              <button onClick={() => onRemove(index)} className="p-2 rounded-xl hover:bg-rose-500/10"><Trash2 size={16} className="text-rose-400" /></button>
+            </div>
+          )) : <div className="text-slate-400">עוד לא סימנת תרגילים לאימון.</div>}
         </div>
       </motion.div>
     </div>
   );
-}
-
-function getNextWorkoutDay(selectedDay: DayKey) {
-  const index = DAY_SPLITS.findIndex((d) => d.id === selectedDay);
-  const nextIndex = index === DAY_SPLITS.length - 1 ? 0 : index + 1;
-  return DAY_SPLITS[nextIndex];
-}
-
-function getCompletedExercisesCount(sessionList: Exercise[], logs: SetRecord[]) {
-  const sessionIds = new Set(sessionList.map((ex) => ex.id));
-  const doneIds = new Set(logs.filter((log) => sessionIds.has(log.exerciseId)).map((log) => log.exerciseId));
-  return doneIds.size;
-}
-
-function getRemainingByMuscle(sessionList: Exercise[], logs: SetRecord[]) {
-  const doneIds = new Set(logs.map((log) => log.exerciseId));
-
-  const grouped = sessionList.reduce<Record<string, { total: number; done: number }>>((acc, ex) => {
-    if (!acc[ex.muscleGroup]) {
-      acc[ex.muscleGroup] = { total: 0, done: 0 };
-    }
-
-    acc[ex.muscleGroup].total += 1;
-
-    if (doneIds.has(ex.id)) {
-      acc[ex.muscleGroup].done += 1;
-    }
-
-    return acc;
-  }, {});
-
-  return Object.entries(grouped).map(([muscle, data]) => ({
-    muscle: muscle as MuscleGroup,
-    total: data.total,
-    done: data.done,
-    left: Math.max(0, data.total - data.done),
-  }));
 }
 
 function ReacherApp() {
@@ -1126,7 +816,7 @@ function ReacherApp() {
   const [toast, setToast] = useState("");
   const [flash, setFlash] = useState(false);
   const [showWorkoutList, setShowWorkoutList] = useState(false);
-const [spotlightExercise, setSpotlightExercise] = useState<Exercise | null>(null);
+  const [spotlightExercise, setSpotlightExercise] = useState<Exercise | null>(null);
   const [plannerMode, setPlannerMode] = useState<"default" | "custom">(() => (typeof window !== "undefined" && (window.localStorage.getItem("planner_mode_v2") as "default" | "custom")) || "default");
   const [customWeek, setCustomWeek] = useState<Record<DayKey, string[]>>(() => {
     if (typeof window === "undefined") return { sun: [], mon: [], tue: [], wed: [], thu: [], fri: [] };
@@ -1180,40 +870,24 @@ const [spotlightExercise, setSpotlightExercise] = useState<Exercise | null>(null
     if (typeof window === "undefined") return;
     if (!audioCtx.current) audioCtx.current = new AudioContext();
     if (audioCtx.current.state === "suspended") audioCtx.current.resume();
-
-    
-const profiles = {
-  nav: { type: "triangle" as OscillatorType, attack: 0.01, decay: 0.1, gain: 0.03, step: 0.05 },
-  add: { type: "sawtooth" as OscillatorType, attack: 0.02, decay: 0.15, gain: 0.02, step: 0.04 }, // צליל מתכתי
-  save: { type: "square" as OscillatorType, attack: 0.005, decay: 0.1, gain: 0.02, step: 0.03 }, // צליל של "קליק" מכני
-  rest: { type: "sine" as OscillatorType, attack: 0.1, decay: 0.5, gain: 0.04, step: 0.1 },
-  finish: { type: "sawtooth" as OscillatorType, attack: 0.01, decay: 0.4, gain: 0.03, step: 0.06 }, // סיום עוצמתי
-} as const;
-    
+    const profiles = {
+      nav: { type: "triangle" as OscillatorType, attack: 0.01, decay: 0.1, gain: 0.03, step: 0.05 },
+      add: { type: "sawtooth" as OscillatorType, attack: 0.02, decay: 0.15, gain: 0.02, step: 0.04 },
+      save: { type: "square" as OscillatorType, attack: 0.005, decay: 0.1, gain: 0.02, step: 0.03 },
+      rest: { type: "sine" as OscillatorType, attack: 0.1, decay: 0.5, gain: 0.04, step: 0.1 },
+      finish: { type: "sawtooth" as OscillatorType, attack: 0.01, decay: 0.4, gain: 0.03, step: 0.06 },
+    } as const;
     const profile = profiles[mode];
-
     freqs.forEach((freq, i) => {
       const osc = audioCtx.current!.createOscillator();
       const gain = audioCtx.current!.createGain();
       const filter = audioCtx.current!.createBiquadFilter();
-
-      osc.connect(filter);
-      filter.connect(gain);
-      gain.connect(audioCtx.current!.destination);
-
-      osc.type = profile.type;
-      filter.type = "lowpass";
-      filter.frequency.setValueAtTime(mode === "finish" ? 1800 : 1400, audioCtx.current!.currentTime);
-
+      osc.connect(filter); filter.connect(gain); gain.connect(audioCtx.current!.destination);
+      osc.type = profile.type; filter.type = "lowpass"; filter.frequency.setValueAtTime(mode === "finish" ? 1800 : 1400, audioCtx.current!.currentTime);
       const start = audioCtx.current!.currentTime + i * profile.step;
-      osc.frequency.setValueAtTime(freq, start);
-      osc.frequency.exponentialRampToValueAtTime(Math.max(80, freq * 0.94), start + profile.decay);
-      gain.gain.setValueAtTime(0.0001, start);
-      gain.gain.linearRampToValueAtTime(profile.gain, start + profile.attack);
-      gain.gain.exponentialRampToValueAtTime(0.0001, start + profile.decay);
-
-      osc.start(start);
-      osc.stop(start + profile.decay + 0.03);
+      osc.frequency.setValueAtTime(freq, start); osc.frequency.exponentialRampToValueAtTime(Math.max(80, freq * 0.94), start + profile.decay);
+      gain.gain.setValueAtTime(0.0001, start); gain.gain.linearRampToValueAtTime(profile.gain, start + profile.attack); gain.gain.exponentialRampToValueAtTime(0.0001, start + profile.decay);
+      osc.start(start); osc.stop(start + profile.decay + 0.03);
     });
   }, []);
 
@@ -1242,22 +916,14 @@ const profiles = {
   useEffect(() => { window.localStorage.setItem("body_measurements_v1", JSON.stringify(bodyMeasurements)); }, [bodyMeasurements]);
   useEffect(() => { window.localStorage.setItem("body_photos_v1", JSON.stringify(bodyPhotos)); }, [bodyPhotos]);
   useEffect(() => { if (userName.trim()) window.localStorage.setItem("reacher_user_name_v1", userName.trim()); }, [userName]);
-  useEffect(() => {
-    if (!toast) return;
-    const t = window.setTimeout(() => setToast(""), 2200);
-    return () => window.clearTimeout(t);
-  }, [toast]);
+  useEffect(() => { if (!toast) return; const t = window.setTimeout(() => setToast(""), 2200); return () => window.clearTimeout(t); }, [toast]);
+  useEffect(() => { if (!(isRunning && timer > 0)) return; const t = window.setInterval(() => setTimer((v) => v - 1), 1000); return () => window.clearInterval(t); }, [isRunning, timer]);
 
-  useEffect(() => {
-    if (!(isRunning && timer > 0)) return;
-    const t = window.setInterval(() => setTimer((v) => v - 1), 1000);
-    return () => window.clearInterval(t);
-  }, [isRunning, timer]);
+  const nextWorkout = useMemo(() => getNextWorkoutDay(selectedDay), [selectedDay]);
+  const completedExercises = useMemo(() => getCompletedExercisesCount(sessionList, logs), [sessionList, logs]);
+  const remainingByMuscle = useMemo(() => getRemainingMuscleGroups(sessionList, logs), [sessionList, logs]);
+  const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, logs), [sessionList, logs]);
 
-const completedExercises = useMemo(() => getCompletedExercisesCount(sessionList, logs), [sessionList, logs]);
-const remainingByMuscle = useMemo(() => getRemainingMuscleGroups(sessionList, logs), [sessionList, logs]);
-const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, logs), [sessionList, logs]);
-  
   const filteredVault = useMemo(() => {
     return EXERCISES.filter((ex) => {
       const sectorOK = selectedSector === "All" || ex.sector === selectedSector;
@@ -1275,19 +941,11 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
   }, [plannerMode, selectedDay, customWeek]);
 
   const currentExercise = sessionList[currentIndex];
-  const nextWorkout = useMemo(() => getNextWorkoutDay(selectedDay), [selectedDay]);
-const completedExercises = useMemo(
-  () => getCompletedExercisesCount(sessionList, logs),
-  [sessionList, logs]
-);
-const remainingByMuscle = useMemo(
-  () => getRemainingByMuscle(sessionList, logs),
-  [sessionList, logs]
-);
   const sessionVolume = useMemo(() => {
     const ids = new Set(sessionList.map((item) => item.id));
     return logs.filter((log) => ids.has(log.exerciseId)).reduce((sum, item) => sum + item.weight * item.reps, 0);
   }, [logs, sessionList]);
+
   const recoveryScore = useMemo(() => getRecoveryScore(history), [history]);
   const weeklyStreak = Math.min(6, Math.max(0, history.length));
   const estimatedSessionMinutes = sessionList.reduce((sum, ex) => sum + ex.sets * (ex.work + ex.rest), 0) / 60;
@@ -1310,107 +968,28 @@ const remainingByMuscle = useMemo(
   const latestMeasurement = bodyMeasurements[0];
   const latestPhotos = bodyPhotos.slice(0, 3);
 
-  const addExerciseToSession = (exercise: Exercise) => {
-    setSessionList((prev) => [...prev, exercise]);
-    setToast(`${exercise.name} נוסף לסשן`);
-    playAddSound();
-  };
-
-  const addExerciseToCustomDay = (day: DayKey, exerciseId: string) => {
-    setCustomWeek((prev) => {
-      if (prev[day].includes(exerciseId)) return prev;
-      return { ...prev, [day]: [...prev[day], exerciseId] };
-    });
-    setToast("התרגיל נוסף ליום שבחרת");
-  };
-
-  const removeExerciseFromCustomDay = (day: DayKey, exerciseId: string) => {
-    setCustomWeek((prev) => ({ ...prev, [day]: prev[day].filter((id) => id !== exerciseId) }));
-  };
-
-  const startSession = () => {
-    if (!sessionList.length) {
-      setToast("צריך לפחות תרגיל אחד בסשן");
-      return;
-    }
-    setInSession(true);
-    setCurrentIndex(0);
-    setCurrentSet(1);
-    setPhase("work");
-    setTimer(sessionList[0].work);
-    setIsRunning(true);
-    playNavigateSound();
-  };
+  const addExerciseToSession = (exercise: Exercise) => { setSessionList((prev) => [...prev, exercise]); setToast(`${exercise.name} נוסף לסשן`); playAddSound(); };
+  const addExerciseToCustomDay = (day: DayKey, exerciseId: string) => { setCustomWeek((prev) => { if (prev[day].includes(exerciseId)) return prev; return { ...prev, [day]: [...prev[day], exerciseId] }; }); setToast("התרגיל נוסף ליום שבחרת"); };
+  const removeExerciseFromCustomDay = (day: DayKey, exerciseId: string) => { setCustomWeek((prev) => ({ ...prev, [day]: prev[day].filter((id) => id !== exerciseId) })); };
+  const startSession = () => { if (!sessionList.length) { setToast("צריך לפחות תרגיל אחד בסשן"); return; } setInSession(true); setCurrentIndex(0); setCurrentSet(1); setPhase("work"); setTimer(sessionList[0].work); setIsRunning(true); playNavigateSound(); };
 
   const handlePhaseTransition = () => {
-    const ex = sessionList[currentIndex];
-    if (!ex) return;
-    if (phase === "work") {
-      setPhase("rest");
-      setTimer(ex.rest);
-      setTip(getExerciseAiNotes(ex, logs)[0] || AI_TIPS[0]);
-      playRestSound();
-      return;
-    }
-    if (currentSet < ex.sets) {
-      setCurrentSet((s) => s + 1);
-      setPhase("work");
-      setTimer(ex.work);
-      playSaveSound();
-      return;
-    }
-    if (currentIndex + 1 < sessionList.length) {
-      setCurrentIndex((i) => i + 1);
-      setCurrentSet(1);
-      setPhase("work");
-      setTimer(sessionList[currentIndex + 1].work);
-      playSaveSound();
-      return;
-    }
+    const ex = sessionList[currentIndex]; if (!ex) return;
+    if (phase === "work") { setPhase("rest"); setTimer(ex.rest); setTip(getExerciseAiNotes(ex, logs)[0] || AI_TIPS[0]); playRestSound(); return; }
+    if (currentSet < ex.sets) { setCurrentSet((s) => s + 1); setPhase("work"); setTimer(ex.work); playSaveSound(); return; }
+    if (currentIndex + 1 < sessionList.length) { setCurrentIndex((i) => i + 1); setCurrentSet(1); setPhase("work"); setTimer(sessionList[currentIndex + 1].work); playSaveSound(); return; }
     const totalVolume = logs.reduce((sum, item) => sum + item.weight * item.reps, 0);
     setHistory((prev) => [{ id: Math.random().toString(36).slice(2, 9), date: new Date().toLocaleDateString("he-IL"), volume: totalVolume, exercises: sessionList.length }, ...prev]);
-    setInSession(false);
-    setIsRunning(false);
-    setSessionList([]);
-    setToast("האימון הושלם");
-    playFinishSound();
+    setInSession(false); setIsRunning(false); setSessionList([]); setToast("האימון הושלם"); playFinishSound();
   };
 
-  useEffect(() => {
-    if (isRunning && timer === 0 && inSession) handlePhaseTransition();
-  }, [timer, isRunning, inSession]);
+  useEffect(() => { if (isRunning && timer === 0 && inSession) handlePhaseTransition(); }, [timer, isRunning, inSession]);
 
-  const logCurrentSet = () => {
-    if (!currentExercise || !weight || !reps) {
-      setToast("מלא משקל וחזרות");
-      return;
-    }
-    setLogs((prev) => [...prev, { weight: parseInt(weight, 10), reps: parseInt(reps, 10), exerciseId: currentExercise.id, timestamp: Date.now() }]);
-    setWeight("");
-    setReps("");
-    setToast("הסט נשמר");
-    playSaveSound();
-  };
-
-  const addNutritionEntry = (entry: Omit<NutritionEntry, "id" | "createdAt">) => {
-    setNutritionEntries((prev) => [{ ...entry, id: Math.random().toString(36).slice(2, 9), createdAt: Date.now() }, ...prev]);
-    setToast("נוספה רשומת תזונה חדשה");
-  };
-
-  const addWater = (ml: number) => {
-    setWaterMl((prev) => prev + ml);
-    setToast(`נוספו ${ml} מ״ל מים`);
-  };
-
-  const addMeasurement = (measurement: Omit<BodyMeasurement, "id" | "createdAt">) => {
-    setBodyMeasurements((prev) => [{ ...measurement, id: Math.random().toString(36).slice(2, 9), createdAt: Date.now() }, ...prev]);
-    setToast("נוספה מדידה חדשה");
-  };
-
-  const addPhoto = (photo: Omit<BodyPhoto, "id" | "createdAt">) => {
-    setBodyPhotos((prev) => [{ ...photo, id: Math.random().toString(36).slice(2, 9), createdAt: Date.now() }, ...prev]);
-    setToast("נוספה תמונת גוף חדשה");
-  };
+  const logCurrentSet = () => { if (!currentExercise || !weight || !reps) { setToast("מלא משקל וחזרות"); return; } setLogs((prev) => [...prev, { weight: parseInt(weight, 10), reps: parseInt(reps, 10), exerciseId: currentExercise.id, timestamp: Date.now() }]); setWeight(""); setReps(""); setToast("הסט נשמר"); playSaveSound(); };
+  const addNutritionEntry = (entry: Omit<NutritionEntry, "id" | "createdAt">) => { setNutritionEntries((prev) => [{ ...entry, id: Math.random().toString(36).slice(2, 9), createdAt: Date.now() }, ...prev]); setToast("נוספה רשומת תזונה חדשה"); };
+  const addWater = (ml: number) => { setWaterMl((prev) => prev + ml); setToast(`נוספו ${ml} מ״ל מים`); };
+  const addMeasurement = (measurement: Omit<BodyMeasurement, "id" | "createdAt">) => { setBodyMeasurements((prev) => [{ ...measurement, id: Math.random().toString(36).slice(2, 9), createdAt: Date.now() }, ...prev]); setToast("נוספה מדידה חדשה"); };
+  const addPhoto = (photo: Omit<BodyPhoto, "id" | "createdAt">) => { setBodyPhotos((prev) => [{ ...photo, id: Math.random().toString(36).slice(2, 9), createdAt: Date.now() }, ...prev]); setToast("נוספה תמונת גוף חדשה"); };
 
   const renderDashboard = () => (
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-8">
@@ -1425,92 +1004,34 @@ const remainingByMuscle = useMemo(
         </div>
       </Card>
       <div className="grid lg:grid-cols-3 gap-6">
-  <Card className="p-6">
-    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">next workout</div>
-    <div className="text-2xl font-black italic text-teal-400">{nextWorkout.title}</div>
-    <div className="text-slate-400 mt-2">{nextWorkout.subtitle}</div>
-    <div className="text-sm text-slate-500 mt-4">{nextWorkout.nutrition}</div>
-  </Card>
-
-  <Card className="p-6 flex flex-col items-center">
-    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">session progress</div>
-    <ProgressDonut
-      value={completedExercises}
-      total={Math.max(sessionList.length, 1)}
-      label="אימון"
-      sublabel={`${completedExercises}/${sessionList.length || 0} תרגילים`}
-    />
-  </Card>
-
-  <Card className="p-6">
-    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">muscle progress</div>
-    <div className="grid grid-cols-2 gap-4">
-      {remainingByMuscle.length ? (
-        remainingByMuscle.map((item) => (
-          <div key={item.muscle} className="flex flex-col items-center">
-            <ProgressDonut
-              value={item.done}
-              total={Math.max(item.total, 1)}
-              label={muscleHebrew[item.muscle]}
-              size={86}
-              stroke={10}
-            />
-            <div className="text-[11px] text-slate-400 mt-2">
-              נשאר: {item.left}
-            </div>
+        <Card className="p-6">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">next workout</div>
+          <div className="text-2xl font-black italic text-teal-400">{nextWorkout.title}</div>
+          <div className="text-slate-400 mt-2">{nextWorkout.subtitle}</div>
+          <div className="text-sm text-slate-500 mt-4">{nextWorkout.nutrition}</div>
+        </Card>
+        <Card className="p-6 flex flex-col items-center">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">session progress</div>
+          <ProgressDonut value={completedExercises} total={Math.max(sessionList.length, 1)} label="אימון" sublabel={`${completedExercises}/${sessionList.length || 0} תרגילים`} />
+        </Card>
+        <Card className="p-6">
+          <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">muscle progress</div>
+          <div className="grid grid-cols-2 gap-4">
+            {remainingByMuscle.length ? remainingByMuscle.map((item) => (
+              <div key={item.muscle} className="flex flex-col items-center">
+                <ProgressDonut value={item.done} total={Math.max(item.total, 1)} label={muscleHebrew[item.muscle]} size={86} stroke={10} />
+                <div className="text-[11px] text-slate-400 mt-2">נשאר: {item.left}</div>
+              </div>
+            )) : <div className="text-sm text-slate-400 col-span-2">אין עדיין שרירים באימון שבנית</div>}
           </div>
-        ))
-      ) : (
-        <div className="text-sm text-slate-400 col-span-2">אין עדיין שרירים באימון שבנית</div>
-      )}
-    </div>
-  </Card>
-</div>
-      <div className="grid md:grid-cols-3 gap-4">
-  <Card className="p-5">
-    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">
-      next workout
-    </div>
-    <div className="text-2xl font-black italic text-teal-400">{nextWorkout.title}</div>
-    <div className="text-sm text-slate-400 mt-2">{nextWorkout.subtitle}</div>
-  </Card>
-
-  <Card className="p-5">
-    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">
-      workout progress
-    </div>
-    <div className="text-2xl font-black italic text-amber-400">{workoutProgressText}</div>
-    <div className="text-sm text-slate-400 mt-2">
-      {sessionList.length ? `נשארו ${Math.max(0, sessionList.length - completedExercises)} תרגילים` : "הוסף תרגילים כדי להתחיל"}
-    </div>
-  </Card>
-
-  <Card className="p-5">
-    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">
-      muscle remaining
-    </div>
-    <div className="space-y-2">
-      {remainingByMuscle.length ? (
-        remainingByMuscle.map((item) => (
-          <div key={item.muscle} className="flex items-center justify-between text-sm">
-            <span className="text-slate-300">{muscleHebrew[item.muscle]}</span>
-            <span className="text-teal-300 font-bold">{item.done}/{item.total}</span>
-          </div>
-        ))
-      ) : (
-        <div className="text-sm text-slate-400">אין עדיין חלוקת שרירים באימון</div>
-      )}
-    </div>
-  </Card>
-</div>
+        </Card>
+      </div>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Exercises</div><div className="text-3xl md:text-4xl font-black italic">{sessionList.length}</div></Card>
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Volume</div><div className="text-3xl md:text-4xl font-black italic text-teal-400">{sessionVolume}</div></Card>
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Calories</div><div className="text-3xl md:text-4xl font-black italic text-amber-400">{estimateCalories(sessionVolume)}</div></Card>
         <Card className="p-5 md:p-8"><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Recovery</div><div className="text-3xl md:text-4xl font-black italic text-indigo-400">{recoveryScore}</div></Card>
-        <Card className="p-5 md:p-8 col-span-2 md:col-span-4"><div className="flex flex-wrap items-center justify-between gap-3"><div><div className="text-[9px] uppercase tracking-[0.18em] text-slate-500 mb-2">Extra features</div><div className="text-lg font-black italic">סטREAK {weeklyStreak} · זמן סשן משוער {estimatedSessionMinutes ? estimatedSessionMinutes.toFixed(0) : 0} דק׳</div></div><div className="text-sm text-slate-400">יש עכשיו גם AI פנימי לתרגיל, סקשן אירובי נפרד, ומפת שרירים אנטומית.</div></div></Card>
       </div>
-
       <div className="grid xl:grid-cols-[1.05fr_0.95fr] gap-6">
         <Card className="p-6 space-y-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -1524,7 +1045,6 @@ const remainingByMuscle = useMemo(
               <Btn variant={plannerMode === "custom" ? "premium" : "outline"} onClick={() => setPlannerMode("custom")}>תכנון אישי</Btn>
             </div>
           </div>
-
           <div className="flex overflow-x-auto gap-3 pb-2">
             {DAY_SPLITS.map((day) => (
               <button key={day.id} onClick={() => setSelectedDay(day.id as DayKey)} className={`min-w-[180px] rounded-[1.4rem] p-4 border transition-all text-right ${selectedDay === day.id ? "border-teal-400 bg-teal-500/10" : "border-white/5 bg-black/20"}`}>
@@ -1534,7 +1054,6 @@ const remainingByMuscle = useMemo(
               </button>
             ))}
           </div>
-
           <div className="grid md:grid-cols-2 gap-4">
             {currentPlanExercises.map((ex) => (
               <Card key={ex.id} className="p-4">
@@ -1553,31 +1072,17 @@ const remainingByMuscle = useMemo(
                 </div>
               </Card>
             ))}
-            {!currentPlanExercises.length && <Card className="p-6 text-slate-400">אין תרגילים ביום הזה עדיין. עבור למאגר והוסף לתכנון האישי.</Card>}
           </div>
-
-          <Card className="p-5 bg-white/5 border-white/10">
-            <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">fuel tip</div>
-            <div className="text-slate-200">{DAY_SPLITS.find((d) => d.id === selectedDay)?.nutrition}</div>
-          </Card>
         </Card>
-
         <div className="space-y-6">
           <BodyMap activeMuscle={selectedMuscle} onSelect={(muscle) => { setSelectedMuscle(muscle); setSelectedSector("All"); navigateTab("vault"); }} />
-
           <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-2xl font-black italic">סשן לייב</h3>
-              <Dumbbell className="text-teal-400" />
-            </div>
+            <div className="flex items-center justify-between mb-4"><h3 className="text-2xl font-black italic">סשן לייב</h3><Dumbbell className="text-teal-400" /></div>
             {!inSession ? (
               <div className="space-y-4">
                 {sessionList.length ? sessionList.map((ex, i) => (
                   <div key={`${ex.id}-${i}`} className="bg-black/30 border border-white/5 rounded-2xl p-4 flex items-center justify-between gap-3">
-                    <div>
-                      <div className="font-black italic">{ex.name}</div>
-                      <div className="text-xs text-slate-400">{getOverloadSuggestion(ex, logs)}</div>
-                    </div>
+                    <div><div className="font-black italic">{ex.name}</div><div className="text-xs text-slate-400">{getOverloadSuggestion(ex, logs)}</div></div>
                     <button onClick={() => setSessionList((prev) => prev.filter((_, idx) => idx !== i))} className="p-2 rounded-xl hover:bg-rose-500/10"><Trash2 size={18} className="text-rose-400" /></button>
                   </div>
                 )) : <div className="text-slate-400">הוסף תרגילים מהדשבורד או מהמאגר כדי להתחיל סשן.</div>}
@@ -1612,80 +1117,13 @@ const remainingByMuscle = useMemo(
   const renderVault = () => (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <Card className="p-5">
-  <div className="flex items-center justify-between mb-4">
-    <div>
-      <div className="text-[10px] uppercase tracking-[0.25em] text-teal-400 mb-1">
-        quick anatomy filter
-      </div>
-      <div className="text-2xl font-black italic text-white">בחר שריר מהר</div>
-    </div>
-    <Btn
-      variant="outline"
-      className="h-10"
-      onClick={() => {
-        setSelectedMuscle("All");
-        setSelectedSector("All");
-      }}
-    >
-      איפוס
-    </Btn>
-  </div>
-
-  <BodyMap
-    activeMuscle={selectedMuscle}
-    onSelect={(muscle) => {
-      setSelectedMuscle(muscle);
-      setSelectedSector("All");
-    }}
-  />
-</Card>
-     <Card className="p-5">
-  <div className="flex items-center justify-between mb-4">
-    <div>
-      <div className="text-[10px] uppercase tracking-[0.25em] text-teal-400 mb-1">
-        quick selection
-      </div>
-      <div className="text-2xl font-black italic text-white">בחירה מהירה לפי גוף</div>
-    </div>
-
-    <div className="flex gap-2">
-      <Btn variant="outline" className="h-10" onClick={() => setShowWorkoutList(true)}>
-        צפה באימון
-      </Btn>
-      <Btn
-        variant="outline"
-        className="h-10"
-        onClick={() => {
-          setSelectedMuscle("All");
-          setSelectedSector("All");
-        }}
-      >
-        איפוס
-      </Btn>
-    </div>
-  </div>
-
-  <BodyMap
-    activeMuscle={selectedMuscle}
-    onSelect={(muscle) => {
-      setSelectedMuscle(muscle);
-      setSelectedSector("All");
-
-      const firstMatch = EXERCISES.find((ex) => ex.muscleGroup === muscle);
-      if (firstMatch) {
-        setSpotlightExercise(firstMatch);
-      }
-    }}
-  />
-</Card>
-
-{spotlightExercise && (
-  <ExerciseSpotlightCard
-    exercise={spotlightExercise}
-    onAdd={() => addExerciseToSession(spotlightExercise)}
-    onAskAI={() => setAskAIExercise(spotlightExercise)}
-  />
-)}
+        <div className="flex items-center justify-between mb-4">
+          <div><div className="text-[10px] uppercase tracking-[0.25em] text-teal-400 mb-1">quick anatomy filter</div><div className="text-2xl font-black italic text-white">בחר שריר מהר</div></div>
+          <Btn variant="outline" className="h-10" onClick={() => { setSelectedMuscle("All"); setSelectedSector("All"); }}>איפוס</Btn>
+        </div>
+        <BodyMap activeMuscle={selectedMuscle} onSelect={(muscle) => { setSelectedMuscle(muscle); setSelectedSector("All"); const firstMatch = EXERCISES.find((ex) => ex.muscleGroup === muscle); if (firstMatch) setSpotlightExercise(firstMatch); }} />
+      </Card>
+      {spotlightExercise && <ExerciseSpotlightCard exercise={spotlightExercise} onAdd={() => addExerciseToSession(spotlightExercise)} onAskAI={() => setAskAIExercise(spotlightExercise)} />}
       <div className="grid md:grid-cols-[1fr_auto] gap-4">
         <div className="relative">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
@@ -1693,52 +1131,24 @@ const remainingByMuscle = useMemo(
         </div>
         <Btn variant="outline" onClick={() => { setSearchText(""); setSelectedSector("All"); setSelectedMuscle("All"); }}><RefreshCcw size={16} /> איפוס</Btn>
       </div>
-
       <div className="flex flex-wrap gap-2">
         {(["All", "Gym", "Home", "TRX"] as const).map((s) => (
-          <button key={s} onClick={() => setSelectedSector(s as any)} className={`px-5 py-3 rounded-2xl font-black text-sm ${selectedSector === s ? "bg-teal-500 text-slate-950" : "bg-slate-900 text-slate-300 border border-white/5"}`}>
-            {s === "All" ? "הכל" : s === "Gym" ? "חדר כושר" : s === "Home" ? "אימונים ביתיים" : "TRX"}
-          </button>
+          <button key={s} onClick={() => setSelectedSector(s as any)} className={`px-5 py-3 rounded-2xl font-black text-sm ${selectedSector === s ? "bg-teal-500 text-slate-950" : "bg-slate-900 text-slate-300 border border-white/5"}`}>{s === "All" ? "הכל" : s === "Gym" ? "חדר כושר" : s === "Home" ? "בית" : "TRX"}</button>
         ))}
       </div>
-
-      <div className="flex flex-wrap gap-2">
-        {(["All", ...Object.keys(muscleHebrew)] as const).map((m) => (
-          <button key={m} onClick={() => setSelectedMuscle(m as any)} className={`px-4 py-2 rounded-xl text-sm ${selectedMuscle === m ? "bg-emerald-500 text-slate-950" : "bg-black/20 border border-white/5 text-slate-300"}`}>
-            {m === "All" ? "כל השרירים" : muscleHebrew[m as MuscleGroup]}
-          </button>
-        ))}
-      </div>
-
-      <Card className="p-5">
-        <div className="grid sm:grid-cols-3 gap-4 text-center">
-          <div><div className="text-slate-400 text-sm">אימונים ביתיים</div><div className="text-3xl font-black italic text-teal-400">{EXERCISES.filter((e) => e.sector === "Home").length}</div></div>
-          <div><div className="text-slate-400 text-sm">אימוני TRX</div><div className="text-3xl font-black italic text-indigo-400">{EXERCISES.filter((e) => e.sector === "TRX").length}</div></div>
-          <div><div className="text-slate-400 text-sm">סה״כ תרגילים</div><div className="text-3xl font-black italic text-amber-400">{EXERCISES.length}</div></div>
-        </div>
-      </Card>
-
       <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
         {filteredVault.map((ex) => (
           <Card key={ex.id} className="overflow-hidden">
             <div className="h-44 relative">
               <SafeImage src={getExerciseImage(ex)} alt={ex.name} className="w-full h-full object-cover opacity-50" fallbackSrc={muscleGroupImages[ex.muscleGroup]} />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent" />
               <div className="absolute top-4 right-4 text-xs tracking-[0.25em] uppercase text-teal-300">{ex.sector}</div>
             </div>
             <div className="p-5 space-y-4">
-              <div>
-                <div className="flex items-center gap-2"><div className="w-8 h-8 rounded-xl bg-white/10 flex items-center justify-center text-xs font-black text-teal-300">{filteredVault.findIndex((item) => item.id === ex.id) + 1}</div><div className="font-black italic text-2xl">{ex.name}</div></div>
-                <div className="text-sm text-slate-400 mt-1">{muscleHebrew[ex.muscleGroup]} · {categoryHebrew[ex.category]}</div>
-              </div>
+              <div><div className="font-black italic text-2xl">{ex.name}</div><div className="text-sm text-slate-400 mt-1">{muscleHebrew[ex.muscleGroup]} · {categoryHebrew[ex.category]}</div></div>
               <div className="text-slate-300 text-sm leading-relaxed">{ex.he}</div>
-              <div className="text-xs text-teal-300">{ex.sets} סטים · {ex.reps}</div>
-              <Card className="p-4 bg-white/5 border-white/5"><div className="text-sm text-slate-200">{getExerciseAiNotes(ex, logs)[0]}</div></Card>
               <div className="grid grid-cols-2 gap-2">
-                <Btn variant="premium" onClick={() => addExerciseToSession(ex)}><Plus size={15} /> אוסף תרגיל לאימון</Btn>
+                <Btn variant="premium" onClick={() => addExerciseToSession(ex)}><Plus size={15} /> הוסף</Btn>
                 <Btn variant="outline" onClick={() => setAskAIExercise(ex)}><Sparkles size={15} /> askAI</Btn>
-                <Btn variant="youtube" onClick={() => window.open(ex.videoUrl, "_blank", "noopener,noreferrer")}><Youtube size={15} /> הדרכה</Btn>
-                <Btn variant="outline" onClick={() => addExerciseToCustomDay(selectedDay, ex.id)}><CalendarDays size={15} /> הוסף לתכנון שבועי</Btn>
               </div>
             </div>
           </Card>
@@ -1751,7 +1161,6 @@ const remainingByMuscle = useMemo(
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-6">
         <Card className="p-8"><div className="text-[10px] tracking-[0.25em] uppercase text-slate-500 mb-2">AI readiness</div><div className="text-4xl font-black italic text-teal-400">{Math.max(72, Math.min(97, recoveryScore + (sessionList.length ? 3 : 0)))}</div></Card>
-        <Card className="p-8"><div className="text-[10px] tracking-[0.25em] uppercase text-slate-500 mb-2">Momentum</div><div className="text-4xl font-black italic text-amber-400">{history.length >= 3 ? "Rising" : "Building"}</div></Card>
         <Card className="p-8"><div className="text-[10px] tracking-[0.25em] uppercase text-slate-500 mb-2">Recovery</div><div className="text-4xl font-black italic text-indigo-400">{recoveryScore}</div></Card>
         <Card className="p-8"><div className="text-[10px] tracking-[0.25em] uppercase text-slate-500 mb-2">Sessions</div><div className="text-4xl font-black italic text-rose-400">{history.length}</div></Card>
       </div>
@@ -1766,19 +1175,6 @@ const remainingByMuscle = useMemo(
           )) : <div className="text-slate-400">עדיין אין היסטוריית אימונים.</div>}
         </div>
       </Card>
-    
-      <Card className="p-8">
-        <div className="flex justify-between items-center mb-4"><h3 className="text-2xl font-black italic">שיאים אחרונים</h3><Target className="text-amber-400" /></div>
-        <div className="space-y-3">
-          {EXERCISES.slice(0, 4).map((ex) => {
-            const best = getExerciseLogs(ex.id, logs).sort((a, b) => (b.weight * b.reps) - (a.weight * a.reps))[0];
-            if (!best) return null;
-            return <div key={ex.id} className="bg-black/30 rounded-2xl p-4 border border-white/5 flex justify-between gap-3"><div><div className="font-black italic">{ex.name}</div><div className="text-xs text-slate-400">{muscleHebrew[ex.muscleGroup]}</div></div><div className="text-right"><div className="text-lg font-black italic text-teal-400">{best.weight}kg</div><div className="text-xs text-slate-400">{best.reps} חזרות</div></div></div>;
-          }).filter(Boolean)}
-          {!logs.length && <div className="text-slate-400">אחרי שתשמור סטים, יופיעו כאן שיאים אחרונים.</div>}
-        </div>
-      </Card>
-
     </motion.div>
   );
 
@@ -1786,327 +1182,89 @@ const remainingByMuscle = useMemo(
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
       <Card className="p-6 bg-gradient-to-r from-teal-500/10 to-cyan-500/10 border-teal-400/20">
         <div className="flex items-center gap-3 mb-4"><Flame className="text-teal-400" /><h2 className="text-3xl md:text-4xl font-black italic">מרכז תזונה חכם</h2></div>
-        <div className="text-slate-300 leading-7">{welcomeMessage}</div>
+        <div className="text-slate-300">{welcomeMessage}</div>
       </Card>
-
-      <Card className="p-6">
-        <div className="grid md:grid-cols-2 xl:grid-cols-5 gap-4">
-          <FieldBlock label="גיל">
-            <input type="number" value={nutritionProfile.age} onChange={(e) => setNutritionProfile({ ...nutritionProfile, age: +e.target.value })} placeholder="הכנס גיל" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
-          </FieldBlock>
-          <FieldBlock label="משקל">
-            <input type="number" value={nutritionProfile.weight} onChange={(e) => setNutritionProfile({ ...nutritionProfile, weight: +e.target.value })} placeholder="הכנס משקל" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
-          </FieldBlock>
-          <FieldBlock label="גובה">
-            <input type="number" value={nutritionProfile.height} onChange={(e) => setNutritionProfile({ ...nutritionProfile, height: +e.target.value })} placeholder="הכנס גובה" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none" />
-          </FieldBlock>
-          <FieldBlock label="מטרה">
-            <select value={nutritionProfile.goal} onChange={(e) => setNutritionProfile({ ...nutritionProfile, goal: e.target.value as any })} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none">
-              <option value="maintain">שמירה</option><option value="gain">מסה</option><option value="cut">חיטוב</option>
-            </select>
-          </FieldBlock>
-          <FieldBlock label="רמת פעילות">
-            <select value={nutritionProfile.activity} onChange={(e) => setNutritionProfile({ ...nutritionProfile, activity: e.target.value as any })} className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none">
-              <option value="light">קל</option><option value="moderate">בינוני</option><option value="high">גבוה</option>
-            </select>
-          </FieldBlock>
-        </div>
-      </Card>
-
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">BMI</div><div className="text-3xl font-black italic text-teal-400">{bmi || "-"}</div><div className="text-xs text-slate-400 mt-2">{trainingPlan.bmiNote}</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">קלוריות יעד</div><div className="text-3xl font-black italic text-amber-400">{recommendedCalories || "-"}</div><div className="text-xs text-slate-400 mt-2">יעד יומי משוער לפי גיל, משקל, גובה ומטרה.</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">חלבון יעד</div><div className="text-3xl font-black italic text-indigo-400">{proteinTarget}g</div><div className="text-xs text-slate-400 mt-2">כדאי לפזר על פני 3-5 ארוחות ביום.</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">ציון תזונה</div><div className="text-3xl font-black italic text-cyan-400">{nutritionScore}/100</div><div className="text-xs text-slate-400 mt-2">מבוסס ארוחות, מים, צעדים וחלבון.</div></Card>
-      </div>
-
       <div className="grid lg:grid-cols-4 gap-4">
-        <Card className="p-5 bg-cyan-500/10 border-cyan-400/20"><div className="flex items-center gap-2 mb-3"><Droplets className="text-cyan-300" /><div className="font-black">מים</div></div><div className="text-3xl font-black italic text-cyan-300">{waterMl} ml</div><div className="text-sm text-slate-400 mt-2">יעד: {waterTargetMl} ml, הושלם {waterPct}%</div><Btn variant="outline" className="w-full mt-4" onClick={() => addWater(250)}>+ 250 מ״ל</Btn></Card>
-        <Card className="p-5 bg-emerald-500/10 border-emerald-400/20"><div className="flex items-center gap-2 mb-3"><Footprints className="text-emerald-300" /><div className="font-black">צעדים</div></div><div className="text-3xl font-black italic text-emerald-300">{dailySteps}</div><div className="text-sm text-slate-400 mt-2">מטרה: {cardioPlan.walkingSteps}</div><Btn variant="outline" className="w-full mt-4" onClick={() => setDailySteps((prev) => prev + 1000)}>+ 1000</Btn></Card>
-        <Card className="p-5 bg-orange-500/10 border-orange-400/20"><div className="flex items-center gap-2 mb-3"><UtensilsCrossed className="text-orange-300" /><div className="font-black">ארוחה הבאה</div></div><div className="text-2xl font-black italic text-orange-300">{nextMealLabel}</div><div className="text-sm text-slate-400 mt-2">לפי הרישום של היום</div></Card>
-        <Card className="p-5 bg-violet-500/10 border-violet-400/20"><div className="flex items-center gap-2 mb-3"><Target className="text-violet-300" /><div className="font-black">קלוריות היום</div></div><div className="text-3xl font-black italic text-violet-300">{totalNutritionCalories}</div><div className="text-sm text-slate-400 mt-2">{caloriesPct}% מהיעד</div></Card>
+        <Card className="p-5 bg-cyan-500/10 border-cyan-400/20"><div className="flex items-center gap-2 mb-3"><Droplets className="text-cyan-300" /><div className="font-black">מים</div></div><div className="text-3xl font-black italic text-cyan-300">{waterMl} ml</div><Btn variant="outline" className="w-full mt-4" onClick={() => addWater(250)}>+ 250 מ״ל</Btn></Card>
+        <Card className="p-5 bg-emerald-500/10 border-emerald-400/20"><div className="flex items-center gap-2 mb-3"><Footprints className="text-emerald-300" /><div className="font-black">צעדים</div></div><div className="text-3xl font-black italic text-emerald-300">{dailySteps}</div><Btn variant="outline" className="w-full mt-4" onClick={() => setDailySteps((prev) => prev + 1000)}>+ 1000</Btn></Card>
       </div>
-
-      <div className="grid lg:grid-cols-3 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4"><h3 className="text-2xl font-black italic">מאקרו</h3><Cpu className="text-teal-400" /></div>
-          <div className="space-y-3">
-            <div className="flex justify-between"><span>חלבון</span><span className="font-black text-indigo-300">{totalProtein}g</span></div>
-            <div className="flex justify-between"><span>פחמימות</span><span className="font-black text-amber-300">{totalCarbs}g</span></div>
-            <div className="flex justify-between"><span>שומן</span><span className="font-black text-rose-300">{totalFat}g</span></div>
-          </div>
-          <div className="mt-4 h-3 rounded-full bg-white/10 overflow-hidden"><div className="h-full bg-gradient-to-r from-teal-400 to-cyan-400" style={{ width: `${caloriesPct}%` }} /></div>
-        </Card>
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-4"><Dumbbell className="text-teal-400" /><h3 className="text-2xl font-black italic">כמה אימונים בשבוע</h3></div>
-          <div className="text-slate-100 text-xl font-black italic mb-3">{trainingPlan.weeklyStrength}</div>
-          <div className="text-slate-300 leading-relaxed">{trainingPlan.focus}</div>
-        </Card>
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-4"><HeartPulse className="text-rose-400" /><h3 className="text-2xl font-black italic">אירובי</h3></div>
-          <div className="text-slate-300 leading-relaxed">{trainingPlan.cardio}</div>
-        </Card>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center justify-between mb-4"><h3 className="text-2xl font-black italic">ארוחות היום</h3><CalendarDays className="text-teal-400" /></div>
-          <div className="space-y-3">{todayMeals.length ? todayMeals.map((entry) => <div key={entry.id} className="bg-black/30 border border-white/5 rounded-2xl p-4 flex gap-3">{entry.imageUrl ? <SafeImage src={entry.imageUrl} alt={entry.title} className="w-16 h-16 rounded-2xl object-cover" /> : <div className="w-16 h-16 rounded-2xl bg-white/10 flex items-center justify-center"><UtensilsCrossed className="text-teal-300" /></div>}<div className="flex-1"><div className="font-black italic">{entry.title}</div><div className="text-sm text-slate-400">{entry.mealLabel}</div><div className="text-xs text-slate-300 mt-1">{entry.calories} קלוריות · {entry.protein} חלבון · {entry.carbs} פחמימות · {entry.fat} שומן</div></div><button onClick={() => setNutritionEntries((prev) => prev.filter((item) => item.id !== entry.id))} className="text-rose-400"><Trash2 size={16} /></button></div>) : <div className="text-slate-400">עדיין אין ארוחות שמורות להיום.</div>}</div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-4"><Weight className="text-amber-400" /><h3 className="text-2xl font-black italic">בניית תפריט יומי</h3></div>
-          <div className="space-y-3">{APEX_MEALS[nutritionProfile.goal].map((meal) => <div key={meal} className="bg-black/30 border border-white/5 rounded-2xl px-4 py-3 text-slate-200">{meal}</div>)}</div>
-          <div className="mt-6 flex items-center gap-3"><Btn variant="premium" onClick={() => setQuickAddMenuOpen(true)}><Plus size={16} /> הוספה מהירה</Btn></div>
-        </Card>
-      </div>
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6"><div className="flex items-center justify-between mb-4"><h3 className="text-2xl font-black italic">מדידה אחרונה</h3><Ruler className="text-amber-400" /></div>{latestMeasurement ? <div className="grid grid-cols-2 gap-3 text-sm">{latestMeasurement.weight && <div className="bg-black/30 rounded-2xl p-4">משקל: <span className="font-black">{latestMeasurement.weight}</span></div>}{latestMeasurement.waist && <div className="bg-black/30 rounded-2xl p-4">מותן: <span className="font-black">{latestMeasurement.waist}</span></div>}{latestMeasurement.chest && <div className="bg-black/30 rounded-2xl p-4">חזה: <span className="font-black">{latestMeasurement.chest}</span></div>}{latestMeasurement.arm && <div className="bg-black/30 rounded-2xl p-4">יד: <span className="font-black">{latestMeasurement.arm}</span></div>}{latestMeasurement.thigh && <div className="bg-black/30 rounded-2xl p-4">ירך: <span className="font-black">{latestMeasurement.thigh}</span></div>}</div> : <div className="text-slate-400">אין מדידות עדיין.</div>}</Card>
-        <Card className="p-6"><div className="flex items-center justify-between mb-4"><h3 className="text-2xl font-black italic">תמונות גוף</h3><Camera className="text-pink-400" /></div><div className="grid grid-cols-3 gap-3">{latestPhotos.length ? latestPhotos.map((photo) => <div key={photo.id} className="space-y-2"><SafeImage src={photo.imageUrl} alt={photo.note || "body progress"} className="w-full h-28 rounded-2xl object-cover" /><div className="text-xs text-slate-400">{photo.note || "ללא הערה"}</div></div>) : <div className="text-slate-400 col-span-3">אין תמונות גוף עדיין.</div>}</div></Card>
-      </div>
-
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4"><Cpu className="text-teal-400" /><h3 className="text-2xl font-black italic">המלצות AI</h3></div>
-        <div className="space-y-3">{NUTRITION_SUGGESTIONS[nutritionProfile.goal].map((tip) => <div key={tip} className="bg-black/30 border border-white/5 rounded-2xl px-4 py-3 text-slate-200">{tip}</div>)}</div>
-      </Card>
+      <Card className="p-6"><div className="flex items-center gap-3 mb-4"><Weight className="text-amber-400" /><h3 className="text-2xl font-black italic">בניית תפריט יומי</h3></div><div className="space-y-3">{APEX_MEALS[nutritionProfile.goal].map((meal) => <div key={meal} className="bg-black/30 border border-white/5 rounded-2xl px-4 py-3 text-slate-200">{meal}</div>)}</div><div className="mt-6"><Btn variant="premium" onClick={() => setQuickAddMenuOpen(true)}><Plus size={16} /> הוספה מהירה</Btn></div></Card>
     </motion.div>
   );
-
 
   const renderCardio = () => (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-8">
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4"><HeartPulse className="text-orange-400" /><h2 className="text-3xl md:text-4xl font-black italic">מרכז אירובי חכם</h2></div>
-        <div className="text-slate-300 leading-7">סקשן נפרד לאירובי עם חישובים לפי גיל, משקל, גובה, מטרה ורמת פעילות. המטרה כאן היא לא רק לשרוף קלוריות, אלא לבנות סיבולת, התאוששות ובריאות לב-ריאה.</div>
-      </Card>
-
+      <Card className="p-6"><h2 className="text-3xl md:text-4xl font-black italic">מרכז אירובי חכם</h2><div className="text-slate-300 mt-4">סקשן נפרד לאירובי מותאם אישית.</div></Card>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">Zone 2 שבועי</div><div className="text-3xl font-black italic text-orange-400">{cardioPlan.zone2Minutes} דק׳</div><div className="text-xs text-slate-400 mt-2">קצב שבו אפשר לדבר אבל לא לשיר.</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">HIIT שבועי</div><div className="text-3xl font-black italic text-rose-400">{cardioPlan.hiitMinutes} דק׳</div><div className="text-xs text-slate-400 mt-2">רק כתוספת, לא כבסיס היחיד.</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">צעדים מומלצים</div><div className="text-3xl font-black italic text-cyan-400">{cardioPlan.walkingSteps}</div><div className="text-xs text-slate-400 mt-2">עוזר גם בהתאוששות וגם בהוצאה אנרגטית.</div></Card>
-        <Card className="p-5"><div className="text-xs text-slate-500 mb-1">כמות יחידות</div><div className="text-2xl font-black italic text-emerald-400">{cardioPlan.recommendedSessions}</div><div className="text-xs text-slate-400 mt-2">מותאם למטרה הנוכחית שלך.</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500">Zone 2 שבועי</div><div className="text-3xl font-black italic text-orange-400">{cardioPlan.zone2Minutes} דק׳</div></Card>
+        <Card className="p-5"><div className="text-xs text-slate-500">HIIT שבועי</div><div className="text-3xl font-black italic text-rose-400">{cardioPlan.hiitMinutes} דק׳</div></Card>
       </div>
-
-      <div className="grid lg:grid-cols-3 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-4"><Target className="text-orange-400" /><h3 className="text-2xl font-black italic">פוקוס שבועי</h3></div>
-          <div className="text-slate-300 leading-relaxed">{cardioPlan.weeklyFocus}</div>
-        </Card>
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-4"><Flame className="text-rose-400" /><h3 className="text-2xl font-black italic">המלצת ביצוע</h3></div>
-          <div className="text-slate-300 leading-relaxed">{cardioPlan.paceTip}</div>
-        </Card>
-        <Card className="p-6">
-          <div className="flex items-center gap-3 mb-4"><Sparkles className="text-cyan-400" /><h3 className="text-2xl font-black italic">רעיונות לאירובי</h3></div>
-          <div className="space-y-3">
-            {["הליכה בשיפוע 20-40 דקות", "אופניים בקצב קבוע", "חתירה לסבבים קצרים", "אינטרוולים של 30/60", "הליכה ארוכה ביום התאוששות"].map((tip) => (
-              <div key={tip} className="bg-black/30 border border-white/5 rounded-2xl px-4 py-3 text-slate-200">{tip}</div>
-            ))}
-          </div>
-        </Card>
-      </div>
-
-      <Card className="p-6">
-        <div className="flex items-center gap-3 mb-4"><CalendarDays className="text-emerald-400" /><h3 className="text-2xl font-black italic">חלוקה מומלצת לשבוע</h3></div>
-        <div className="grid md:grid-cols-2 xl:grid-cols-4 gap-4">
-          {[
-            { title: "יום התאוששות", text: "20-30 דקות הליכה מהירה או אופניים קלים." },
-            { title: "Zone 2", text: "35-45 דקות בקצב אחיד ונשלט." },
-            { title: "HIIT", text: "8-12 סבבים קצרים, לא אחרי יום רגליים קשה." },
-            { title: "NEAT", text: "עוד צעדים במהלך היום, מדרגות, והליכות קצרות." },
-          ].map((item) => (
-            <Card key={item.title} className="p-4 bg-black/20 border-white/5">
-              <div className="font-black italic text-lg">{item.title}</div>
-              <div className="text-slate-400 mt-2 text-sm leading-6">{item.text}</div>
-            </Card>
-          ))}
-        </div>
-      </Card>
     </motion.div>
   );
 
- return (
-  <>
-    <ScreenFlash show={flash} />
-
-    <AnimatePresence>
-      {toast && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          className="fixed top-6 left-1/2 -translate-x-1/2 z-[900] bg-slate-900/95 border border-teal-500/30 rounded-[1.2rem] px-5 py-3 text-white"
-        >
-          <div className="flex items-center gap-2">
-            <CheckCircle2 size={16} className="text-teal-400" />
-            <span className="font-bold">{toast}</span>
+  return (
+    <>
+      <ScreenFlash show={flash} />
+      <AnimatePresence>{toast && <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }} className="fixed top-6 left-1/2 -translate-x-1/2 z-[900] bg-slate-900/95 border border-teal-500/30 rounded-[1.2rem] px-5 py-3 text-white"><div className="flex items-center gap-2"><CheckCircle2 size={16} className="text-teal-400" /><span className="font-bold">{toast}</span></div></motion.div>}</AnimatePresence>
+      {askAIExercise && <AskAIModal exercise={askAIExercise} logs={logs} onClose={() => setAskAIExercise(null)} onAdd={() => { addExerciseToSession(askAIExercise); setAskAIExercise(null); }} />}
+      <WorkoutListModal open={showWorkoutList} sessionList={sessionList} onClose={() => setShowWorkoutList(false)} onRemove={(index) => setSessionList((prev) => prev.filter((_, i) => i !== index))} />
+      <QuickAddNutritionModal open={quickAddMenuOpen} onClose={() => setQuickAddMenuOpen(false)} onAddEntry={addNutritionEntry} onAddWater={addWater} onAddMeasurement={addMeasurement} onAddPhoto={addPhoto} />
+      <AnimatePresence>
+        {showNamePrompt && (
+          <div className="fixed inset-0 z-[950] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+            <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="w-full max-w-md bg-slate-900 border border-white/10 rounded-[2rem] p-6">
+              <div className="text-2xl font-bold text-white mb-2">ברוך הבא</div>
+              <input value={userName} onChange={(e) => setUserName(e.target.value)} placeholder="השם שלך" className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none text-teal-400 mb-4 text-right" />
+              <Btn variant="premium" className="w-full" disabled={!userName.trim()} onClick={() => setShowNamePrompt(false)}>שמור</Btn>
+            </motion.div>
           </div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+        )}
+      </AnimatePresence>
 
-    {askAIExercise && (
-      <AskAIModal
-        exercise={askAIExercise}
-        logs={logs}
-        onClose={() => setAskAIExercise(null)}
-        onAdd={() => {
-          addExerciseToSession(askAIExercise);
-          setAskAIExercise(null);
-        }}
-      />
-    )}
-<WorkoutListModal
-  open={showWorkoutList}
-  sessionList={sessionList}
-  onClose={() => setShowWorkoutList(false)}
-  onRemove={(index) => {
-    setSessionList((prev) => prev.filter((_, i) => i !== index));
-  }}
-/>
-    <QuickAddNutritionModal
-      open={quickAddMenuOpen}
-      onClose={() => setQuickAddMenuOpen(false)}
-      onAddEntry={addNutritionEntry}
-      onAddWater={addWater}
-      onAddMeasurement={addMeasurement}
-      onAddPhoto={addPhoto}
-    />
+      <div className="min-h-screen bg-[#020617] text-slate-100 overflow-x-hidden" dir="rtl">
+        <header className="relative z-10 max-w-7xl mx-auto px-4 pt-8 pb-6 flex flex-col lg:flex-row justify-between items-start gap-6">
+          <div className="space-y-3">
+            <div className="flex items-center gap-3">
+              <LogoMark />
+              <h1 className="text-[2.2rem] sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none break-words">Betesh<span className="text-teal-500">Training</span></h1>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <Btn variant={tabButtonVariant(tab, "dashboard")} onClick={() => navigateTab("dashboard")}><Home size={16} /> בית</Btn>
+            <Btn variant={tabButtonVariant(tab, "vault")} onClick={() => navigateTab("vault")}><LayoutGrid size={16} /> מאגר</Btn>
+            <Btn variant={tabButtonVariant(tab, "stats")} onClick={() => navigateTab("stats")}><BarChart3 size={16} /> ביצועים</Btn>
+            <Btn variant={tabButtonVariant(tab, "nutrition")} onClick={() => navigateTab("nutrition")}><HeartPulse size={16} /> תזונה</Btn>
+            <Btn variant={tabButtonVariant(tab, "cardio")} onClick={() => navigateTab("cardio")}><Flame size={16} /> אירובי</Btn>
+          </div>
+        </header>
 
-    <AnimatePresence>
-      {showNamePrompt && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[950] bg-black/80 backdrop-blur-md flex items-center justify-center p-4"
-        >
-          <motion.div
-            initial={{ scale: 0.9, y: 20 }}
-            animate={{ scale: 1, y: 0 }}
-            className="w-full max-w-md bg-slate-900 border border-white/10 rounded-[2rem] p-6"
-          >
-<div className="text-2xl font-bold text-white mb-2">ברוך הבא</div>
-<div className="text-sm font-medium text-slate-400 mb-6">איך לקרוא לך באפליקציה?</div>
-          <input
-  value={userName}
-  onChange={(e) => setUserName(e.target.value)}
-  onKeyDown={(e) => {
-    if (e.key === "Enter" && userName.trim()) {
-      localStorage.setItem("reacher_user_name_v1", userName.trim());
-      setShowNamePrompt(false);
-    }
-  }}
-  placeholder="השם שלך"
-  className="w-full h-12 bg-black/30 border border-white/10 rounded-2xl px-4 outline-none 
-             text-teal-400                
-             placeholder:text-slate-500      
-             text-right                   
-             caret-teal-400               
-             mb-4 focus:border-teal-400 focus:ring-2 focus:ring-teal-400/20 transition-all"
-/>
-            <Btn
-              variant="premium"
-              className={`w-full ${!userName.trim() ? "opacity-50 cursor-not-allowed" : ""}`}
-              disabled={!userName.trim()}
-              onClick={() => {
-                if (!userName.trim()) return;
-                localStorage.setItem("betesh_user_name", userName.trim());
-                setShowNamePrompt(false);
-              }}
-            >
-              שמור
-            </Btn>
+        <main className="relative z-10 max-w-7xl mx-auto px-4 pb-56">
+          {tab === "dashboard" && renderDashboard()}
+          {tab === "vault" && renderVault()}
+          {tab === "stats" && renderStats()}
+          {tab === "nutrition" && renderNutrition()}
+          {tab === "cardio" && renderCardio()}
+        </main>
+
+        <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md px-4">
+          <motion.div initial={{ y: 100 }} animate={{ y: 0 }} className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 rounded-[2rem] flex justify-around items-center shadow-2xl">
+            {[
+              { id: "dashboard", icon: Home, label: "בית", active: "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)]" },
+              { id: "vault", icon: Dumbbell, label: "מאגר", active: "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)]" },
+              { id: "stats", icon: BarChart3, label: "ביצועים", active: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.45)]" },
+              { id: "nutrition", icon: UtensilsCrossed, label: "תזונה", active: "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.45)]" },
+              { id: "cardio", icon: Footprints, label: "אירובי", active: "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.45)]" },
+            ].map((item) => (
+              <button key={item.id} onClick={() => navigateTab(item.id as MainTab)} className={`min-w-[64px] px-2 py-2 rounded-[1.2rem] transition-all duration-500 flex flex-col items-center gap-1 ${tab === item.id ? `${item.active} scale-110` : "text-slate-600 hover:text-white"}`}>
+                <item.icon size={22} />
+                <span className="text-[11px] font-bold">{item.label}</span>
+              </button>
+            ))}
           </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
-
-    <div className="min-h-screen bg-[#020617] text-slate-100 overflow-x-hidden" dir="rtl">
-      <div className="fixed inset-0 pointer-events-none z-0">
-        <div className="absolute top-[-20%] left-[-10%] w-full h-full bg-teal-500/5 blur-[150px] rounded-full animate-pulse" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-full h-full bg-indigo-500/5 blur-[150px] rounded-full" />
-      </div>
-
-      <header className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pt-8 md:pt-12 pb-6 md:pb-8 flex flex-col lg:flex-row justify-between items-start gap-6">
-        <div className="space-y-3">
-          <div className="flex flex-wrap items-center gap-3">
-            <LogoMark />
-            <h1 className="text-[2.2rem] sm:text-5xl md:text-7xl font-black italic uppercase tracking-tighter leading-none break-words">
-              Betesh<span className="text-teal-500">Training</span>
-            </h1>
-          </div>
-          <div className="text-slate-400 font-bold text-xs sm:text-sm max-w-full">
-            Training, nutrition, cardio, recovery, progression.
-          </div>
         </div>
-
-        <div className="flex flex-wrap gap-3">
-          <Btn variant={tabButtonVariant(tab, "dashboard")} onClick={() => navigateTab("dashboard")}>
-            <Home size={16} /> בית
-          </Btn>
-          <Btn variant={tabButtonVariant(tab, "vault")} onClick={() => navigateTab("vault")}>
-            <LayoutGrid size={16} /> מאגר תרגילים
-          </Btn>
-          <Btn variant={tabButtonVariant(tab, "stats")} onClick={() => navigateTab("stats")}>
-            <BarChart3 size={16} /> ביצועים
-          </Btn>
-          <Btn variant={tabButtonVariant(tab, "nutrition")} onClick={() => navigateTab("nutrition")}>
-            <HeartPulse size={16} /> תזונה
-          </Btn>
-          <Btn variant={tabButtonVariant(tab, "cardio")} onClick={() => navigateTab("cardio")}>
-            <Flame size={16} /> אירובי
-          </Btn>
-          <Btn
-            variant="youtube"
-            onClick={() => window.open("https://www.youtube.com/", "_blank", "noopener,noreferrer")}
-          >
-            <Youtube size={16} /> YouTube
-          </Btn>
-          <Btn
-            variant="spotify"
-            onClick={() => window.open("https://open.spotify.com/", "_blank", "noopener,noreferrer")}
-          >
-            <SpotifyIcon className="w-4 h-4" /> ספוטיפיי
-          </Btn>
-        </div>
-      </header>
-
-      <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 pb-56 md:pb-40">
-        {tab === "dashboard" && renderDashboard()}
-        {tab === "vault" && renderVault()}
-        {tab === "stats" && renderStats()}
-        {tab === "nutrition" && renderNutrition()}
-        {tab === "cardio" && renderCardio()}
       </div>
+    </>
+  );
+}
 
-     <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md md:max-w-lg px-4 md:px-8">
-  <motion.div
-    initial={{ y: 100 }}
-    animate={{ y: 0 }}
-    className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 md:p-4 rounded-[2rem] md:rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]"
-  >
-    {[
-      { id: "dashboard", icon: Home, label: "בית", active: "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)]" },
-      { id: "vault", icon: Dumbbell, label: "מאגר", active: "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)]" },
-      { id: "stats", icon: BarChart3, label: "ביצועים", active: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.45)]" },
-      { id: "nutrition", icon: UtensilsCrossed, label: "תזונה", active: "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.45)]" },
-      { id: "cardio", icon: Footprints, label: "אירובי", active: "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.45)]" },
-    ].map((item) => (
-      <button
-        key={item.id}
-        onClick={() => navigateTab(item.id as MainTab)}
-        className={`min-w-[64px] px-2 py-2 rounded-[1.2rem] transition-all duration-500 flex flex-col items-center gap-1 ${
-          tab === item.id ? `${item.active} scale-110` : "text-slate-600 hover:text-white"
-        }`}
-      >
-        <item.icon size={22} />
-        <span className="text-[11px] font-bold">{item.label}</span>
-      </button>
-    ))}
-  </motion.div>
-</div> 
-      );
-      }
 export default ReacherApp;
