@@ -1,5 +1,5 @@
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, Footprints, UtensilsCrossed } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   BarChart3,
@@ -510,13 +510,11 @@ function BodyMap({
     y,
     label,
     muscle,
-    side = "front",
   }: {
     x: number;
     y: number;
     label: string;
     muscle: MuscleGroup;
-    side?: "front" | "back";
   }) => {
     const active = activeMuscle === muscle;
 
@@ -527,9 +525,11 @@ function BodyMap({
         style={{ left: `${x}%`, top: `${y}%` }}
       >
         <span
-          className={`absolute ${
-            side === "front" ? "-right-16" : "-left-16"
-          } top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${
+          className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap text-[10px] font-black px-2 py-1 rounded-full transition-all ${
+            x < 50
+              ? "-left-16"
+              : "-right-16"
+          } ${
             active
               ? "bg-teal-500 text-white opacity-100 scale-110"
               : "bg-black/80 text-teal-300 opacity-0 group-hover:opacity-100 border border-white/10"
@@ -551,40 +551,43 @@ function BodyMap({
 
   return (
     <Card className="p-4 relative overflow-hidden bg-slate-950/80 border-white/10">
-      <div className="flex items-center gap-3 mb-4 px-2">
-        <User className="text-teal-400" size={20} />
+      <div className="flex items-center justify-between mb-4 px-2">
         <h3 className="text-xl font-black italic text-white uppercase tracking-tight">
           Anatomy Map
         </h3>
+        <User className="text-teal-400" size={20} />
       </div>
 
       <div className="relative h-[560px] rounded-[2rem] bg-black border border-white/5 overflow-hidden">
-        <img
-          src={bodyImage}
-          alt="Anatomy map"
-          className="absolute inset-0 w-full h-full object-contain opacity-95"
-        />
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="relative w-[78%] h-[92%] max-w-[900px]">
+            <img
+              src={bodyImage}
+              alt="Anatomy map"
+              className="absolute inset-0 w-full h-full object-contain opacity-95"
+            />
+
+            {/* Front */}
+            <Dot x={27} y={21} label="כתפיים" muscle="Shoulders" />
+            <Dot x={33} y={24} label="חזה" muscle="Chest" />
+            <Dot x={23} y={39} label="ידיים" muscle="Arms" />
+            <Dot x={35} y={38} label="ליבה" muscle="Core" />
+            <Dot x={33} y={55} label="רגליים" muscle="Legs" />
+
+            {/* Back */}
+            <Dot x={63} y={21} label="כתפיים" muscle="Shoulders" />
+            <Dot x={68} y={24} label="גב" muscle="Back" />
+            <Dot x={77} y={39} label="ידיים" muscle="Arms" />
+            <Dot x={66} y={40} label="ישבן" muscle="Glutes" />
+            <Dot x={66} y={55} label="רגליים" muscle="Legs" />
+          </div>
+        </div>
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/10 via-transparent to-black/10 pointer-events-none" />
-
-        {/* FRONT */}
-        <Dot x={17} y={22} label="כתפיים" muscle="Shoulders" side="front" />
-        <Dot x={24} y={24} label="חזה" muscle="Chest" side="front" />
-        <Dot x={12} y={38} label="ידיים" muscle="Arms" side="front" />
-        <Dot x={28} y={39} label="ליבה" muscle="Core" side="front" />
-        <Dot x={24} y={55} label="רגליים" muscle="Legs" side="front" />
-
-        {/* BACK */}
-        <Dot x={56} y={22} label="כתפיים" muscle="Shoulders" side="back" />
-        <Dot x={67} y={24} label="גב" muscle="Back" side="back" />
-        <Dot x={77} y={38} label="ידיים" muscle="Arms" side="back" />
-        <Dot x={63} y={39} label="ישבן" muscle="Glutes" side="back" />
-        <Dot x={63} y={55} label="רגליים" muscle="Legs" side="back" />
       </div>
     </Card>
   );
 }
-
 
 function AskAIModal({ exercise, logs, onClose, onAdd }: { exercise: Exercise; logs: SetRecord[]; onClose: () => void; onAdd: () => void }) {
   const notes = useMemo(() => getExerciseAiNotes(exercise, logs), [exercise, logs]);
@@ -918,6 +921,201 @@ function getWorkoutProgressText(sessionList: Exercise[], logs: SetRecord[]) {
   if (!total) return "עוד לא נבנה אימון";
   return `${done}/${total} תרגילים הושלמו`;
 }
+
+function ProgressDonut({
+  value,
+  total,
+  label,
+  sublabel,
+  size = 120,
+  stroke = 12,
+}: {
+  value: number;
+  total: number;
+  label: string;
+  sublabel?: string;
+  size?: number;
+  stroke?: number;
+}) {
+  const safeTotal = Math.max(total, 1);
+  const pct = Math.max(0, Math.min(100, Math.round((value / safeTotal) * 100)));
+  const inner = size - stroke * 2;
+
+  return (
+    <div className="flex flex-col items-center justify-center">
+      <div
+        className="relative rounded-full flex items-center justify-center"
+        style={{
+          width: size,
+          height: size,
+          background: `conic-gradient(rgb(45 212 191) ${pct * 3.6}deg, rgba(255,255,255,0.08) 0deg)`,
+        }}
+      >
+        <div
+          className="rounded-full bg-slate-950/95 flex flex-col items-center justify-center text-center"
+          style={{
+            width: inner,
+            height: inner,
+          }}
+        >
+          <div className="text-2xl font-black italic text-white">{pct}%</div>
+          <div className="text-[11px] text-slate-400">{label}</div>
+        </div>
+      </div>
+
+      {sublabel && <div className="mt-2 text-xs text-slate-400">{sublabel}</div>}
+    </div>
+  );
+}
+
+function ExerciseSpotlightCard({
+  exercise,
+  onAdd,
+  onAskAI,
+}: {
+  exercise: Exercise;
+  onAdd: () => void;
+  onAskAI: () => void;
+}) {
+  return (
+    <Card className="overflow-hidden">
+      <div className="relative h-52">
+        <SafeImage
+          src={getExerciseImage(exercise)}
+          alt={exercise.name}
+          className="w-full h-full object-cover opacity-60"
+          fallbackSrc={muscleGroupImages[exercise.muscleGroup]}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent" />
+
+        <div className="absolute bottom-0 left-0 right-0 p-5">
+          <div className="text-xs uppercase tracking-[0.25em] text-teal-300 mb-2">
+            spotlight
+          </div>
+          <div className="text-2xl font-black italic text-white">{exercise.name}</div>
+          <div className="text-sm text-slate-300 mt-1">
+            {muscleHebrew[exercise.muscleGroup]} · {categoryHebrew[exercise.category]}
+          </div>
+          <div className="text-sm text-slate-400 mt-2 line-clamp-2">{exercise.he}</div>
+
+          <div className="flex gap-2 mt-4 flex-wrap">
+            <Btn variant="premium" className="h-10 px-4" onClick={onAdd}>
+              <Plus size={14} /> הוסף לאימון
+            </Btn>
+            <Btn variant="outline" className="h-10 px-4" onClick={onAskAI}>
+              <Sparkles size={14} /> askAI
+            </Btn>
+          </div>
+        </div>
+      </div>
+    </Card>
+  );
+}
+
+function WorkoutListModal({
+  open,
+  sessionList,
+  onClose,
+  onRemove,
+}: {
+  open: boolean;
+  sessionList: Exercise[];
+  onClose: () => void;
+  onRemove: (index: number) => void;
+}) {
+  if (!open) return null;
+
+  return (
+    <div className="fixed inset-0 z-[880] bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.92 }}
+        animate={{ opacity: 1, scale: 1 }}
+        className="w-full max-w-2xl bg-slate-900 border border-white/10 rounded-[2rem] p-6 max-h-[80vh] overflow-y-auto"
+      >
+        <div className="flex items-center justify-between mb-5">
+          <div>
+            <div className="text-xs uppercase tracking-[0.25em] text-teal-400 mb-1">
+              workout list
+            </div>
+            <div className="text-2xl font-black italic text-white">האימון שלי</div>
+          </div>
+
+          <button
+            onClick={onClose}
+            className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center text-white hover:bg-rose-500/20"
+          >
+            <X size={18} />
+          </button>
+        </div>
+
+        <div className="space-y-3">
+          {sessionList.length ? (
+            sessionList.map((ex, index) => (
+              <div
+                key={`${ex.id}-${index}`}
+                className="bg-black/30 border border-white/5 rounded-2xl p-4 flex items-center justify-between gap-3"
+              >
+                <div>
+                  <div className="font-black italic text-white">{ex.name}</div>
+                  <div className="text-xs text-slate-400">
+                    {muscleHebrew[ex.muscleGroup]} · {ex.sets} סטים · {ex.reps}
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => onRemove(index)}
+                  className="p-2 rounded-xl hover:bg-rose-500/10"
+                >
+                  <Trash2 size={16} className="text-rose-400" />
+                </button>
+              </div>
+            ))
+          ) : (
+            <div className="text-slate-400">עוד לא סימנת תרגילים לאימון.</div>
+          )}
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+function getNextWorkoutDay(selectedDay: DayKey) {
+  const index = DAY_SPLITS.findIndex((d) => d.id === selectedDay);
+  const nextIndex = index === DAY_SPLITS.length - 1 ? 0 : index + 1;
+  return DAY_SPLITS[nextIndex];
+}
+
+function getCompletedExercisesCount(sessionList: Exercise[], logs: SetRecord[]) {
+  const sessionIds = new Set(sessionList.map((ex) => ex.id));
+  const doneIds = new Set(logs.filter((log) => sessionIds.has(log.exerciseId)).map((log) => log.exerciseId));
+  return doneIds.size;
+}
+
+function getRemainingByMuscle(sessionList: Exercise[], logs: SetRecord[]) {
+  const doneIds = new Set(logs.map((log) => log.exerciseId));
+
+  const grouped = sessionList.reduce<Record<string, { total: number; done: number }>>((acc, ex) => {
+    if (!acc[ex.muscleGroup]) {
+      acc[ex.muscleGroup] = { total: 0, done: 0 };
+    }
+
+    acc[ex.muscleGroup].total += 1;
+
+    if (doneIds.has(ex.id)) {
+      acc[ex.muscleGroup].done += 1;
+    }
+
+    return acc;
+  }, {});
+
+  return Object.entries(grouped).map(([muscle, data]) => ({
+    muscle: muscle as MuscleGroup,
+    total: data.total,
+    done: data.done,
+    left: Math.max(0, data.total - data.done),
+  }));
+}
+
 function ReacherApp() {
   const [tab, setTab] = useState<MainTab>("dashboard");
   const [selectedDay, setSelectedDay] = useState<DayKey>("sun");
@@ -927,6 +1125,8 @@ function ReacherApp() {
   const [askAIExercise, setAskAIExercise] = useState<Exercise | null>(null);
   const [toast, setToast] = useState("");
   const [flash, setFlash] = useState(false);
+  const [showWorkoutList, setShowWorkoutList] = useState(false);
+const [spotlightExercise, setSpotlightExercise] = useState<Exercise | null>(null);
   const [plannerMode, setPlannerMode] = useState<"default" | "custom">(() => (typeof window !== "undefined" && (window.localStorage.getItem("planner_mode_v2") as "default" | "custom")) || "default");
   const [customWeek, setCustomWeek] = useState<Record<DayKey, string[]>>(() => {
     if (typeof window === "undefined") return { sun: [], mon: [], tue: [], wed: [], thu: [], fri: [] };
@@ -1076,6 +1276,15 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
   }, [plannerMode, selectedDay, customWeek]);
 
   const currentExercise = sessionList[currentIndex];
+  const nextWorkout = useMemo(() => getNextWorkoutDay(selectedDay), [selectedDay]);
+const completedExercises = useMemo(
+  () => getCompletedExercisesCount(sessionList, logs),
+  [sessionList, logs]
+);
+const remainingByMuscle = useMemo(
+  () => getRemainingByMuscle(sessionList, logs),
+  [sessionList, logs]
+);
   const sessionVolume = useMemo(() => {
     const ids = new Set(sessionList.map((item) => item.id));
     return logs.filter((log) => ids.has(log.exerciseId)).reduce((sum, item) => sum + item.weight * item.reps, 0);
@@ -1216,6 +1425,48 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
           <Card className="p-4 bg-black/30 border-white/10 min-w-[180px]"><div className="text-xs text-slate-500 mb-1">Nutrition score</div><div className="text-4xl font-black italic text-teal-400">{nutritionScore}</div></Card>
         </div>
       </Card>
+      <div className="grid lg:grid-cols-3 gap-6">
+  <Card className="p-6">
+    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">next workout</div>
+    <div className="text-2xl font-black italic text-teal-400">{nextWorkout.title}</div>
+    <div className="text-slate-400 mt-2">{nextWorkout.subtitle}</div>
+    <div className="text-sm text-slate-500 mt-4">{nextWorkout.nutrition}</div>
+  </Card>
+
+  <Card className="p-6 flex flex-col items-center">
+    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">session progress</div>
+    <ProgressDonut
+      value={completedExercises}
+      total={Math.max(sessionList.length, 1)}
+      label="אימון"
+      sublabel={`${completedExercises}/${sessionList.length || 0} תרגילים`}
+    />
+  </Card>
+
+  <Card className="p-6">
+    <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-4">muscle progress</div>
+    <div className="grid grid-cols-2 gap-4">
+      {remainingByMuscle.length ? (
+        remainingByMuscle.map((item) => (
+          <div key={item.muscle} className="flex flex-col items-center">
+            <ProgressDonut
+              value={item.done}
+              total={Math.max(item.total, 1)}
+              label={muscleHebrew[item.muscle]}
+              size={86}
+              stroke={10}
+            />
+            <div className="text-[11px] text-slate-400 mt-2">
+              נשאר: {item.left}
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="text-sm text-slate-400 col-span-2">אין עדיין שרירים באימון שבנית</div>
+      )}
+    </div>
+  </Card>
+</div>
       <div className="grid md:grid-cols-3 gap-4">
   <Card className="p-5">
     <div className="text-[10px] uppercase tracking-[0.25em] text-slate-500 mb-2">
@@ -1389,6 +1640,53 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
     }}
   />
 </Card>
+     <Card className="p-5">
+  <div className="flex items-center justify-between mb-4">
+    <div>
+      <div className="text-[10px] uppercase tracking-[0.25em] text-teal-400 mb-1">
+        quick selection
+      </div>
+      <div className="text-2xl font-black italic text-white">בחירה מהירה לפי גוף</div>
+    </div>
+
+    <div className="flex gap-2">
+      <Btn variant="outline" className="h-10" onClick={() => setShowWorkoutList(true)}>
+        צפה באימון
+      </Btn>
+      <Btn
+        variant="outline"
+        className="h-10"
+        onClick={() => {
+          setSelectedMuscle("All");
+          setSelectedSector("All");
+        }}
+      >
+        איפוס
+      </Btn>
+    </div>
+  </div>
+
+  <BodyMap
+    activeMuscle={selectedMuscle}
+    onSelect={(muscle) => {
+      setSelectedMuscle(muscle);
+      setSelectedSector("All");
+
+      const firstMatch = EXERCISES.find((ex) => ex.muscleGroup === muscle);
+      if (firstMatch) {
+        setSpotlightExercise(firstMatch);
+      }
+    }}
+  />
+</Card>
+
+{spotlightExercise && (
+  <ExerciseSpotlightCard
+    exercise={spotlightExercise}
+    onAdd={() => addExerciseToSession(spotlightExercise)}
+    onAskAI={() => setAskAIExercise(spotlightExercise)}
+  />
+)}
       <div className="grid md:grid-cols-[1fr_auto] gap-4">
         <div className="relative">
           <Search className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500" size={18} />
@@ -1660,7 +1958,14 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
         }}
       />
     )}
-
+<WorkoutListModal
+  open={showWorkoutList}
+  sessionList={sessionList}
+  onClose={() => setShowWorkoutList(false)}
+  onRemove={(index) => {
+    setSessionList((prev) => prev.filter((_, i) => i !== index));
+  }}
+/>
     <QuickAddNutritionModal
       open={quickAddMenuOpen}
       onClose={() => setQuickAddMenuOpen(false)}
@@ -1777,53 +2082,30 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
         {tab === "cardio" && renderCardio()}
       </div>
 
-      <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md md:max-w-lg px-4 md:px-8">
-        <motion.div
-          initial={{ y: 100 }}
-          animate={{ y: 0 }}
-          className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 md:p-5 rounded-[2rem] md:rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]"
-        >
-          {[
-            {
-              id: "dashboard",
-              icon: Home,
-              active: "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)]",
-            },
-            {
-              id: "vault",
-              icon: LayoutGrid,
-              active: "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)]",
-            },
-            {
-              id: "stats",
-              icon: BarChart3,
-              active: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.45)]",
-            },
-            {
-              id: "nutrition",
-              icon: HeartPulse,
-              active: "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.45)]",
-            },
-            {
-              id: "cardio",
-              icon: Flame,
-              active: "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.45)]",
-            },
-          ].map((item) => (
-            <button
-              key={item.id}
-              onClick={() => navigateTab(item.id as MainTab)}
-              className={`p-3 md:p-5 rounded-[1.2rem] transition-all duration-500 relative ${
-                tab === item.id ? `${item.active} scale-110` : "text-slate-600 hover:text-white"
-              }`}
-            >
-              <item.icon size={24} />
-            </button>
-          ))}
-        </motion.div>
-      </div>
-    </div>
-  </>
-);
-}
+     <div className="fixed bottom-4 md:bottom-10 left-1/2 -translate-x-1/2 z-[200] w-full max-w-md md:max-w-lg px-4 md:px-8">
+  <motion.div
+    initial={{ y: 100 }}
+    animate={{ y: 0 }}
+    className="bg-[#0f172a]/90 backdrop-blur-3xl border border-white/10 p-3 md:p-4 rounded-[2rem] md:rounded-[3rem] flex justify-around items-center shadow-[0_40px_100px_rgba(0,0,0,0.9)]"
+  >
+    {[
+      { id: "dashboard", icon: Home, label: "בית", active: "bg-emerald-500 text-slate-950 shadow-[0_0_30px_rgba(34,197,94,0.45)]" },
+      { id: "vault", icon: Dumbbell, label: "מאגר", active: "bg-pink-500 text-white shadow-[0_0_30px_rgba(236,72,153,0.45)]" },
+      { id: "stats", icon: BarChart3, label: "ביצועים", active: "bg-gradient-to-r from-violet-500 to-cyan-500 text-white shadow-[0_0_30px_rgba(6,182,212,0.45)]" },
+      { id: "nutrition", icon: UtensilsCrossed, label: "תזונה", active: "bg-teal-500 text-slate-950 shadow-[0_0_30px_rgba(20,184,166,0.45)]" },
+      { id: "cardio", icon: Footprints, label: "אירובי", active: "bg-orange-500 text-white shadow-[0_0_30px_rgba(249,115,22,0.45)]" },
+    ].map((item) => (
+      <button
+        key={item.id}
+        onClick={() => navigateTab(item.id as MainTab)}
+        className={`min-w-[64px] px-2 py-2 rounded-[1.2rem] transition-all duration-500 flex flex-col items-center gap-1 ${
+          tab === item.id ? `${item.active} scale-110` : "text-slate-600 hover:text-white"
+        }`}
+      >
+        <item.icon size={22} />
+        <span className="text-[11px] font-bold">{item.label}</span>
+      </button>
+    ))}
+  </motion.div>
+</div> 
 export default ReacherApp;
