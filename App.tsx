@@ -3744,7 +3744,7 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
         <Card className="p-6">
           <div className="flex items-center gap-3 mb-4"><Bot className="text-teal-400" /><h3 className="text-2xl font-black italic">AI Nutrition Coach</h3></div>
           <div className="space-y-3">
-            <textarea value={nutritionAiPrompt} onChange={(e) => setNutritionAiPrompt(e.target.value)} className="w-full h-24 bg-black/30 border border-white/10 rounded-2xl p-4 outline-none resize-none" />
+            <textarea value={nutritionAiPrompt} onChange={(e) => setNutritionAiPrompt(e.target.value)} className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-4 outline-none resize-none text-white placeholder:text-slate-400 caret-teal-400 focus:border-teal-500 transition-all shadow-inner" />
             <div className="grid grid-cols-2 gap-3"><Btn variant="premium" className="w-full" onClick={() => setNutritionAiReply(`${generateNutritionCoachReply({
               profile: nutritionProfile,
               calories: totalNutritionCalories,
@@ -3756,7 +3756,7 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
               steps: dailySteps,
               nextMealLabel,
             })} שאלה: ${nutritionAiPrompt}`)}>קבל תשובת AI</Btn><Btn variant="outline" className="w-full" onClick={() => setShowNutritionChat(true)}>פתח צ׳אט מלא</Btn></div>
-            <Card className="p-4 bg-black/30 border-white/5">
+            <Card className="w-full h-32 bg-black/40 border border-white/10 rounded-2xl p-4 outline-none resize-none text-white placeholder:text-slate-400 caret-teal-400 focus:border-teal-500 transition-all shadow-inner">
               <div className="text-sm leading-7 text-slate-200">{nutritionAiReply || "כתוב שאלה או פתח צ׳אט מלא לייעוץ מתמשך."}</div>
             </Card>
           </div>
