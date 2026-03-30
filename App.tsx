@@ -2803,8 +2803,6 @@ const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, lo
 
   const latestPhotos = bodyPhotos.slice(0, 3);
   const { mealMap, workoutMap, measurementMap, photoMap } = useMemo(() => buildCalendarMaps(nutritionEntries, history, bodyMeasurements, bodyPhotos), [nutritionEntries, history, bodyMeasurements, bodyPhotos]);
-  const mealDates = useMemo(() => new Set(Array.from(mealMap.keys())), [mealMap]);
-  const workoutDates = useMemo(() => new Set(Array.from(workoutMap.keys())), [workoutMap]);
   const mealDates = useMemo(() => new Set(nutritionEntries.map((entry) => formatDayKey(new Date(entry.createdAt)))), [nutritionEntries]);
   const workoutDates = useMemo(() => new Set(history.map((entry) => {
     const parsed = new Date(entry.date);
