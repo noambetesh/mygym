@@ -1254,7 +1254,6 @@ const profiles = {
     return () => window.clearInterval(t);
   }, [isRunning, timer]);
 
-  const nextWorkout = useMemo(() => getNextWorkoutDay(selectedDay), [selectedDay]);
 const completedExercises = useMemo(() => getCompletedExercisesCount(sessionList, logs), [sessionList, logs]);
 const remainingByMuscle = useMemo(() => getRemainingMuscleGroups(sessionList, logs), [sessionList, logs]);
 const workoutProgressText = useMemo(() => getWorkoutProgressText(sessionList, logs), [sessionList, logs]);
@@ -2108,4 +2107,6 @@ const remainingByMuscle = useMemo(
     ))}
   </motion.div>
 </div> 
+      );
+      }
 export default ReacherApp;
